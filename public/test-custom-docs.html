@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Documents Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .links {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .link-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 250px;
+        }
+        .link-card:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .link-card h3 {
+            margin: 0 0 10px 0;
+            color: #ff6b35;
+        }
+        .link-card p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+        .status {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        .status h3 {
+            margin-top: 0;
+        }
+        .status-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .status-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+        .status-icon.success {
+            background: #4caf50;
+        }
+        .status-icon.pending {
+            background: #ff9800;
+        }
+        .code-block {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 RentTix Custom Documents Feature Test Page</h1>
+        
+        <div class="info">
+            <h3>ℹ️ About This Page</h3>
+            <p>This is a test page to help you access and verify the Custom Documents feature implementation.</p>
+            <p>Since the System Setup menu might not be visible due to permissions, you can use the direct links below.</p>
+        </div>
+
+        <h2>📋 Quick Access Links</h2>
+        <div class="links">
+            <a href="/system-setup/company-details" class="link-card">
+                <h3>Company Details Page</h3>
+                <p>Direct link to the Company Details page where the Custom Documents section is located</p>
+            </a>
+            
+            <a href="/system-setup" class="link-card">
+                <h3>System Setup</h3>
+                <p>Main System Setup page with all configuration options</p>
+            </a>
+            
+            <a href="/dashboard" class="link-card">
+                <h3>Dashboard</h3>
+                <p>Return to the main dashboard</p>
+            </a>
+        </div>
+
+        <div class="status">
+            <h3>✅ Implementation Status</h3>
+            
+            <div class="status-item">
+                <div class="status-icon success"></div>
+                <strong>Backend API:</strong> 4 endpoints implemented (Upload, List, Update, Delete)
+            </div>
+            
+            <div class="status-item">
+                <div class="status-icon success"></div>
+                <strong>Database Schema:</strong> tenantCustomDocs field added to Vendor model
+            </div>
+            
+            <div class="status-item">
+                <div class="status-icon success"></div>
+                <strong>File Upload:</strong> Configured for multiple file types (PDF, DOC, DOCX, TXT, Images)
+            </div>
+            
+            <div class="status-item">
+                <div class="status-icon success"></div>
+                <strong>Frontend Component:</strong> CustomDocumentsManager created and integrated
+            </div>
+            
+            <div class="status-item">
+                <div class="status-icon success"></div>
+                <strong>Audit Trail:</strong> Complete logging for all document operations
+            </div>
+        </div>
+
+        <div class="status">
+            <h3>🔧 API Endpoints</h3>
+            <div class="code-block">
+POST   /api/vendor/custom-docs         - Upload new document
+GET    /api/vendor/custom-docs         - Get all documents
+PUT    /api/vendor/custom-docs/:docId  - Update document metadata
+DELETE /api/vendor/custom-docs/:docId  - Delete document (soft delete)
+            </div>
+        </div>
+
+        <div class="status">
+            <h3>📝 How to Test</h3>
+            <ol>
+                <li>Click on the "Company Details Page" link above</li>
+                <li>Look for the "Custom Documents" section after "Terms & Conditions"</li>
+                <li>Try uploading a document (PDF, Word, Text, or Image file)</li>
+                <li>Edit the document name or description</li>
+                <li>Delete a document to test the soft delete functionality</li>
+            </ol>
+        </div>
+
+        <div class="status">
+            <h3>🐛 Troubleshooting</h3>
+            <p>If you're getting a 401 Unauthorized error:</p>
+            <ul>
+                <li>Make sure you're logged in</li>
+                <li>Check that your authentication token is valid</li>
+                <li>Ensure your user account has vendor privileges</li>
+            </ul>
+            <p>If the page redirects to dashboard:</p>
+            <ul>
+                <li>The user might not have "System Setup" permissions</li>
+                <li>Try using the direct link to Company Details</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,192 @@
+/* Template Designer Specific Styles */
+
+/* Color Picker Enhancements */
+.sketch-picker {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 0.5rem !important;
+}
+
+/* Designer Layout Enhancements */
+.template-designer {
+  min-height: 600px;
+}
+
+.designer-sidebar {
+  position: sticky;
+  top: 0;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+.designer-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.designer-sidebar::-webkit-scrollbar-track {
+  background: #f3f4f6;
+}
+
+.designer-sidebar::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.designer-sidebar::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Section Animations */
+.design-section {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhanced Form Controls */
+.form-control {
+  transition: all 0.2s ease;
+}
+
+.form-control:hover:not(:focus) {
+  border-color: #9ca3af;
+}
+
+/* Color Preview Enhancements */
+.color-preview {
+  position: relative;
+  overflow: hidden;
+}
+
+.color-preview::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, #e5e7eb 25%, transparent 25%, transparent 75%, #e5e7eb 75%, #e5e7eb),
+              linear-gradient(45deg, #e5e7eb 25%, transparent 25%, transparent 75%, #e5e7eb 75%, #e5e7eb);
+  background-size: 10px 10px;
+  background-position: 0 0, 5px 5px;
+  z-index: -1;
+}
+
+/* Font Preview */
+select.form-control option {
+  padding: 0.5rem;
+}
+
+/* Margin Visual Guide */
+.margin-grid {
+  position: relative;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 0.375rem;
+}
+
+.margin-grid::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60%;
+  height: 80%;
+  border: 2px dashed #d1d5db;
+  pointer-events: none;
+}
+
+/* Settings Toggle Animation */
+.checkbox-group input[type="checkbox"] {
+  position: relative;
+  appearance: none;
+  width: 2.5rem;
+  height: 1.25rem;
+  background-color: #d1d5db;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.checkbox-group input[type="checkbox"]::before {
+  content: '';
+  position: absolute;
+  top: 0.125rem;
+  left: 0.125rem;
+  width: 1rem;
+  height: 1rem;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+.checkbox-group input[type="checkbox"]:checked {
+  background-color: #3b82f6;
+}
+
+.checkbox-group input[type="checkbox"]:checked::before {
+  transform: translateX(1.25rem);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  .color-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .font-size-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .color-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .margin-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Tooltip Styles */
+.form-group[title] {
+  position: relative;
+}
+
+.form-group[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background-color: #1f2937;
+  color: white;
+  font-size: 0.75rem;
+  border-radius: 0.375rem;
+  white-space: nowrap;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.form-group[title]:hover::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 1rem;
+  margin-bottom: 0.25rem;
+  border: 0.25rem solid transparent;
+  border-top-color: #1f2937;
+  z-index: 10;
+  pointer-events: none;
+}

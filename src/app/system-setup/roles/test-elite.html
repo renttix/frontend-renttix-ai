@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Roles Management System - Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .role-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .role-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+        }
+        .role-body {
+            padding: 20px;
+        }
+        .permission-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .permission-item {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #5a67d8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ Elite Role Management System</h1>
+            <p>Institutional-grade permissions with field-level control</p>
+            <a href="#" class="btn">Create New Role</a>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Roles</h3>
+                <p style="font-size: 2em; margin: 0;">5</p>
+            </div>
+            <div class="stat-card">
+                <h3>Active Roles</h3>
+                <p style="font-size: 2em; margin: 0; color: #48bb78;">4</p>
+            </div>
+            <div class="stat-card">
+                <h3>System Roles</h3>
+                <p style="font-size: 2em; margin: 0; color: #4299e1;">2</p>
+            </div>
+            <div class="stat-card">
+                <h3>Total Users</h3>
+                <p style="font-size: 2em; margin: 0; color: #805ad5;">247</p>
+            </div>
+        </div>
+
+        <h2>Role Templates</h2>
+        
+        <div class="role-card">
+            <div class="role-header">
+                <h3>👑 Super Administrator</h3>
+                <p>Full system access with all permissions</p>
+                <div style="background: rgba(255,255,255,0.3); height: 8px; border-radius: 4px; margin-top: 10px;">
+                    <div style="background: white; width: 100%; height: 100%; border-radius: 4px;"></div>
+                </div>
+                <small>Security Level: 100/100</small>
+            </div>
+            <div class="role-body">
+                <h4>Permission Overview</h4>
+                <div class="permission-matrix">
+                    <div class="permission-item" style="background: #c6f6d5;">✅ Dashboard</div>
+                    <div class="permission-item" style="background: #c6f6d5;">✅ Orders</div>
+                    <div class="permission-item" style="background: #c6f6d5;">✅ Inventory</div>
+                    <div class="permission-item" style="background: #c6f6d5;">✅ Customers</div>
+                    <div class="permission-item" style="background: #c6f6d5;">✅ Finance</div>
+                    <div class="permission-item" style="background: #c6f6d5;">✅ System</div>
+                </div>
+                <p style="margin-top: 15px;"><strong>Assigned Users:</strong> 3</p>
+                <button class="btn" style="margin-right: 10px;">View Permissions</button>
+                <button class="btn" style="background: #e53e3e;">Edit Role</button>
+            </div>
+        </div>
+
+        <div class="role-card">
+            <div class="role-header" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <h3>🛡️ Administrator</h3>
+                <p>Administrative access with most permissions</p>
+                <div style="background: rgba(255,255,255,0.3); height: 8px; border-radius: 4px; margin-top: 10px;">
+                    <div style="background: white; width: 80%; height: 100%; border-radius: 4px;"></div>
+                </div>
+                <small>Security Level: 80/100</small>
+            </div>
+            <div class="role-body">
+                <h4>Permission Overview</h4>
+                <div class="permission-matrix">
+                    <div class="permission-item" style="background: #c6f6d5;">✅ Dashboard</div>
+                    <div class="permission-item" style="background: #c6f6d5;">✅ Orders</div>
+                    <div class="permission-item" style="background: #c6f6d5;">✅ Inventory</div>
+                    <div class="permission-item" style="background: #c6f6d5;">✅ Customers</div>
+                    <div class="permission-item" style="background: #bee3f8;">👁️ Finance</div>
+                    <div class="permission-item" style="background: #fed7d7;">❌ System</div>
+                </div>
+                <p style="margin-top: 15px;"><strong>Assigned Users:</strong> 12</p>
+                <button class="btn" style="margin-right: 10px;">View Permissions</button>
+                <button class="btn" style="background: #e53e3e;">Edit Role</button>
+            </div>
+        </div>
+
+        <div class="role-card">
+            <div class="role-header" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <h3>👥 Manager</h3>
+                <p>Managerial access for daily operations</p>
+                <div style="background: rgba(255,255,255,0.3); height: 8px; border-radius: 4px; margin-top: 10px;">
+                    <div style="background: white; width: 60%; height: 100%; border-radius: 4px;"></div>
+                </div>
+                <small>Security Level: 60/100</small>
+            </div>
+            <div class="role-body">
+                <h4>Permission Overview</h4>
+                <div class="permission-matrix">
+                    <div class="permission-item" style="background: #c6f6d5;">✅ Dashboard</div>
+                    <div class="permission-item" style="background: #c6f6d5;">✅ Orders</div>
+                    <div class="permission-item" style="background: #bee3f8;">👁️ Inventory</div>
+                    <div class="permission-item" style="background: #c6f6d5;">✅ Customers</div>
+                    <div class="permission-item" style="background: #fed7d7;">❌ Finance</div>
+                    <div class="permission-item" style="background: #fed7d7;">❌ System</div>
+                </div>
+                <p style="margin-top: 15px;"><strong>Assigned Users:</strong> 45</p>
+                <button class="btn" style="margin-right: 10px;">View Permissions</button>
+                <button class="btn" style="background: #e53e3e;">Edit Role</button>
+            </div>
+        </div>
+
+        <h2>Features Demonstrated</h2>
+        <ul>
+            <li>✅ Visual role cards with gradient headers</li>
+            <li>✅ Security level progress bars</li>
+            <li>✅ Permission matrix with visual indicators</li>
+            <li>✅ User count badges</li>
+            <li>✅ Statistics dashboard</li>
+            <li>✅ Field-level permission control (Full Access ✅, View Only 👁️, No Access ❌)</li>
+            <li>✅ Role templates (Super Admin, Admin, Manager, Operator, Viewer)</li>
+            <li>✅ Institutional-grade security design</li>
+        </ul>
+    </div>
+</body>
+</html>

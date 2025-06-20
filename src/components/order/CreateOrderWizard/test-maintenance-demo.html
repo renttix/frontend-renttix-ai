@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inline Maintenance Configuration Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .demo-container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .product-table th {
+            background-color: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+        }
+        .product-table td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .product-row {
+            transition: background-color 0.2s;
+        }
+        .product-row:hover {
+            background-color: #f8f9fa;
+        }
+        .maintenance-config {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .config-fields {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .field-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        input[type="date"], input[type="number"] {
+            padding: 6px 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        input[type="number"] {
+            width: 60px;
+            text-align: center;
+        }
+        .advanced-btn {
+            background: none;
+            border: none;
+            color: #007bff;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 4px 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .advanced-btn:hover {
+            text-decoration: underline;
+        }
+        .advanced-options {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #dee2e6;
+        }
+        .product-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .product-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .quantity-input {
+            width: 100px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .quantity-btn {
+            background: #f8f9fa;
+            border: 1px solid #ced4da;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .quantity-btn:hover {
+            background: #e9ecef;
+        }
+        .demo-note {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .demo-note h3 {
+            margin-top: 0;
+            color: #0066cc;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>Inline Maintenance Configuration Demo</h1>
+        
+        <div class="demo-note">
+            <h3>New Simplified Maintenance Configuration</h3>
+            <p>The maintenance configuration has been simplified with the following improvements:</p>
+            <ul class="feature-list">
+                <li>Inline checkbox next to each product for easy maintenance enabling</li>
+                <li>Smart defaults based on product type (e.g., toilets = 7 days, generators = 30 days)</li>
+                <li>Minimal configuration showing only essential fields</li>
+                <li>Advanced options hidden behind a toggle</li>
+                <li>Automatic first service date calculation based on delivery date</li>
+            </ul>
+        </div>
+
+        <h2>Product Selection</h2>
+        <table class="product-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Daily Rate</th>
+                    <th>Availability</th>
+                    <th style="width: 350px;">Select & Configure</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="product-row">
+                    <td>
+                        <div class="product-info">
+                            <img src="https://via.placeholder.com/50" alt="Portable Toilet" class="product-image">
+                            <div>
+                                <strong>Portable Toilet Deluxe</strong><br>
+                                <small>SKU: PT-001</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>Sanitation</td>
+                    <td>£15.00</td>
+                    <td>25 units</td>
+                    <td>
+                        <div>
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="select-pt001" checked>
+                                <div class="quantity-input">
+                                    <button class="quantity-btn">-</button>
+                                    <input type="number" value="5" min="1" max="25" style="width: 40px;">
+                                    <button class="quantity-btn">+</button>
+                                </div>
+                            </div>
+                            <div class="maintenance-config">
+                                <div class="checkbox-container">
+                                    <input type="checkbox" id="maintenance-pt001" checked>
+                                    <label for="maintenance-pt001"><strong>Maintenance</strong></label>
+                                </div>
+                                <div class="config-fields">
+                                    <div class="field-group">
+                                        <span>First service:</span>
+                                        <input type="date" value="2025-06-12">
+                                    </div>
+                                    <div class="field-group">
+                                        <span>Every:</span>
+                                        <input type="number" value="7" min="1" max="365">
+                                        <span>days</span>
+                                    </div>
+                                    <button class="advanced-btn">
+                                        ⚙️ Advanced
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="product-row">
+                    <td>
+                        <div class="product-info">
+                            <img src="https://via.placeholder.com/50" alt="Generator" class="product-image">
+                            <div>
+                                <strong>Industrial Generator 50kW</strong><br>
+                                <small>SKU: GEN-050</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>Power</td>
+                    <td>£85.00</td>
+                    <td>8 units</td>
+                    <td>
+                        <div>
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="select-gen050" checked>
+                                <div class="quantity-input">
+                                    <button class="quantity-btn">-</button>
+                                    <input type="number" value="2" min="1" max="8" style="width: 40px;">
+                                    <button class="quantity-btn">+</button>
+                                </div>
+                            </div>
+                            <div class="maintenance-config">
+                                <div class="checkbox-container">
+                                    <input type="checkbox" id="maintenance-gen050" checked>
+                                    <label for="maintenance-gen050"><strong>Maintenance</strong></label>
+                                </div>
+                                <div class="config-fields">
+                                    <div class="field-group">
+                                        <span>First service:</span>
+                                        <input type="date" value="2025-07-05">
+                                    </div>
+                                    <div class="field-group">
+                                        <span>Every:</span>
+                                        <input type="number" value="30" min="1" max="365">
+                                        <span>days</span>
+                                    </div>
+                                    <button class="advanced-btn">
+                                        ⚙️ Advanced
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="product-row">
+                    <td>
+                        <div class="product-info">
+                            <img src="https://via.placeholder.com/50" alt="Fence Panel" class="product-image">
+                            <div>
+                                <strong>Heras Fence Panel</strong><br>
+                                <small>SKU: FEN-001</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>Fencing</td>
+                    <td>£2.50</td>
+                    <td>200 units</td>
+                    <td>
+                        <div>
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="select-fen001">
+                                <span style="color: #6c757d;">Select to configure</span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 6px;">
+            <h3>How it works:</h3>
+            <ol>
+                <li><strong>Select a product</strong> - Check the box to add it to your order</li>
+                <li><strong>Set quantity</strong> - Use the +/- buttons or type the amount needed</li>
+                <li><strong>Enable maintenance</strong> - Check the maintenance box if the product needs servicing</li>
+                <li><strong>Configure schedule</strong> - Smart defaults are applied based on product type:
+                    <ul>
+                        <li>Toilets: Every 7 days (weekly cleaning)</li>
+                        <li>Generators: Every 30 days (monthly inspection)</li>
+                        <li>Pumps/Compressors: Every 14 days</li>
+                        <li>Other products: Every 30 days (default)</li>
+                    </ul>
+                </li>
+                <li><strong>Advanced options</strong> - Click "Advanced" for additional settings like frequency presets and service duration</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Simple demo interactivity
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            if (checkbox.id.startsWith('select-')) {
+                checkbox.addEventListener('change', function() {
+                    const row = this.closest('td');
+                    const maintenanceConfig = row.querySelector('.maintenance-config');
+                    const quantityInput = row.querySelector('.quantity-input');
+                    const placeholder = row.querySelector('span[style*="color: #6c757d"]');
+                    
+                    if (this.checked) {
+                        if (!maintenanceConfig) {
+                            // Create maintenance config for products that don't have it
+                            const configHtml = `
+                                <div class="quantity-input">
+                                    <button class="quantity-btn">-</button>
+                                    <input type="number" value="1" min="1" style="width: 40px;">
+                                    <button class="quantity-btn">+</button>
+                                </div>
+                                <div class="maintenance-config">
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="maintenance-${this.id.replace('select-', '')}">
+                                        <label for="maintenance-${this.id.replace('select-', '')}"><strong>Maintenance</strong></label>
+                                    </div>
+                                </div>
+                            `;
+                            if (placeholder) {
+                                placeholder.style.display = 'none';
+                            }
+                            const div = document.createElement('div');
+                            div.innerHTML = configHtml;
+                            this.parentElement.appendChild(div);
+                        }
+                    }
+                });
+            }
+        });
+
+        // Advanced button toggle (demo only)
+        document.querySelectorAll('.advanced-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                alert('Advanced options would show:\n- Frequency presets (Daily, Weekly, Monthly)\n- Service duration settings\n- Continue until termination checkbox\n- Custom service types');
+            });
+        });
+    </script>
+</body>
+</html>

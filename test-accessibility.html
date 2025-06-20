@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Accessibility Settings Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+        }
+        
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Accessibility Settings Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Instructions</h2>
+        <ol>
+            <li>Open the browser console (F12)</li>
+            <li>Navigate to your profile page</li>
+            <li>Change the font size setting</li>
+            <li>Click save/update</li>
+            <li>Check the console logs below</li>
+        </ol>
+    </div>
+    
+    <div class="test-section">
+        <h2>Expected Console Logs</h2>
+        <div class="status info">
+            <h3>When saving preferences:</h3>
+            <pre>
+🔍 Submitting preferences: {fontSize: "large", ...}
+🔍 Accessibility settings being sent: {fontSize: "large", ...}
+✅ Response from server: {success: true, ...}
+✅ Updated user preferences: {fontSize: "large", ...}
+🔄 Dispatching setUpdateUser with: {user object}
+🔄 User preferences being dispatched: {fontSize: "large", ...}
+🔄 Redux authSlice - setUpdateUser called with: {user object}
+🔄 Redux authSlice - Updated preferences: {fontSize: "large", ...}
+            </pre>
+        </div>
+        
+        <div class="status info">
+            <h3>In AccessibilityProvider:</h3>
+            <pre>
+🔍 AccessibilityProvider - Full user object: {user object}
+🔍 AccessibilityProvider - User preferences object: {fontSize: "large", ...}
+🎨 AccessibilityProvider - Current user preferences: {fontSize: "large", ...}
+🎨 Font size setting: large
+📏 Applied large font size: 18px
+🎨 AccessibilityProvider useEffect triggered with preferences: {"fontSize":"large",...}
+            </pre>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Visual Verification</h2>
+        <p>After changing font size, you should see:</p>
+        <ul>
+            <li><strong>Small:</strong> Font size changes to 14px</li>
+            <li><strong>Medium:</strong> Font size changes to 16px (default)</li>
+            <li><strong>Large:</strong> Font size changes to 18px</li>
+            <li><strong>Extra Large:</strong> Font size changes to 20px</li>
+        </ul>
+        <p>Check the computed styles on the html element: <code>document.documentElement.style.fontSize</code></p>
+    </div>
+    
+    <div class="test-section">
+        <h2>Quick Debug Commands</h2>
+        <p>Run these in the browser console:</p>
+        <pre>
+// Check current font size
+console.log('Current font size:', document.documentElement.style.fontSize);
+
+// Check high contrast mode
+console.log('High contrast enabled:', document.documentElement.classList.contains('high-contrast'));
+
+// Check color blind mode
+console.log('Color blind mode:', document.documentElement.getAttribute('data-color-blind-mode'));
+
+// Check text spacing
+console.log('Text spacing:', getComputedStyle(document.documentElement).getPropertyValue('--text-spacing'));
+        </pre>
+    </div>
+    
+    <div class="test-section">
+        <h2>Common Issues</h2>
+        <div class="status error">
+            <strong>Issue:</strong> Font size not changing
+            <p><strong>Check:</strong> Look for "📏 Applied [size] font size" in console logs</p>
+        </div>
+        <div class="status error">
+            <strong>Issue:</strong> Settings reset on page refresh
+            <p><strong>Check:</strong> Verify Redux store is persisted or user data is fetched on load</p>
+        </div>
+    </div>
+</body>
+</html>

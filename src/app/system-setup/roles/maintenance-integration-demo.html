@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Roles + Maintenance Integration</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: #1a1a2e;
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .sidebar h2 {
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            color: #667eea;
+        }
+        .sidebar-menu {
+            list-style: none;
+        }
+        .sidebar-menu li {
+            margin-bottom: 10px;
+        }
+        .sidebar-menu a {
+            color: #e0e0e0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        .sidebar-menu a:hover {
+            background: #667eea;
+            color: white;
+        }
+        .sidebar-menu a.active {
+            background: #667eea;
+            color: white;
+        }
+        .sidebar-menu .icon {
+            margin-right: 10px;
+            width: 20px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        /* Header */
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .stat-card h3 {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        /* Permission Matrix */
+        .permission-grid {
+            display: grid;
+            grid-template-columns: 200px repeat(6, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .permission-header {
+            font-weight: bold;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .permission-cell {
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .permission-cell.full {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        .permission-cell.view {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+        .permission-cell.none {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        
+        /* Buttons */
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            background: #5a67d8;
+        }
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        /* Maintenance Specific */
+        .maintenance-feature {
+            background: #fffbeb;
+            border: 1px solid #fbbf24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .maintenance-icon {
+            color: #f59e0b;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>🏢 RentTix Elite</h2>
+        <ul class="sidebar-menu">
+            <li><a href="#"><span class="icon">📊</span> Dashboard</a></li>
+            <li><a href="#"><span class="icon">📋</span> Orders</a></li>
+            <li><a href="#"><span class="icon">📦</span> Inventory</a></li>
+            <li><a href="#"><span class="icon">👥</span> Customers</a></li>
+            <li><a href="#"><span class="icon">💰</span> Finance</a></li>
+            <li><a href="#" class="active"><span class="icon">⚙️</span> System Setup</a></li>
+            <li style="margin-left: 20px;"><a href="#" class="active"><span class="icon">🛡️</span> Roles</a></li>
+            <li style="margin-left: 20px;"><a href="#"><span class="icon">🔧</span> Maintenance Types</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1>Elite Role Management with Maintenance Integration</h1>
+                <p>Institutional-grade permissions with product maintenance control</p>
+            </div>
+            <button class="btn">Create New Role</button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Roles</h3>
+                <div class="value">8</div>
+            </div>
+            <div class="stat-card">
+                <h3>Maintenance Roles</h3>
+                <div class="value" style="color: #f59e0b;">2</div>
+            </div>
+            <div class="stat-card">
+                <h3>Active Users</h3>
+                <div class="value">247</div>
+            </div>
+            <div class="stat-card">
+                <h3>Maintenance Tasks</h3>
+                <div class="value" style="color: #10b981;">156</div>
+            </div>
+        </div>
+
+        <!-- Maintenance Supervisor Role -->
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                <h2>🔧 Maintenance Supervisor</h2>
+                <p>Full maintenance access with approval rights for product maintenance</p>
+                <div style="margin-top: 10px;">
+                    <small>Security Level: 70/100</small>
+                    <div style="background: rgba(255,255,255,0.3); height: 8px; border-radius: 4px; margin-top: 5px;">
+                        <div style="background: white; width: 70%; height: 100%; border-radius: 4px;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Tabs -->
+                <div class="tabs">
+                    <div class="tab active">Permissions Overview</div>
+                    <div class="tab">Maintenance Permissions</div>
+                    <div class="tab">Field-Level Control</div>
+                </div>
+
+                <!-- Maintenance Features -->
+                <h3 style="margin-bottom: 15px;">🔧 Maintenance Capabilities</h3>
+                <div class="maintenance-feature">
+                    <strong><span class="maintenance-icon">✅</span>Product Maintenance Management</strong>
+                    <p style="margin-left: 30px; margin-top: 5px; color: #666;">
+                        Can configure maintenance schedules for products, set intervals, and manage task types
+                    </p>
+                </div>
+                <div class="maintenance-feature">
+                    <strong><span class="maintenance-icon">✅</span>Maintenance Task Assignment</strong>
+                    <p style="margin-left: 30px; margin-top: 5px; color: #666;">
+                        Assign maintenance tasks to technicians, manage workload distribution
+                    </p>
+                </div>
+                <div class="maintenance-feature">
+                    <strong><span class="maintenance-icon">✅</span>Cost Approval Authority</strong>
+                    <p style="margin-left: 30px; margin-top: 5px; color: #666;">
+                        Approve maintenance costs, view financial impact, manage budgets
+                    </p>
+                </div>
+
+                <!-- Permission Matrix -->
+                <h3 style="margin-top: 30px; margin-bottom: 15px;">Permission Matrix</h3>
+                <div class="permission-grid">
+                    <div class="permission-header">Module</div>
+                    <div class="permission-header">View</div>
+                    <div class="permission-header">Create</div>
+                    <div class="permission-header">Edit</div>
+                    <div class="permission-header">Delete</div>
+                    <div class="permission-header">Approve</div>
+                    <div class="permission-header">Reports</div>
+                    
+                    <div class="permission-cell"><strong>Maintenance</strong></div>
+                    <div class="permission-cell full">✅ Full</div>
+                    <div class="permission-cell full">✅ Full</div>
+                    <div class="permission-cell full">✅ Full</div>
+                    <div class="permission-cell full">✅ Full</div>
+                    <div class="permission-cell full">✅ Full</div>
+                    <div class="permission-cell full">✅ Full</div>
+                    
+                    <div class="permission-cell"><strong>Products</strong></div>
+                    <div class="permission-cell view">👁️ View</div>
+                    <div class="permission-cell none">❌ None</div>
+                    <div class="permission-cell view">👁️ Maint Only</div>
+                    <div class="permission-cell none">❌ None</div>
+                    <div class="permission-cell none">❌ None</div>
+                    <div class="permission-cell view">👁️ View</div>
+                    
+                    <div class="permission-cell"><strong>Orders</strong></div>
+                    <div class="permission-cell view">👁️ View</div>
+                    <div class="permission-cell none">❌ None</div>
+                    <div class="permission-cell none">❌ None</div>
+                    <div class="permission-cell none">❌ None</div>
+                    <div class="permission-cell none">❌ None</div>
+                    <div class="permission-cell none">❌ None</div>
+                </div>
+
+                <!-- Field-Level Permissions -->
+                <h3 style="margin-top: 30px; margin-bottom: 15px;">Field-Level Maintenance Permissions</h3>
+                <div style="background: #f7fafc; padding: 20px; border-radius: 8px;">
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                        <div>
+                            <strong>Product Maintenance Fields:</strong>
+                            <ul style="margin-top: 10px; list-style: none;">
+                                <li>✅ Maintenance Schedule - <span style="color: #22543d;">Full Access</span></li>
+                                <li>✅ Service Intervals - <span style="color: #22543d;">Full Access</span></li>
+                                <li>✅ Task Types - <span style="color: #22543d;">Full Access</span></li>
+                                <li>✅ Cost Estimates - <span style="color: #22543d;">Full Access</span></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <strong>Task Management Fields:</strong>
+                            <ul style="margin-top: 10px; list-style: none;">
+                                <li>✅ Task Assignment - <span style="color: #22543d;">Full Access</span></li>
+                                <li>✅ Priority Setting - <span style="color: #22543d;">Full Access</span></li>
+                                <li>✅ Status Updates - <span style="color: #22543d;">Full Access</span></li>
+                                <li>✅ Completion Notes - <span style="color: #22543d;">Full Access</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button class="btn" style="margin-right: 10px;">View Full Permissions</button>
+                    <button class="btn btn-secondary">Edit Role</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Maintenance Technician Role -->
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);">
+                <h2>👷 Maintenance Technician</h2>
+                <p>Execute and update maintenance tasks on products</p>
+                <div style="margin-top: 10px;">
+                    <small>Security Level: 50/100</small>
+                    <div style="background: rgba(255,255,255,0.3); height: 8px; border-radius: 4px; margin-top: 5px;">
+                        <div style="background: white; width: 50%; height: 100%; border-radius: 4px;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <h3 style="margin-bottom: 15px;">🔧 Technician Capabilities</h3>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                    <div>
+                        <strong>Can Do:</strong>
+                        <ul style="margin-top: 10px; color: #22543d;">
+                            <li>✅ View assigned maintenance tasks</li>
+                            <li>✅ Update task status</li>
+                            <li>✅ Add completion notes</li>
+                            <li>✅ Upload service photos</li>
+                            <li>✅ Mark tasks complete</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <strong>Cannot Do:</strong>
+                        <ul style="margin-top: 10px; color: #742a2a;">
+                            <li>❌ Assign tasks to others</li>
+                            <li>❌ View maintenance costs</li>
+                            <li>❌ Approve work orders</li>
+                            <li>❌ Modify schedules</li>
+                            <li>❌ Access financial reports</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Integration Benefits -->
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <h2>🚀 Maintenance + Roles Integration Benefits</h2>
+            </div>
+            <div class="card-body">
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                    <div>
+                        <h3>🛡️ Security Benefits</h3>
+                        <ul style="margin-top: 10px; line-height: 1.8;">
+                            <li>Field-level control over maintenance data</li>
+                            <li>Cost visibility restrictions by role</li>
+                            <li>Approval workflows based on security level</li>
+                            <li>Audit trail for all maintenance actions</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>📊 Operational Benefits</h3>
+                        <ul style="margin-top: 10px; line-height: 1.8;">
+                            <li>Technicians focus on tasks, not admin</li>
+                            <li>Supervisors have full oversight</li>
+                            <li>Automatic task assignment by skill</li>
+                            <li>Role-based maintenance dashboards</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

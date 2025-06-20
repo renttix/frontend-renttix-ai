@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Hire Agreement Signature</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+        }
+        .test-button {
+            padding: 10px 20px;
+            margin: 10px 0;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .test-button:hover {
+            background: #2980b9;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .link-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+        }
+        .link-section a {
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .link-section a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hire Agreement Signature Test Page</h1>
+        
+        <div class="test-section">
+            <h2>1. Test API Endpoint</h2>
+            <p>Token: <code id="token">e31cc868fe1158d92e4d328e3a7f1c8982e9664caf68aef80fcc62df43b7b1dc</code></p>
+            <button class="test-button" onclick="testAPI()">Test API Connection</button>
+            <div id="api-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>2. Test Signature Pages</h2>
+            <p>Click the links below to test the signature pages directly:</p>
+            
+            <div class="link-section">
+                <h3>Simple Signature Page (No Canvas)</h3>
+                <p>This version uses a simple form without the signature canvas component:</p>
+                <a href="/sign-agreement-simple/e31cc868fe1158d92e4d328e3a7f1c8982e9664caf68aef80fcc62df43b7b1dc" target="_blank">
+                    Open Simple Signature Page
+                </a>
+            </div>
+
+            <div class="link-section">
+                <h3>Full Signature Page (With Canvas)</h3>
+                <p>This version includes the full signature canvas functionality:</p>
+                <a href="/sign-agreement/e31cc868fe1158d92e4d328e3a7f1c8982e9664caf68aef80fcc62df43b7b1dc" target="_blank">
+                    Open Full Signature Page
+                </a>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>3. Create New Test Agreement</h2>
+            <button class="test-button" onclick="createNewAgreement()">Generate New Test Agreement</button>
+            <div id="new-agreement-result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000/api';
+        
+        async function testAPI() {
+            const resultDiv = document.getElementById('api-result');
+            const token = document.getElementById('token').textContent;
+            
+            try {
+                resultDiv.innerHTML = '<div class="result">Testing API connection...</div>';
+                
+                const response = await fetch(`${API_URL}/agreements/${token}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div class="result success">✅ API Connection Successful!\n\nResponse:\n${JSON.stringify(data, null, 2)}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="result error">❌ API Error: ${response.status}\n\n${JSON.stringify(data, null, 2)}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error">❌ Connection Error:\n${error.message}</div>`;
+            }
+        }
+
+        async function createNewAgreement() {
+            const resultDiv = document.getElementById('new-agreement-result');
+            
+            resultDiv.innerHTML = `<div class="result">To create a new test agreement, run this command in your backend directory:
+                
+cd backend && node test-signature-page-simple.js
+
+This will generate a new agreement with a fresh token that you can use for testing.</div>`;
+        }
+
+        // Test API on page load
+        window.onload = () => {
+            console.log('Test page loaded. Click the buttons to test the signature functionality.');
+        };
+    </script>
+</body>
+</html>

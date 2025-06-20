@@ -1,0 +1,286 @@
+/* Quick Start Guide Styles */
+.quick-start-dialog {
+  max-height: 90vh;
+}
+
+.quick-start-dialog .p-dialog-content {
+  overflow-y: auto;
+}
+
+.quick-start-container {
+  min-height: 400px;
+}
+
+/* Step indicator customization */
+.quick-start-container .p-steps {
+  margin-bottom: 2rem;
+}
+
+.quick-start-container .p-steps .p-steps-item.p-highlight .p-steps-number {
+  background: var(--primary-color);
+  color: var(--primary-color-text);
+}
+
+.quick-start-container .p-steps .p-steps-item.p-steps-complete .p-steps-number {
+  background: var(--green-500);
+  color: white;
+}
+
+/* Content sections */
+.quick-start-content {
+  padding: 1rem 0;
+  min-height: 300px;
+}
+
+.welcome-content .feature-highlights {
+  margin-top: 2rem;
+}
+
+.welcome-content .feature-highlights i {
+  color: var(--primary-color);
+}
+
+/* Overview section */
+.overview-section {
+  background: var(--surface-100);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  transition: all 0.2s;
+}
+
+.overview-section:hover {
+  background: var(--surface-200);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.overview-section h4 {
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+.overview-section p {
+  margin: 0;
+}
+
+/* Widget carousel */
+.widget-carousel .p-carousel-content {
+  padding: 1rem;
+}
+
+.widget-description-card {
+  height: 100%;
+  min-height: 280px;
+  transition: all 0.3s;
+}
+
+.widget-description-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.widget-description-card .p-card-body {
+  padding: 1.5rem;
+}
+
+.widget-description-card h4 {
+  color: var(--text-color);
+  margin-bottom: 0.75rem;
+}
+
+.widget-description-card .p-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* Customization content */
+.customization-features .feature-item {
+  padding-left: 1rem;
+  border-left: 3px solid var(--primary-color);
+  transition: all 0.2s;
+}
+
+.customization-features .feature-item:hover {
+  background: var(--surface-50);
+  padding-left: 1.5rem;
+}
+
+.customization-features .feature-item h4 {
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+.customization-features .feature-item i {
+  font-size: 1.25rem;
+}
+
+/* Tips content */
+.shortcuts-list .shortcut-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  background: var(--surface-100);
+  border-radius: var(--border-radius);
+  transition: all 0.2s;
+}
+
+.shortcuts-list .shortcut-item:hover {
+  background: var(--surface-200);
+  transform: translateX(4px);
+}
+
+.shortcuts-list kbd {
+  background: var(--surface-0);
+  border: 1px solid var(--surface-300);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  font-family: monospace;
+  font-size: 0.875rem;
+  box-shadow: 0 2px 0 var(--surface-300);
+  min-width: 120px;
+  text-align: center;
+}
+
+.pro-tips-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pro-tips-list li {
+  padding: 0.5rem 0;
+  display: flex;
+  align-items: flex-start;
+}
+
+.pro-tips-list li i {
+  margin-top: 0.125rem;
+}
+
+/* Progress indicator */
+.progress-indicator {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--surface-200);
+}
+
+/* Dialog footer */
+.quick-start-dialog .p-dialog-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--surface-200);
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  .quick-start-dialog {
+    width: 95vw !important;
+  }
+  
+  .quick-start-container .p-steps {
+    font-size: 0.875rem;
+  }
+  
+  .quick-start-container .p-steps .p-steps-title {
+    display: none;
+  }
+  
+  .shortcuts-list kbd {
+    min-width: auto;
+    font-size: 0.75rem;
+  }
+  
+  .widget-description-card {
+    min-height: 240px;
+  }
+  
+  .welcome-content .grid > div {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Dark mode adjustments */
+.dark .overview-section {
+  background: var(--surface-800);
+}
+
+.dark .overview-section:hover {
+  background: var(--surface-700);
+}
+
+.dark .shortcuts-list .shortcut-item {
+  background: var(--surface-800);
+}
+
+.dark .shortcuts-list .shortcut-item:hover {
+  background: var(--surface-700);
+}
+
+.dark .shortcuts-list kbd {
+  background: var(--surface-900);
+  border-color: var(--surface-600);
+  box-shadow: 0 2px 0 var(--surface-600);
+}
+
+.dark .widget-description-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Animation for step transitions */
+.step-content {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Carousel navigation buttons */
+.widget-carousel .p-carousel-prev,
+.widget-carousel .p-carousel-next {
+  background: var(--primary-color);
+  color: var(--primary-color-text);
+  border: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.widget-carousel .p-carousel-prev:hover,
+.widget-carousel .p-carousel-next:hover {
+  background: var(--primary-600);
+  transform: scale(1.1);
+}
+
+.widget-carousel .p-carousel-indicators .p-carousel-indicator button {
+  background: var(--surface-300);
+}
+
+.widget-carousel .p-carousel-indicators .p-highlight button {
+  background: var(--primary-color);
+}
+
+/* Checkbox styling */
+.quick-start-dialog .p-checkbox {
+  margin-right: 0.5rem;
+}
+
+/* Success message styling */
+.quick-start-content .surface-200 {
+  background: var(--green-50);
+  border: 1px solid var(--green-200);
+  color: var(--green-900);
+}
+
+.dark .quick-start-content .surface-200 {
+  background: var(--green-900);
+  border: 1px solid var(--green-700);
+  color: var(--green-100);
+}

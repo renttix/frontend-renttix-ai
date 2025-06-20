@@ -1,0 +1,148 @@
+/* Accessibility Styles */
+
+/* High Contrast Mode */
+.high-contrast {
+  filter: contrast(1.2);
+}
+
+.high-contrast * {
+  border-color: currentColor !important;
+}
+
+.high-contrast button,
+.high-contrast .p-button {
+  border: 2px solid currentColor !important;
+}
+
+.high-contrast input,
+.high-contrast .p-inputtext,
+.high-contrast .p-dropdown {
+  border: 2px solid currentColor !important;
+  background: transparent !important;
+}
+
+/* Reduce Motion */
+.reduce-motion * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+.reduce-motion .p-toast-message {
+  animation: none !important;
+}
+
+/* Enhanced Focus Indicators */
+.enhanced-focus *:focus {
+  outline: 3px solid #f97316 !important;
+  outline-offset: 2px !important;
+}
+
+.enhanced-focus button:focus,
+.enhanced-focus .p-button:focus {
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.5) !important;
+}
+
+/* Large Cursor */
+.large-cursor * {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="black" stroke="white" stroke-width="2"/></svg>') 16 16, auto !important;
+}
+
+.extra-large-cursor * {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="black" stroke="white" stroke-width="3"/></svg>') 24 24, auto !important;
+}
+
+/* Text Spacing */
+* {
+  line-height: calc(1.5 * var(--text-spacing, 1));
+  letter-spacing: calc(0.05em * var(--text-spacing, 1));
+  word-spacing: calc(0.1em * var(--text-spacing, 1));
+}
+
+p, li, td, th {
+  margin-bottom: calc(1em * var(--text-spacing, 1));
+}
+
+/* Color Blind Modes */
+[data-color-blind-mode="protanopia"] {
+  filter: url('#protanopia-filter');
+}
+
+[data-color-blind-mode="deuteranopia"] {
+  filter: url('#deuteranopia-filter');
+}
+
+[data-color-blind-mode="tritanopia"] {
+  filter: url('#tritanopia-filter');
+}
+
+[data-color-blind-mode="achromatopsia"] {
+  filter: grayscale(100%) contrast(1.2);
+}
+
+/* Screen Reader Optimizations */
+[data-screen-reader="true"] .decorative {
+  display: none;
+}
+
+[data-screen-reader="true"] .sr-only {
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  clip: auto !important;
+  white-space: normal !important;
+}
+
+/* Keyboard Navigation Enhancements */
+[data-keyboard-nav="true"] *:focus {
+  outline: 2px solid #f97316 !important;
+  outline-offset: 2px !important;
+}
+
+[data-keyboard-nav="true"] .skip-link {
+  position: absolute;
+  left: -9999px;
+  z-index: 999;
+}
+
+[data-keyboard-nav="true"] .skip-link:focus {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: #f97316;
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+}
+
+/* Accessibility Helper Classes */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* ARIA Live Regions */
+[aria-live="polite"] {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* Color Blind Filters SVG */
+.color-blind-filters {
+  position: absolute;
+  width: 0;
+  height: 0;
+}

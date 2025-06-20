@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Route Settings Demo - RentTix</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .demo-section {
+            margin-bottom: 40px;
+        }
+        .demo-section h2 {
+            color: #444;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .icon {
+            width: 24px;
+            height: 24px;
+        }
+        .route-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .route-table th,
+        .route-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .route-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+        .btn-view {
+            color: #3b82f6;
+            background: transparent;
+        }
+        .btn-view:hover {
+            color: #2563eb;
+        }
+        .btn-edit {
+            color: #6366f1;
+            background: transparent;
+        }
+        .btn-edit:hover {
+            color: #4f46e5;
+        }
+        .btn-settings {
+            color: #6b7280;
+            background: transparent;
+        }
+        .btn-settings:hover {
+            color: #374151;
+        }
+        .btn-delete {
+            color: #ef4444;
+            background: transparent;
+        }
+        .btn-delete:hover {
+            color: #dc2626;
+        }
+        .settings-preview {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        .settings-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .settings-card h3 {
+            margin: 0 0 20px 0;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .help-text {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+        .highlight {
+            background-color: #fef3c7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .new-badge {
+            background-color: #10b981;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Route Settings Feature Demo</h1>
+        <p class="description">
+            We've added a new <span class="highlight">Settings</span> button to the route management interface. 
+            This allows you to configure service windows and capacity limits for each route separately from the basic route information.
+        </p>
+
+        <div class="demo-section">
+            <h2>📋 Manage Maintenance Routes</h2>
+            <table class="route-table">
+                <thead>
+                    <tr>
+                        <th>Maintenance Route</th>
+                        <th>Depot</th>
+                        <th>Schedule</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <strong>Route 1</strong><br>
+                            <small style="color: #666;">North Birmingham</small>
+                        </td>
+                        <td>Birmingham</td>
+                        <td>weekly (Mon)</td>
+                        <td><span style="color: #10b981;">Active</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-view">View</button>
+                                <button class="btn btn-edit">Edit</button>
+                                <button class="btn btn-settings">Settings<span class="new-badge">NEW</span></button>
+                                <button class="btn btn-delete">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Route 2</strong><br>
+                            <small style="color: #666;">South Birmingham</small>
+                        </td>
+                        <td>Birmingham</td>
+                        <td>weekly (Tue)</td>
+                        <td><span style="color: #10b981;">Active</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-view">View</button>
+                                <button class="btn btn-edit">Edit</button>
+                                <button class="btn btn-settings">Settings<span class="new-badge">NEW</span></button>
+                                <button class="btn btn-delete">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="demo-section">
+            <h2>⚙️ Route Settings Page</h2>
+            <p style="color: #666; margin-bottom: 20px;">
+                When you click the Settings button, you'll see this dedicated configuration page:
+            </p>
+            
+            <div class="settings-preview">
+                <h3 style="margin-top: 0;">Route Settings - Route 2</h3>
+                <p style="color: #666; margin-bottom: 30px;">Configure service window and capacity for Route 2</p>
+                
+                <div class="settings-grid">
+                    <div class="settings-card">
+                        <h3>
+                            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Service Window
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label>Start Time</label>
+                            <input type="text" class="form-control" value="08:00" readonly>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>End Time</label>
+                            <input type="text" class="form-control" value="17:00" readonly>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Average Service Duration (minutes)</label>
+                            <input type="text" class="form-control" value="15 min" readonly>
+                            <p class="help-text">Average time spent at each delivery location</p>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-card">
+                        <h3>
+                            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                            </svg>
+                            Capacity Limits
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label>Maximum Orders</label>
+                            <input type="text" class="form-control" value="50" readonly>
+                            <p class="help-text">Maximum number of orders this route can handle</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Maximum Distance (km)</label>
+                            <input type="text" class="form-control" value="100 km" readonly>
+                            <p class="help-text">Maximum total distance for the route</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Maximum Duration (minutes)</label>
+                            <input type="text" class="form-control" value="480 min" readonly>
+                            <p class="help-text">Maximum total time for completing the route (8h 0m)</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px; text-align: right;">
+                    <button class="btn" style="background: #e5e7eb; color: #374151; margin-right: 10px; padding: 10px 20px;">Cancel</button>
+                    <button class="btn" style="background: #3b82f6; color: white; padding: 10px 20px;">
+                        <svg style="width: 16px; height: 16px; display: inline-block; margin-right: 6px; vertical-align: -2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                        </svg>
+                        Save Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>✨ Key Features</h2>
+            <ul style="line-height: 1.8;">
+                <li><strong>Separated Concerns:</strong> Basic route info (name, area) is separate from operational settings</li>
+                <li><strong>Service Window:</strong> Configure start/end times and average service duration</li>
+                <li><strong>Capacity Management:</strong> Set limits for orders, distance, and total route duration</li>
+                <li><strong>Clear UI:</strong> Organized into logical sections with helpful descriptions</li>
+                <li><strong>Validation:</strong> Ensures logical constraints (e.g., end time > start time)</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

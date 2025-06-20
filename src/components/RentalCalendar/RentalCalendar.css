@@ -1,0 +1,810 @@
+/* Rental Calendar Styles */
+
+.rental-calendar-container {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Dashboard view specific styles */
+.rental-calendar-container.dashboard-view {
+  padding: 1rem;
+  box-shadow: none;
+}
+
+.rental-calendar-container.dashboard-view .fc {
+  font-size: 0.875rem;
+}
+
+.rental-calendar-container.dashboard-view .fc-daygrid-day-number {
+  font-size: 0.875rem;
+}
+
+.rental-calendar-container.dashboard-view .custom-event-content {
+  font-size: 0.75rem;
+}
+
+.dark .rental-calendar-container {
+  background: #1f2937;
+}
+
+/* Calendar Header */
+.calendar-header {
+  margin-bottom: 1rem;
+}
+
+/* Calendar Wrapper */
+.calendar-wrapper {
+  position: relative;
+  min-height: 500px;
+}
+
+.calendar-loading,
+.calendar-error {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  padding: 2rem;
+}
+
+/* FullCalendar Custom Styles */
+.fc {
+  font-family: inherit;
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border-color: #e5e7eb;
+}
+
+.dark .fc-theme-standard td,
+.dark .fc-theme-standard th {
+  border-color: #374151;
+}
+
+/* Day Cell Customization */
+.fc-daygrid-day {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.fc-daygrid-day:hover {
+  background-color: #f3f4f6;
+}
+
+.dark .fc-daygrid-day:hover {
+  background-color: #374151;
+}
+
+.custom-day-cell {
+  padding: 0.25rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+
+.custom-day-cell > * {
+  pointer-events: none;
+}
+
+.day-number {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.day-counts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+}
+
+.delivery-count,
+.collection-count {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.delivery-count {
+  color: #059669;
+}
+
+.collection-count {
+  color: #2563eb;
+}
+
+/* Event Styling */
+.fc-event {
+  border: none;
+  padding: 0.125rem 0.25rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.fc-event:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.event-delivery {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.event-delivery:hover {
+  background-color: #a7f3d0;
+}
+
+.event-return {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.event-return:hover {
+  background-color: #bfdbfe;
+}
+
+.custom-event-content {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.custom-event-content .pi {
+  font-size: 0.75rem;
+}
+
+/* Today's Date */
+.fc-day-today {
+  background-color: #eff6ff !important;
+}
+
+.dark .fc-day-today {
+  background-color: #1e3a8a !important;
+}
+
+.fc-day-today .day-number {
+  color: #2563eb;
+  font-weight: 700;
+}
+
+/* Calendar Navigation */
+.fc-toolbar {
+  display: none; /* We use custom header */
+}
+
+/* More Events Link */
+.fc-more-link {
+  color: #2563eb;
+  font-weight: 500;
+}
+
+/* Action Menu */
+.rental-calendar-menu {
+  min-width: 200px;
+}
+
+.rental-calendar-menu .p-menuitem-link {
+  padding: 0.75rem 1rem;
+}
+
+/* Modal Styles */
+.step-content {
+  min-height: 400px;
+}
+
+.products-list {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+}
+
+.product-item {
+  transition: all 0.2s;
+}
+
+.product-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.event-card {
+  transition: all 0.2s;
+}
+
+.event-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Day Details Modal */
+.day-details-content .p-tabview-panel {
+  min-height: 400px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .rental-calendar-container {
+    padding: 1rem;
+  }
+  
+  .calendar-header h2 {
+    font-size: 1.25rem;
+  }
+  
+  .day-counts {
+    font-size: 0.625rem;
+  }
+  
+  .fc-event {
+    font-size: 0.625rem;
+  }
+  
+  /* Switch to list view on mobile */
+  .fc-daygrid-day-frame {
+    min-height: 60px;
+  }
+  
+  /* Stack buttons vertically on mobile */
+  .calendar-header .flex {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* Loading Animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pi-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Calendar Filters */
+.calendar-filters {
+  padding: 0.75rem;
+  background-color: #f9fafb;
+  border-radius: 0.375rem;
+}
+
+.dark .calendar-filters {
+  background-color: #1f2937;
+}
+
+/* Calendar Legend */
+.calendar-legend {
+  border-top: 1px solid #e5e7eb;
+}
+
+.dark .calendar-legend {
+  border-top-color: #374151;
+}
+
+/* PrimeReact Overrides for Calendar */
+.p-dialog .p-dialog-header {
+  padding: 1.25rem;
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.dark .p-dialog .p-dialog-header {
+  background-color: #1f2937;
+  border-bottom-color: #374151;
+}
+
+.p-dialog .p-dialog-content {
+  padding: 1.5rem;
+}
+
+.p-dialog .p-dialog-footer {
+  padding: 1rem 1.5rem;
+  background-color: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+}
+
+.dark .p-dialog .p-dialog-footer {
+  background-color: #1f2937;
+  border-top-color: #374151;
+}
+
+/* Steps Component */
+.p-steps .p-steps-item.p-highlight .p-steps-number {
+  background-color: #2563eb;
+  color: white;
+}
+
+.p-steps .p-steps-item.p-highlight .p-steps-title {
+  color: #2563eb;
+}
+
+/* Event Status Styles */
+.event-completed {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+
+.event-overdue {
+  border: 2px solid #ef4444 !important;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+/* Drag and Drop Styles */
+.fc-event-dragging {
+  opacity: 0.75;
+  cursor: move;
+}
+
+.fc-event-resizing {
+  opacity: 0.75;
+  cursor: ew-resize;
+}
+
+/* Day view specific styles */
+.fc-timeGridDay-view .fc-event {
+  margin: 2px 0;
+  cursor: move;
+}
+
+.fc-timeGridDay-view .fc-event-dragging {
+  opacity: 0.75;
+  z-index: 999;
+}
+
+.fc-timeGridDay-view .fc-timegrid-event {
+  border-radius: 4px;
+  padding: 4px;
+}
+
+.fc-timeGridDay-view .fc-timegrid-slot {
+  height: 60px; /* Make time slots taller for better drag targets */
+}
+
+/* List view styles for day view */
+.fc-listDay-view .fc-list-event {
+  cursor: move;
+  transition: all 0.2s;
+  border-left: 4px solid transparent;
+}
+
+.fc-listDay-view .fc-list-event:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: translateX(4px);
+}
+
+.fc-listDay-view .fc-list-event-dragging {
+  opacity: 0.75;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* List view event styling */
+.fc-list-event-title {
+  font-weight: 500;
+}
+
+.fc-list-event-time {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+/* Delivery events in list view */
+.fc-list-event.event-delivery {
+  border-left-color: #10b981;
+}
+
+.fc-list-event.event-delivery .fc-list-event-dot {
+  background-color: #10b981;
+}
+
+/* Return events in list view */
+.fc-list-event.event-return {
+  border-left-color: #3b82f6;
+}
+
+.fc-list-event.event-return .fc-list-event-dot {
+  background-color: #3b82f6;
+}
+
+/* List view table styling */
+.fc-list-table {
+  width: 100%;
+}
+
+.fc-list-table td {
+  padding: 0.75rem;
+}
+
+.fc-list-day-cushion {
+  background-color: #f3f4f6;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+}
+
+.dark .fc-list-day-cushion {
+  background-color: #374151;
+}
+
+/* No events message */
+.fc-list-empty {
+  text-align: center;
+  padding: 3rem;
+  color: #6b7280;
+}
+
+.fc-list-empty-cushion {
+  font-size: 1.125rem;
+}
+
+/* Day view event ordering */
+.fc-timeGridDay-view .fc-timegrid-col-events {
+  margin: 0;
+}
+
+.fc-timeGridDay-view .fc-timegrid-event-harness {
+  margin-bottom: 2px;
+}
+
+/* Connection Status */
+.connection-status {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+}
+
+/* Availability Modal Styles */
+.availability-content .p-datatable-tbody > tr:hover {
+  background-color: #f3f4f6;
+}
+
+.dark .availability-content .p-datatable-tbody > tr:hover {
+  background-color: #374151;
+}
+
+/* Socket Update Animation */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.socket-update {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Enhanced Calendar Navigation */
+.fc-button-group {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.fc-button {
+  background-color: white;
+  border-color: #e5e7eb;
+  color: #374151;
+}
+
+.fc-button:hover {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+  color: #111827;
+}
+
+.fc-button-active {
+  background-color: #2563eb !important;
+  border-color: #2563eb !important;
+  color: white !important;
+}
+
+/* Print Styles */
+@media print {
+  .calendar-header,
+  .calendar-filters,
+  .calendar-legend,
+  .p-dialog-footer,
+  .connection-status {
+    display: none;
+  }
+  
+  .rental-calendar-container {
+    box-shadow: none;
+    padding: 0;
+  }
+  
+  .fc-event {
+    background-color: white !important;
+    color: black !important;
+    border: 1px solid black !important;
+  }
+  
+  .event-delivery {
+    border-left: 4px solid #059669 !important;
+  }
+  
+  .event-return {
+    border-left: 4px solid #2563eb !important;
+  }
+}
+
+/* Accessibility Improvements */
+.fc-daygrid-day:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: -2px;
+}
+
+.fc-event:focus {
+  outline: 2px solid #1e40af;
+  outline-offset: 2px;
+}
+
+/* Loading Skeleton */
+.calendar-skeleton {
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Day Details Modal Enhancements */
+.day-details-content .event-card {
+  background-color: #ffffff;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.day-details-content .event-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.day-details-content .event-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: var(--primary-color);
+}
+
+.day-details-content .deliveries-list .event-card::before {
+  background-color: #10b981;
+}
+
+.day-details-content .collections-list .event-card::before {
+  background-color: #3b82f6;
+}
+
+/* Job Detail Modal Styles */
+.job-detail-modal .p-dialog-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.job-detail-modal .p-tabview-nav {
+  background-color: transparent;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.job-detail-modal .p-tabview-nav-link {
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.job-detail-modal .p-tabview-nav-link:not(.p-disabled):not(.p-highlight):hover {
+  background-color: #f8f9fa;
+  border-bottom-color: #dee2e6;
+}
+
+.job-detail-modal .p-tabview-selected .p-tabview-nav-link {
+  background-color: transparent;
+  border-bottom-color: var(--primary-color);
+}
+
+/* Timeline Customization */
+.customized-timeline .p-timeline-event-opposite {
+  flex: 0.5;
+}
+
+.customized-timeline .p-timeline-event-content {
+  flex: 1;
+}
+
+.customized-timeline .p-timeline-event-separator {
+  flex: 0;
+}
+
+/* Event Card Item Details */
+.event-card .item-detail-box {
+  background-color: #f8f9fa;
+  border-left: 3px solid #dee2e6;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.event-card .item-detail-box:hover {
+  background-color: #e9ecef;
+  border-left-color: var(--primary-color);
+}
+
+/* Staff and Vehicle Cards */
+.staff-vehicle-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background-color: #f8f9fa;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.staff-vehicle-info:hover {
+  background-color: #e9ecef;
+}
+
+.staff-vehicle-info i {
+  font-size: 1.5rem;
+  color: #6c757d;
+}
+
+/* Status Tags Enhancement */
+.p-tag.p-tag-success {
+  background-color: #d1fae5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.p-tag.p-tag-danger {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.p-tag.p-tag-info {
+  background-color: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+
+/* Print Styles for Day Details */
+@media print {
+  .day-details-content .event-card {
+    page-break-inside: avoid;
+    border: 1px solid #000;
+    margin-bottom: 1rem;
+  }
+  
+  .p-dialog-header,
+  .p-dialog-footer,
+  .p-button {
+    display: none !important;
+  }
+  
+  .p-tabview-nav {
+    display: none !important;
+  }
+  
+  .p-tabview-panels {
+    border: none !important;
+  }
+}
+
+/* Responsive Adjustments for Job Details */
+@media (max-width: 768px) {
+  .day-details-content .event-card {
+    padding: 0.75rem;
+  }
+  
+  .day-details-content .grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .job-detail-modal .p-dialog-content {
+    padding: 1rem;
+  }
+}
+
+/* Dark Mode Support for Job Details */
+.dark .day-details-content .event-card {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+.dark .day-details-content .event-card:hover {
+  background-color: #111827;
+}
+
+.dark .event-card .item-detail-box {
+  background-color: #111827;
+  border-left-color: #374151;
+}
+
+.dark .staff-vehicle-info {
+  background-color: #111827;
+}
+
+.dark .job-detail-modal .p-dialog-header {
+  background-color: #111827;
+  border-bottom-color: #374151;
+}
+
+/* Keyboard shortcuts modal */
+.keyboard-shortcuts-modal .p-dialog-content {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.keyboard-shortcut-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.keyboard-shortcut-item:last-child {
+  border-bottom: none;
+}
+
+.keyboard-shortcut-key {
+  background-color: #f3f4f6;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-family: monospace;
+  font-size: 0.875rem;
+  min-width: 2rem;
+  text-align: center;
+}
+
+/* Action Menu Styles */
+.rental-calendar-menu {
+  z-index: 9999 !important;
+}
+
+.p-menu.p-menu-overlay {
+  z-index: 9999 !important;
+}
+
+.p-menu-overlay {
+  position: fixed !important;
+}

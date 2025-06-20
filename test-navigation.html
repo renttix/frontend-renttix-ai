@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .container {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        .log {
+            background: #e5e7eb;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Navigation Test for Asset Detail Page</h1>
+        <p>This page tests the back button navigation fix for the asset detail page.</p>
+        
+        <h2>Test Scenarios:</h2>
+        <ol>
+            <li>Navigate to asset page with history - should use router.back()</li>
+            <li>Navigate to asset page without history - should fallback to /product/product-list</li>
+        </ol>
+        
+        <h2>Actions:</h2>
+        <button onclick="navigateWithHistory()">Navigate to Asset (with history)</button>
+        <button onclick="navigateDirectly()">Navigate to Asset (direct URL)</button>
+        <button onclick="clearLog()">Clear Log</button>
+        
+        <div id="log" class="log">Log will appear here...</div>
+    </div>
+    
+    <script>
+        const log = document.getElementById('log');
+        
+        function addLog(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            log.textContent += `[${timestamp}] ${message}\n`;
+        }
+        
+        function clearLog() {
+            log.textContent = 'Log cleared.\n';
+        }
+        
+        function navigateWithHistory() {
+            addLog('Creating navigation history...');
+            // First navigate to product list
+            addLog('Step 1: Navigate to /product/product-list');
+            window.location.href = 'http://localhost:3000/product/product-list';
+            
+            // Note: In real scenario, user would click on an asset from the list
+            addLog('Note: From product list, user would click on an asset to view details');
+        }
+        
+        function navigateDirectly() {
+            addLog('Navigating directly to asset page (no history)...');
+            addLog('Opening in new tab to simulate direct navigation');
+            window.open('http://localhost:3000/asset/PROD-3F0C-02', '_blank');
+            addLog('In new tab, back button should fallback to /product/product-list');
+        }
+        
+        // Initial log
+        addLog('Navigation test page loaded');
+        addLog('Current history length: ' + window.history.length);
+    </script>
+</body>
+</html>

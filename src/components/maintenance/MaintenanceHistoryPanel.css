@@ -1,0 +1,365 @@
+/* Maintenance History Panel Styles */
+.maintenance-history-panel {
+  margin-top: 1rem;
+}
+
+.maintenance-history-panel .p-card-content {
+  padding: 1.5rem;
+}
+
+/* Statistics Grid */
+.statistics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.stat-card {
+  background: var(--surface-50);
+  border: 1px solid var(--surface-200);
+  border-radius: 8px;
+  padding: 1.25rem;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: var(--text-color-secondary);
+  font-weight: 500;
+}
+
+/* Date Filter */
+.date-filter {
+  max-width: 250px;
+}
+
+/* Timeline Styles */
+.maintenance-timeline .p-timeline-event-content {
+  width: 100%;
+}
+
+.timeline-card {
+  margin-bottom: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.timeline-card .p-card-body {
+  padding: 1rem;
+}
+
+.timeline-card h4 {
+  font-size: 1.1rem;
+  color: var(--text-color);
+}
+
+/* Service Detail Dialog */
+.service-detail-content {
+  padding: 1rem;
+}
+
+.service-detail-content .field {
+  margin-bottom: 1.25rem;
+}
+
+.service-detail-content .field label {
+  display: block;
+  font-weight: 600;
+  color: var(--text-color-secondary);
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.service-detail-content .field p {
+  margin: 0;
+  color: var(--text-color);
+}
+
+/* Checklist Items */
+.checklist-items {
+  padding: 0.5rem 0;
+}
+
+.checklist-item {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--surface-200);
+  display: flex;
+  align-items: flex-start;
+}
+
+.checklist-item:last-child {
+  border-bottom: none;
+}
+
+.checklist-item small {
+  margin-top: 0.25rem;
+}
+
+/* Image Gallery */
+.image-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.image-item {
+  position: relative;
+  border: 1px solid var(--surface-200);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface-50);
+}
+
+.service-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.image-info {
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.image-info small {
+  color: var(--text-color-secondary);
+  font-size: 0.75rem;
+}
+
+/* Document List */
+.document-list {
+  margin-top: 1rem;
+}
+
+.document-item {
+  padding: 0.75rem;
+  border: 1px solid var(--surface-200);
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s;
+}
+
+.document-item:hover {
+  background-color: var(--surface-50);
+}
+
+.document-item a {
+  color: var(--primary-color);
+  text-decoration: none;
+  flex: 1;
+}
+
+.document-item a:hover {
+  text-decoration: underline;
+}
+
+/* Customer Feedback */
+.customer-feedback {
+  padding: 1rem 0;
+}
+
+.signature-image {
+  max-width: 300px;
+  border: 1px solid var(--surface-200);
+  border-radius: 4px;
+  padding: 0.5rem;
+  background: white;
+}
+
+/* DataTable Customizations */
+.maintenance-history-panel .p-datatable .p-datatable-tbody > tr > td {
+  padding: 0.75rem;
+}
+
+.maintenance-history-panel .p-datatable .p-datatable-header {
+  background: transparent;
+  border: none;
+  padding: 0 0 1rem 0;
+}
+
+/* Tag Customizations */
+.maintenance-history-panel .p-tag {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .statistics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .stat-card {
+    padding: 1rem;
+  }
+  
+  .stat-value {
+    font-size: 1.5rem;
+  }
+  
+  .image-gallery {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+  
+  .service-detail-content {
+    padding: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .statistics-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .date-filter {
+    max-width: 100%;
+  }
+}
+
+/* Loading State */
+.maintenance-history-panel .p-datatable-loading-overlay {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+/* Empty State */
+.maintenance-history-panel .p-datatable-emptymessage td {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-color-secondary);
+}
+
+/* Tab Customizations */
+.maintenance-history-panel .p-tabview-nav {
+  background: transparent;
+  border-bottom: 2px solid var(--surface-200);
+}
+
+.maintenance-history-panel .p-tabview-nav li .p-tabview-nav-link {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-color-secondary);
+  transition: all 0.2s;
+}
+
+.maintenance-history-panel .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+  background: transparent;
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.maintenance-history-panel .p-tabview-panels {
+  background: transparent;
+  padding: 1.5rem 0;
+}
+
+/* Progress Bar */
+.stat-card .p-progressbar {
+  height: 6px;
+  background: var(--surface-200);
+}
+
+.stat-card .p-progressbar-value {
+  background: var(--primary-color);
+}
+
+/* Rating Component */
+.stat-card .p-rating .p-rating-icon {
+  font-size: 0.875rem;
+  color: #fbbf24;
+}
+
+/* Issue Cards */
+.service-detail-content .p-card {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.service-detail-content .p-card .p-card-body {
+  padding: 1rem;
+}
+
+/* Action Buttons */
+.maintenance-history-panel .p-button-text {
+  color: var(--text-color-secondary);
+}
+
+.maintenance-history-panel .p-button-text:hover {
+  color: var(--primary-color);
+  background: var(--surface-50);
+}
+
+/* Dialog Customizations */
+.p-dialog .p-dialog-header {
+  background: var(--surface-0);
+  border-bottom: 1px solid var(--surface-200);
+}
+
+.p-dialog .p-dialog-content {
+  padding: 0;
+}
+
+/* Timeline Event Markers */
+.maintenance-timeline .p-timeline-event-marker {
+  border: 2px solid var(--primary-color);
+  background: white;
+}
+
+.maintenance-timeline .p-timeline-event-connector {
+  background-color: var(--surface-200);
+}
+
+.maintenance-timeline .p-timeline-event.p-timeline-event-active .p-timeline-event-marker {
+  background: var(--primary-color);
+}
+
+/* Severity Colors */
+.text-uppercase {
+  text-transform: uppercase;
+}
+
+.text-green-500 {
+  color: #10b981;
+}
+
+.text-green-600 {
+  color: #059669;
+}
+
+.text-red-600 {
+  color: #dc2626;
+}
+
+.text-orange-600 {
+  color: #ea580c;
+}
+
+.text-gray-400 {
+  color: #9ca3af;
+}
+
+.text-gray-500 {
+  color: #6b7280;
+}
+
+.text-gray-600 {
+  color: #4b5563;
+}

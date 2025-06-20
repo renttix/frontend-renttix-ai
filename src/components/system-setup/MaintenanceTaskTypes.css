@@ -1,0 +1,87 @@
+.maintenance-task-types {
+  padding: 1.5rem;
+}
+
+.maintenance-task-types .p-card {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.maintenance-task-types .p-datatable .p-datatable-tbody > tr > td {
+  padding: 0.75rem;
+}
+
+.maintenance-task-types .p-datatable .p-column-header-content {
+  font-weight: 600;
+}
+
+.task-type-form .field {
+  margin-bottom: 1.5rem;
+}
+
+.task-type-form .field:last-child {
+  margin-bottom: 0;
+}
+
+.task-type-form label {
+  display: block;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.task-type-form .p-inputtext,
+.task-type-form .p-dropdown,
+.task-type-form .p-inputnumber,
+.task-type-form .p-inputtextarea {
+  width: 100%;
+}
+
+.task-type-form .p-colorpicker {
+  margin-right: 0.5rem;
+}
+
+.task-type-form .p-error {
+  display: block;
+  margin-top: 0.25rem;
+}
+
+.task-type-form small.text-gray-500 {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Status tags */
+.maintenance-task-types .p-tag {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* Action buttons */
+.maintenance-task-types .p-button-text {
+  padding: 0.5rem;
+}
+
+.maintenance-task-types .p-button-text:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.maintenance-task-types .p-button-text.p-button-danger:hover {
+  background-color: rgba(239, 68, 68, 0.04);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .maintenance-task-types {
+    padding: 1rem;
+  }
+  
+  .maintenance-task-types .p-datatable {
+    font-size: 0.875rem;
+  }
+  
+  .task-type-form .grid {
+    grid-template-columns: 1fr;
+  }
+}

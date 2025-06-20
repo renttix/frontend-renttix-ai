@@ -1,0 +1,108 @@
+.enhanced-maintenance-config {
+  background: var(--surface-ground);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+}
+
+.maintenance-step {
+  margin-bottom: 1.5rem;
+  background: var(--surface-card);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--surface-border);
+  overflow: hidden;
+}
+
+.maintenance-step:last-child {
+  margin-bottom: 0;
+}
+
+.step-header {
+  padding: 1rem;
+  background: var(--surface-50);
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.step-header h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+}
+
+.step-header h4 i {
+  font-size: 1.2rem;
+  color: var(--primary-color);
+}
+
+.step-content {
+  padding: 1rem;
+}
+
+/* Route status styling */
+.route-color-indicator {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .enhanced-maintenance-config {
+    padding: 0.75rem;
+  }
+  
+  .step-content {
+    padding: 0.75rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .maintenance-step {
+    background: var(--surface-800);
+    border-color: var(--surface-700);
+  }
+  
+  .step-header {
+    background: var(--surface-700);
+    border-color: var(--surface-600);
+  }
+}
+
+/* Animation for route checking */
+.pi-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Priority tag colors */
+.p-tag.priority-low {
+  background-color: var(--green-100);
+  color: var(--green-700);
+}
+
+.p-tag.priority-medium {
+  background-color: var(--blue-100);
+  color: var(--blue-700);
+}
+
+.p-tag.priority-high {
+  background-color: var(--orange-100);
+  color: var(--orange-700);
+}
+
+.p-tag.priority-urgent {
+  background-color: var(--red-100);
+  color: var(--red-700);
+}

@@ -1,0 +1,297 @@
+/* Calendar Widget Styles */
+.calendar-widget {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--surface-card);
+}
+
+/* Loading and Error States */
+.calendar-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+}
+
+.calendar-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2rem;
+  color: var(--red-500);
+}
+
+.calendar-error i {
+  font-size: 1.5rem;
+}
+
+/* Grid Container */
+.calendar-grid-container {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* DataTable Customization */
+.calendar-datatable {
+  height: 100%;
+}
+
+.calendar-datatable .p-datatable-wrapper {
+  border: 1px solid var(--surface-border);
+  border-top: none;
+}
+
+.calendar-datatable .p-datatable-thead > tr > th {
+  background: var(--surface-50);
+  border-bottom: 2px solid var(--surface-border);
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.calendar-datatable .p-datatable-tbody > tr > td {
+  border: 1px solid var(--surface-border);
+  padding: 0.5rem;
+  vertical-align: top;
+  min-height: 80px;
+}
+
+.calendar-datatable .p-datatable-tbody > tr:hover {
+  background: var(--surface-hover);
+}
+
+/* Route Column */
+.calendar-route-column {
+  background: var(--surface-50);
+  font-weight: 600;
+  position: sticky;
+  left: 0;
+  z-index: 5;
+}
+
+.calendar-route-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.calendar-route-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.calendar-route-name {
+  flex: 1;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.calendar-route-capacity {
+  font-size: 0.75rem;
+  color: var(--text-color-secondary);
+  font-weight: normal;
+}
+
+/* Calendar Cells */
+.calendar-cell {
+  min-height: 80px;
+  padding: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  position: relative;
+  transition: background-color 0.2s ease;
+}
+
+.calendar-cell-hover {
+  background: var(--primary-50);
+  border: 2px dashed var(--primary-300);
+}
+
+.calendar-cell-empty {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calendar-cell-drop-indicator {
+  color: var(--primary-500);
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.5rem;
+  background: var(--primary-100);
+  border-radius: 4px;
+}
+
+/* Date Column Headers */
+.calendar-date-column .p-column-header-content {
+  justify-content: center;
+}
+
+/* Unassigned Row */
+.calendar-unassigned-row {
+  background: var(--orange-50);
+}
+
+.calendar-unassigned-row:hover {
+  background: var(--orange-100);
+}
+
+.calendar-unassigned-row .calendar-route-cell {
+  color: var(--orange-700);
+  font-weight: 600;
+}
+
+/* Job Cards Container */
+.calendar-cell .job-card {
+  margin-bottom: 0.25rem;
+}
+
+.calendar-cell .job-card:last-child {
+  margin-bottom: 0;
+}
+
+/* Scrollbar Styling */
+.calendar-datatable .p-datatable-scrollable-body::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.calendar-datatable .p-datatable-scrollable-body::-webkit-scrollbar-track {
+  background: var(--surface-100);
+}
+
+.calendar-datatable .p-datatable-scrollable-body::-webkit-scrollbar-thumb {
+  background: var(--surface-400);
+  border-radius: 4px;
+}
+
+.calendar-datatable .p-datatable-scrollable-body::-webkit-scrollbar-thumb:hover {
+  background: var(--surface-500);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1200px) {
+  .calendar-route-column {
+    width: 150px !important;
+  }
+  
+  .calendar-date-column {
+    width: 150px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .calendar-route-column {
+    width: 120px !important;
+  }
+  
+  .calendar-date-column {
+    width: 120px !important;
+  }
+  
+  .calendar-route-capacity {
+    display: none;
+  }
+  
+  .calendar-cell {
+    min-height: 60px;
+  }
+}
+
+/* Dark Mode Adjustments */
+@media (prefers-color-scheme: dark) {
+  .calendar-datatable .p-datatable-thead > tr > th {
+    background: var(--surface-800);
+  }
+  
+  .calendar-route-column {
+    background: var(--surface-800);
+  }
+  
+  .calendar-unassigned-row {
+    background: rgba(251, 146, 60, 0.1);
+  }
+  
+  .calendar-unassigned-row:hover {
+    background: rgba(251, 146, 60, 0.2);
+  }
+  
+  .calendar-cell-hover {
+    background: rgba(var(--primary-color-rgb), 0.1);
+    border-color: var(--primary-400);
+  }
+  
+  .calendar-cell-drop-indicator {
+    background: rgba(var(--primary-color-rgb), 0.2);
+  }
+}
+
+/* Weekend Columns */
+.calendar-date-column[data-weekend="true"] {
+  background: var(--surface-50);
+}
+
+/* Today's Column */
+.calendar-date-column[data-today="true"] .p-column-header-content {
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.calendar-date-column[data-today="true"] {
+  background: var(--primary-50);
+}
+
+/* Capacity Warning */
+.calendar-cell[data-over-capacity="true"] {
+  background: var(--red-50);
+  border: 1px solid var(--red-200);
+}
+
+/* Animation for job movements */
+.job-card {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Print Styles */
+@media print {
+  .calendar-controls {
+    display: none;
+  }
+  
+  .calendar-datatable {
+    border: 1px solid #000;
+  }
+  
+  .calendar-datatable .p-datatable-thead > tr > th,
+  .calendar-datatable .p-datatable-tbody > tr > td {
+    border: 1px solid #000;
+    padding: 4px;
+  }
+  
+  .job-card {
+    border: 1px solid #000;
+    page-break-inside: avoid;
+  }
+}

@@ -1,0 +1,263 @@
+/* Barcode Label Print Styles */
+
+.barcode-print-container {
+  background: white;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.print-header {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.print-header h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1f2937;
+  margin: 0 0 10px 0;
+}
+
+.print-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.print-button,
+.close-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.print-button {
+  background: #7c3aed;
+  color: white;
+}
+
+.print-button:hover {
+  background: #6d28d9;
+}
+
+.close-button {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.close-button:hover {
+  background: #d1d5db;
+}
+
+/* Labels Grid */
+.labels-grid {
+  display: grid;
+  gap: 0;
+  page-break-inside: avoid;
+}
+
+.labels-grid.standard {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.labels-grid.detailed {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.labels-grid.minimal {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Label Styles */
+.barcode-label {
+  border: 1px dashed #d1d5db;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  page-break-inside: avoid;
+  position: relative;
+}
+
+.barcode-label.standard {
+  height: 100mm;
+  width: 70mm;
+}
+
+.barcode-label.detailed {
+  height: 120mm;
+  width: 100mm;
+}
+
+.barcode-label.minimal {
+  height: 50mm;
+  width: 50mm;
+}
+
+.label-content {
+  text-align: center;
+  width: 100%;
+}
+
+/* Standard Label */
+.barcode-label.standard .product-name {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  line-height: 1.2;
+  max-height: 2.4em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.barcode-label.standard .barcode {
+  width: 100%;
+  max-width: 180px;
+  height: auto;
+  margin: 10px auto;
+}
+
+.barcode-label.standard .qr-code {
+  margin: 10px auto;
+  display: block;
+}
+
+.barcode-label.standard .price {
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* Detailed Label */
+.barcode-label.detailed .company-name {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.barcode-label.detailed .product-name {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  line-height: 1.3;
+}
+
+.barcode-label.detailed .barcode {
+  width: 100%;
+  max-width: 220px;
+  height: auto;
+  margin: 15px auto;
+}
+
+.barcode-label.detailed .qr-code {
+  margin: 15px auto;
+  display: block;
+}
+
+.barcode-label.detailed .label-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.barcode-label.detailed .price {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.barcode-label.detailed .print-date {
+  font-size: 10px;
+  color: #9ca3af;
+}
+
+/* Minimal Label */
+.barcode-label.minimal .barcode-minimal {
+  width: 100%;
+  max-width: 120px;
+  height: auto;
+  margin: 5px auto;
+}
+
+.barcode-label.minimal .qr-code-minimal {
+  width: 80px;
+  height: 80px;
+  margin: 5px auto;
+  display: block;
+}
+
+.barcode-label.minimal .price-minimal {
+  font-size: 14px;
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+/* Print-specific styles */
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  .barcode-print-container {
+    padding: 0;
+  }
+
+  .labels-grid {
+    gap: 0;
+  }
+
+  .barcode-label {
+    border: 1px solid #000;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Adjust grid for print */
+  .labels-grid.standard {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .labels-grid.detailed {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .labels-grid.minimal {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  /* Ensure barcodes print clearly */
+  .barcode,
+  .barcode-minimal {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .qr-code,
+  .qr-code-minimal {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  .labels-grid.standard {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  .labels-grid.detailed {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  .labels-grid.minimal {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

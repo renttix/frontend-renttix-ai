@@ -1,0 +1,50 @@
+.product-maintenance-settings {
+  padding: 1.5rem;
+}
+
+.product-maintenance-settings .p-card {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.product-maintenance-settings .p-datatable .p-datatable-tbody > tr > td {
+  padding: 0.75rem;
+}
+
+.product-maintenance-settings .p-inputswitch {
+  transform: scale(0.9);
+}
+
+.maintenance-config-form {
+  padding: 1rem 0;
+}
+
+.maintenance-config-form .field {
+  margin-bottom: 1.5rem;
+}
+
+.maintenance-config-form label {
+  font-weight: 500;
+  color: #374151;
+}
+
+.maintenance-config-form .p-multiselect,
+.maintenance-config-form .p-dropdown {
+  width: 100%;
+}
+
+/* Status tags */
+.product-maintenance-settings .p-tag {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .product-maintenance-settings {
+    padding: 1rem;
+  }
+  
+  .product-maintenance-settings .p-datatable {
+    font-size: 0.875rem;
+  }
+}

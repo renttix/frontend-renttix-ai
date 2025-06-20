@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Route Map Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .info {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .depot-info {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Route Map Test - Depot Location Verification</h1>
+        
+        <div class="info">
+            <h2>Test Results:</h2>
+            <div class="depot-info">
+                <h3>Birmingham Depot</h3>
+                <p><strong>Address:</strong> George Rd, Erdington, Birmingham B23 7SD, UK</p>
+                <p><strong>Coordinates from Database:</strong></p>
+                <ul>
+                    <li>Latitude: 52.51968859999999</li>
+                    <li>Longitude: -1.8639987</li>
+                </ul>
+                <p class="success">✅ Depot has been successfully geocoded with Google Maps API</p>
+            </div>
+            
+            <div class="depot-info">
+                <h3>London Depot</h3>
+                <p><strong>Address:</strong> Victoria St, London SW1, UK</p>
+                <p><strong>Coordinates from Database:</strong></p>
+                <ul>
+                    <li>Latitude: 51.4952103</li>
+                    <li>Longitude: -0.1438979</li>
+                </ul>
+                <p class="success">✅ Depot has been successfully geocoded with Google Maps API</p>
+            </div>
+        </div>
+        
+        <div class="info">
+            <h2>What was fixed:</h2>
+            <ol>
+                <li><strong>Added missing geocodeAddress method</strong> to the geocoding service</li>
+                <li><strong>Updated depot creation/update</strong> to automatically geocode addresses</li>
+                <li><strong>Fixed map centering</strong> to use depot location instead of defaulting to London</li>
+                <li><strong>Added map re-render key</strong> to force update when depot selection changes</li>
+                <li><strong>Geocoded all existing depots</strong> using the update script</li>
+            </ol>
+        </div>
+        
+        <div class="info">
+            <h2>How to test:</h2>
+            <ol>
+                <li>Navigate to <code>/system-setup/routing</code></li>
+                <li>Click on "Create Maintenance Route" tab</li>
+                <li>Select "Birmingham" from the depot dropdown</li>
+                <li>The map should now center on Birmingham (52.519°N, 1.864°W)</li>
+                <li>Select "London Depot" from the dropdown</li>
+                <li>The map should now center on London (51.495°N, 0.144°W)</li>
+            </ol>
+        </div>
+        
+        <div class="info">
+            <h2>Live Route Creation Page:</h2>
+            <iframe src="http://localhost:3000/system-setup/routing"></iframe>
+        </div>
+    </div>
+</body>
+</html>

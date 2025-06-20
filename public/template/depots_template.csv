@@ -1,0 +1,6 @@
+name,description,code,email,telephone,depotManager,fax,website,address1,address2,city,postCode,country
+Main Depot,Primary storage facility,MD0s401,depsot1@example.com,1234567890,John Doe,123-456-789,www.depot1.com,123 Main St,Apt 4B,New York,10001,USA
+West Coast Depot,Secondary storage facility,WCD44002,depsot2@example.com,depot2@example.com,depot2@example.com,321-654-987,www.depot2.com,456 West Ave,Suite 10,Los Angeles,90001,USA
+East Coast Depot,East region storage facility,ECDs0403,depsot3@example.com,1122334455,Alice Johnson,111-222-333,www.depot3.com,789 East Blvd,Unit 5,Boston,21001,USA
+Southern Depot,Southern region storage facility,SD00444,depsot4@example.com,6677889900,Bob Williams,444-555-666,www.depot4.com,321 South St,Warehouse B,Houston,77001,USA
+Midwest Depot,Midwest region storage facility,MW4D005,depost5@example.com,5566778899,Charlie Brown,777-888-999,www.depot5.com,159 Midwest Ave,Building C,Chicago,60601,USA

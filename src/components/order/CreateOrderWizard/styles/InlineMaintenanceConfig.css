@@ -1,0 +1,161 @@
+/* Inline Maintenance Configuration Styles */
+.inline-maintenance-config {
+  width: 100%;
+}
+
+.inline-maintenance-config .p-checkbox {
+  margin-right: 0.5rem;
+}
+
+.inline-maintenance-config .surface-100 {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+}
+
+/* Main controls grid */
+.inline-maintenance-config .main-controls {
+  margin-bottom: 0.5rem;
+}
+
+.inline-maintenance-config .main-controls label {
+  font-weight: 500;
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+/* Calendar styling */
+.inline-maintenance-config .p-calendar {
+  width: 100% !important;
+}
+
+.inline-maintenance-config .p-calendar .p-inputtext {
+  padding: 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Input number styling */
+.inline-maintenance-config .p-inputnumber {
+  width: 60px !important;
+}
+
+.inline-maintenance-config .p-inputnumber .p-inputtext {
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+/* Dropdown styling */
+.inline-maintenance-config .p-dropdown {
+  font-size: 0.875rem;
+  width: 100% !important;
+}
+
+.inline-maintenance-config .p-dropdown .p-inputtext {
+  padding: 0.5rem;
+}
+
+.inline-maintenance-config .p-dropdown-label {
+  font-size: 0.875rem;
+}
+
+/* Priority dropdown item styling */
+.inline-maintenance-config .p-dropdown-item {
+  font-size: 0.875rem;
+}
+
+/* Textarea styling */
+.inline-maintenance-config .p-inputtextarea {
+  font-size: 0.875rem;
+  min-height: 60px;
+  width: 100%;
+}
+
+/* Button styling */
+.inline-maintenance-config .p-button-text {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Advanced section */
+.inline-maintenance-config .border-top-1 {
+  border-top: 1px solid #dee2e6;
+}
+
+/* Loading spinner */
+.inline-maintenance-config .p-progress-spinner {
+  margin: 0 auto;
+}
+
+/* Checkbox label */
+.inline-maintenance-config label {
+  user-select: none;
+}
+
+/* Grid column spacing */
+.inline-maintenance-config .grid {
+  margin-left: -0.5rem;
+  margin-right: -0.5rem;
+}
+
+.inline-maintenance-config .grid > [class*="col-"] {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .inline-maintenance-config .main-controls {
+    gap: 0.5rem;
+  }
+  
+  .inline-maintenance-config .main-controls .col-12 {
+    padding: 0.25rem;
+  }
+  
+  .inline-maintenance-config .flex-wrap {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+  
+  .inline-maintenance-config .p-calendar,
+  .inline-maintenance-config .p-inputnumber {
+    width: 100% !important;
+    max-width: 200px;
+  }
+  
+  .inline-maintenance-config .p-dropdown {
+    width: 100% !important;
+  }
+}
+
+/* DataTable cell adjustments for maintenance config */
+.p-datatable .p-datatable-tbody > tr > td .inline-maintenance-config {
+  margin-top: 0.5rem;
+}
+
+.p-datatable .p-datatable-tbody > tr > td .flex-column {
+  align-items: flex-start;
+}
+
+/* Highlight when maintenance is enabled */
+.inline-maintenance-config.maintenance-enabled {
+  border-left: 3px solid var(--primary-color);
+  padding-left: 0.5rem;
+}
+
+/* Priority color indicators */
+.inline-maintenance-config .priority-low {
+  color: #10B981;
+}
+
+.inline-maintenance-config .priority-medium {
+  color: #F59E0B;
+}
+
+.inline-maintenance-config .priority-high {
+  color: #EF4444;
+}
+
+.inline-maintenance-config .priority-urgent {
+  color: #DC2626;
+}

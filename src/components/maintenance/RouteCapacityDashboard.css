@@ -1,0 +1,210 @@
+/* RouteCapacityDashboard.css */
+
+.route-capacity-dashboard {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.dark .route-capacity-dashboard {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+/* Header Section */
+.capacity-dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.dark .capacity-dashboard-header {
+  border-bottom-color: #374151;
+}
+
+.header-left h3 {
+  color: #111827;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.dark .header-left h3 {
+  color: #f9fafb;
+}
+
+.header-left p {
+  color: #6b7280;
+  margin: 0;
+}
+
+.dark .header-left p {
+  color: #9ca3af;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.capacity-date-picker {
+  max-width: 200px;
+}
+
+/* Summary Section */
+.capacity-summary {
+  margin-bottom: 1.5rem;
+}
+
+.capacity-summary .p-message {
+  border-radius: 0.5rem;
+}
+
+/* Routes Grid */
+.routes-capacity-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .routes-capacity-grid {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .routes-capacity-grid {
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  }
+}
+
+.route-capacity-card {
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+.route-capacity-card:hover {
+  transform: translateY(-2px);
+}
+
+.route-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 1rem;
+  margin-top: -0.5rem;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #9ca3af;
+}
+
+.dark .empty-state {
+  color: #6b7280;
+}
+
+.empty-state i {
+  color: #d1d5db;
+}
+
+.dark .empty-state i {
+  color: #4b5563;
+}
+
+/* Loading State */
+.route-capacity-dashboard .p-progress-spinner {
+  width: 50px;
+  height: 50px;
+}
+
+/* Edit Dialog */
+.p-dialog .field {
+  margin-bottom: 1rem;
+}
+
+.p-dialog .field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.dark .p-dialog .field label {
+  color: #d1d5db;
+}
+
+.p-dialog .field small {
+  display: block;
+  margin-top: 0.5rem;
+  color: #6b7280;
+}
+
+.dark .p-dialog .field small {
+  color: #9ca3af;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 640px) {
+  .capacity-dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .capacity-date-picker {
+    max-width: none;
+    flex: 1;
+  }
+
+  .routes-capacity-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Animation for capacity updates */
+@keyframes capacityUpdate {
+  0% {
+    background-color: rgba(59, 130, 246, 0.1);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.route-capacity-card.updating {
+  animation: capacityUpdate 1s ease-out;
+}
+
+/* Critical Routes Highlight */
+.route-capacity-card.critical {
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+.route-capacity-card.warning {
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+}
+
+/* Tooltip Styling */
+.route-capacity-dashboard .p-tooltip {
+  font-size: 0.875rem;
+}
+
+/* Button Hover Effects */
+.route-actions .p-button-text:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.dark .route-actions .p-button-text:hover {
+  background-color: rgba(59, 130, 246, 0.2);
+}

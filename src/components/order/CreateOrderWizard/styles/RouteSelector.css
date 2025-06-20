@@ -1,0 +1,285 @@
+/* Route Selector Styles */
+.route-selector {
+  margin-top: 0.5rem;
+}
+
+.route-selector .p-progressspinner {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.route-assignment-box {
+  padding: 0.75rem;
+  background-color: #f8fafc;
+  border-radius: 0.375rem;
+  border: 1px solid #e2e8f0;
+}
+
+.route-assignment-box.has-route {
+  background-color: #f0f9ff;
+  border-color: #3b82f6;
+}
+
+.route-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.route-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.route-icon {
+  font-size: 1.125rem;
+}
+
+.route-name {
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.route-status-tag {
+  margin-left: 0.5rem;
+}
+
+.route-status-tag.p-tag-success {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.route-status-tag.p-tag-warning {
+  background-color: #fed7aa;
+  color: #92400e;
+}
+
+.route-status-tag.p-tag-info {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.route-override-reason {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+.no-route-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background-color: #f9fafb;
+  border-radius: 0.375rem;
+  border: 1px solid #e5e7eb;
+}
+
+.no-route-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+/* Route Dialog Styles */
+.route-dialog .p-dialog-content {
+  padding: 1.5rem;
+}
+
+.route-dialog .current-assignment {
+  margin-bottom: 1rem;
+}
+
+.route-dialog .current-assignment-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.route-dialog .current-assignment-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.route-options-container {
+  margin-bottom: 1rem;
+}
+
+.route-options-label {
+  font-size: 0.875rem;
+  color: #374151;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.route-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.route-option {
+  padding: 0.75rem;
+  background-color: #f9fafb;
+  border-radius: 0.375rem;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.route-option:hover {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.route-option.selected {
+  background-color: #eff6ff;
+  border-color: #3b82f6;
+}
+
+.route-option-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+
+.route-option-name {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.route-option-name strong {
+  font-size: 0.875rem;
+  color: #111827;
+}
+
+.route-option-status {
+  font-size: 0.75rem;
+}
+
+.route-option-status.in-area {
+  color: #10b981;
+}
+
+.route-option-status.distance {
+  color: #6b7280;
+}
+
+.route-option-description {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-left: 1.5rem;
+}
+
+.floating-route-option {
+  border-top: 1px solid #e5e7eb;
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+}
+
+.floating-route-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.floating-route-icon {
+  color: #f59e0b;
+}
+
+.floating-route-tag {
+  font-size: 0.625rem !important;
+}
+
+.override-reason-container {
+  margin-top: 1rem;
+}
+
+.override-reason-label {
+  font-size: 0.75rem;
+  color: #374151;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.override-reason-required {
+  color: #ef4444;
+  margin-left: 0.25rem;
+}
+
+.override-reason-textarea {
+  width: 100%;
+  font-size: 0.875rem;
+}
+
+/* Loading State */
+.route-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.route-loading-text {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+/* Error State */
+.route-error {
+  margin-bottom: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .route-dialog {
+    width: 95vw !important;
+  }
+  
+  .route-option {
+    padding: 0.625rem;
+  }
+  
+  .route-option-description {
+    margin-left: 0;
+    margin-top: 0.25rem;
+  }
+}
+
+/* Animation */
+.route-assignment-box,
+.route-option {
+  transition: all 0.2s ease-in-out;
+}
+
+.route-assignment-box:hover {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Button Overrides */
+.route-selector .p-button-text {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+.route-selector .p-button-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+/* Dialog Footer */
+.route-dialog .p-dialog-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}

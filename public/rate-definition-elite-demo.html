@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rate Definition Elite - Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .animate-slideIn {
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        .animate-pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .status-ribbon {
+            position: absolute;
+            top: 0;
+            right: 0;
+            transform: rotate(12deg) translate(25%, -10%);
+            padding: 0.25rem 2rem;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
+        <div class="px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                        <i class="fas fa-calculator text-orange-500"></i>
+                        Rate Definitions
+                        <span class="bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded">4</span>
+                    </h1>
+                    <p class="text-sm text-gray-600 mt-1">
+                        Manage rental pricing structures and billing cycles for your products
+                    </p>
+                </div>
+                <button onclick="showCreateWizard()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+                    <i class="fas fa-plus"></i>
+                    Create Rate Definition
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="px-6 py-6">
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 animate-fadeIn" style="animation-delay: 0.1s">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Total Rates</p>
+                        <p class="text-2xl font-bold text-gray-800">4</p>
+                    </div>
+                    <div class="p-3 bg-blue-100 rounded-lg">
+                        <i class="fas fa-calculator text-xl text-blue-600"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 animate-fadeIn" style="animation-delay: 0.2s">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Active Rates</p>
+                        <p class="text-2xl font-bold text-green-600">3</p>
+                    </div>
+                    <div class="p-3 bg-green-100 rounded-lg">
+                        <i class="fas fa-check-circle text-xl text-green-600"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 animate-fadeIn" style="animation-delay: 0.3s">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Avg. Min Period</p>
+                        <p class="text-2xl font-bold text-purple-600">7 days</p>
+                    </div>
+                    <div class="p-3 bg-purple-100 rounded-lg">
+                        <i class="fas fa-clock text-xl text-purple-600"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 animate-fadeIn" style="animation-delay: 0.4s">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Products Using</p>
+                        <p class="text-2xl font-bold text-orange-600">28</p>
+                    </div>
+                    <div class="p-3 bg-orange-100 rounded-lg">
+                        <i class="fas fa-money-bill-wave text-xl text-orange-600"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Filter Bar -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1 relative">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="Search rate definitions..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="flex gap-2">
+                    <select class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option>All Rates</option>
+                        <option>Active Only</option>
+                        <option>Inactive Only</option>
+                    </select>
+                    <button class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-filter-circle-xmark"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rate Definition Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Card 1: Standard Weekly -->
+            <div class="relative overflow-hidden rounded-xl border-2 border-green-200 bg-gradient-to-br from-white to-green-50 shadow-lg card-hover">
+                <div class="status-ribbon bg-green-500 text-white">ACTIVE</div>
+                
+                <div class="p-6 pb-4">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="p-3 rounded-lg bg-green-100">
+                                <i class="fas fa-calculator text-2xl text-green-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800">Standard Weekly Rate</h3>
+                                <p class="text-sm text-gray-600 mt-1">5-day rental week with 1-week minimum</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="bg-white bg-opacity-70 rounded-lg p-3 border border-gray-100">
+                            <div class="flex items-center gap-2 mb-1">
+                                <i class="fas fa-calendar-alt text-blue-500 text-sm"></i>
+                                <span class="text-xs text-gray-600">Min. Rental Period</span>
+                            </div>
+                            <p class="text-xl font-bold text-gray-800">5 <span class="text-sm font-normal">days</span></p>
+                        </div>
+                        <div class="bg-white bg-opacity-70 rounded-lg p-3 border border-gray-100">
+                            <div class="flex items-center gap-2 mb-1">
+                                <i class="fas fa-clock text-purple-500 text-sm"></i>
+                                <span class="text-xs text-gray-600">Rental Days/Week</span>
+                            </div>
+                            <p class="text-xl font-bold text-gray-800">5 <span class="text-sm font-normal">days</span></p>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs text-gray-600">Usage in Products</span>
+                            <span class="text-xs font-bold text-gray-800">12 products</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%"></div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
+                        <div class="flex items-center gap-2">
+                            <button class="p-2 rounded-lg bg-green-100 hover:bg-green-200 text-green-600 transition-colors">
+                                <i class="fas fa-toggle-on text-xl"></i>
+                            </button>
+                            <button onclick="showRateDetails()" class="p-2 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-600 transition-colors">
+                                <i class="fas fa-eye text-xl"></i>
+                            </button>
+                            <button class="p-2 rounded-lg bg-purple-100 hover:bg-purple-200 text-purple-600 transition-colors">
+                                <i class="fas fa-copy text-xl"></i>
+                            </button>
+                        </div>
+                        <button class="p-2 rounded-lg bg-red-100 hover:bg-red-200 text-red-600 transition-colors">
+                            <i class="fas fa-trash text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Flexible Daily -->
+            <div class="relative overflow-hidden rounded-xl border-2 border-green-200 bg-gradient-to-br from-white to-green-50 shadow-lg card-hover">
+                <div class="status-ribbon bg-green-500 text-white">ACTIVE</div>
+                
+                <div class="p-6 pb-4">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="p-3 rounded-lg bg-green-100">
+                                <i class="fas fa-clock text-2xl text-green-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800">Flexible Daily Rate</h3>
+                                <p class="text-sm text-gray-600 mt-1">Daily rentals with no minimum period</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="bg-white bg-opacity-70 rounded-lg p-3 border border-gray-100">
+                            <div class="flex items-center gap-2 mb-1">
+                                <i class="fas fa-calendar-alt text-blue-500 text-sm"></i>
+                                <span class="text-xs text-gray-600">Min. Rental Period</span>
+                            </div>
+                            <p class="text-xl font-bold text-gray-800">1 <span class="text-sm font-normal">day</span></p>
+                        </div>
+                        <div class="bg-white bg-opacity-70 rounded-lg p-3 border border-gray-100">
+                            <div class="flex items-center gap-2 mb-1">
+                                <i class="fas fa-clock text-purple-500 text-sm"></i>
+                                <span class="text-xs text-gray-600">Rental Days/Week</span>
+                            </div>
+                            <p class="text-xl font-bold text-gray-800">7 <span class="text-sm font-normal">days</span></p>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs text-gray-600">Usage in Products</span>
+                            <span class="text-xs font-bold text-gray-800">8 products</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 50%"></div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
+                        <div class="flex items-center gap-2">
+                            <button class="p-2 rounded-lg bg-green-100 hover:bg-green-200 text-green-600 transition-colors">
+                                <i class="fas fa-toggle-on text-xl"></i>
+                            </button>
+                            <button class="p-2 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-600 transition-colors">
+                                <i class="fas fa-eye text-xl"></i>
+                            </button>
+                            <button class="p-2 rounded-lg bg-purple-100 hover:bg-purple-200 text-purple-600 transition-colors">
+                                <i class="fas fa-copy text-xl"></i>
+                            </button>
+                        </div>
+                        <button class="p-2 rounded-lg bg-red-100 hover:bg-red-200 text-red-600 transition-colors">
+                            <i class="fas fa-trash text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Monthly Contract -->
+            <div class="relative overflow-hidden rounded-xl border-2 border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md card-hover">
+                <div class="status-ribbon bg-gray-400 text-white">INACTIVE</div>
+                
+                <div class="p-6 pb-4">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="p-3 rounded-lg bg-gray-100">
+                                <i class="fas fa-calendar-alt text-2xl text-gray-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800">Monthly Contract</h3>
+                                <p class="text-sm text-gray-600 mt-1">30-day minimum for long-term rentals</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="bg-white bg-opacity-70 rounded-lg p-3 border border-gray-100">
+                            <div class="flex items-center gap-2 mb-1">
+                                <i class="fas fa-calendar-alt text-blue-500 text-sm"></i>
+                                <span class="text-xs text-gray-600">Min. Rental Period</span>
+                            </div>
+                            <p class="text-xl font-bold text-gray-800">30 <span class="text-sm font-normal">days</span></p>
+                        </div>
+                        <div class="bg-white bg-opacity-70 rounded-lg p-3 border border-gray-100">
+                            <div class="flex items-center gap-2 mb-1">
+                                <i class="fas fa-clock text-purple-500 text-sm"></i>
+                                <span class="text-xs text-gray-600">Rental Days/Week</span>
+                            </div>
+                            <p class="text-xl font-bold text-gray-800">7 <span class="text-sm font-normal">days</span></p>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs text-gray-600">Usage in Products</span>
+                            <span class="text-xs font-bold text-gray-800">0 products</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
+                        <div class="flex items-center gap-2">
+                            <button class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors">
+                                <i class="fas fa-toggle-off text-xl"></i>
+                            </button>
+                            <button class="p-2 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-600 transition-colors">
+                                <i class="fas fa-eye text-xl"></i>
+                            </button>
+                            <button class="p-2 rounded-lg bg-purple-100 hover:bg-purple-200 text-purple-600 transition-colors">
+                                <i class="fas fa-copy text-xl"></i>
+                            </button>
+                        </div>
+                        <button class="p-2 rounded-lg bg-red-100 hover:bg-red-200 text-red-600 transition-colors">
+                            <i class="fas fa-trash text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Help Button -->
+    <button onclick="showHelp()" class="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full shadow-lg flex items-center justify-center text-white animate-pulse">
+        <i class="fas fa-lightbulb text-xl"></i>
+    </button>
+
+    <!-- Create Wizard Modal -->
+    <div id="createWizard" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-slideIn">
+                <!-- Wizard Header -->
+                <div class="bg-white border-b border-gray-200 p-6 sticky top-0 z-10">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                                <i class="fas fa-calculator text-orange-500"></i>
+                                Create Rate Definition
+                            </h2>
+                            <p class="text-sm text-gray-600 mt-1">Set up a new pricing structure for your rental products</p>
+                        </div>
+                        <button onclick="closeCreateWizard()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Progress Steps -->
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">1</div>
+                            <span class="ml-3 font-medium text-gray-900">Basic Info</span>
+                        </div>
+                        <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-gray-300 text-white rounded-full flex items-center justify-center font-bold">2</div>
+                            <span class="ml-3 font-medium text-gray-500">Template</span>
+                        </div>
+                        <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-gray-300 text-white rounded-full flex items-center justify-center font-bold">3</div>
+                            <span class="ml-3 font-medium text-gray-500">Configuration</span>
+                        </div>
+                        <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-gray-300 text-white rounded-full flex items-center justify-center font-bold">4</div>
+                            <span class="ml-3 font-medium text-gray-500">Preview</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step Content -->
+                <div class="p-6">
+                    <!-- Basic Info Step -->
+                    <div class="space-y-6">
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-info-circle text-blue-500 text-xl mt-1"></i>
+                                <div>
+                                    <h4 class="font-bold text-blue-900 mb-1">What are Rate Definitions?</h4>
+                                    <p class="text-sm text-blue-800">
+                                        Rate definitions control how your rental products are priced over time. 
+                                        They determine minimum rental periods, billing cycles, and how rates change 
+                                        based on rental duration.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">
+                                    Rate Definition Name
+                                    <span class="text-red-500 ml-1">*</span>
+                                    <i class="fas fa-question-circle inline ml-2 text-gray-400 cursor-help"></i>
+                                </label>
+                                <input type="text" placeholder="e.g., Standard Weekly Rate, Weekend Special" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">
+                                    Description
+                                    <i class="fas fa-question-circle inline ml-2 text-gray-400 cursor-help"></i>
+                                </label>
+                                <textarea placeholder="Describe the purpose and use case for this rate definition..." rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                            </div>
+
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <h4 class="font-bold text-gray-700 mb-3 flex items-center gap-2">
+                                    <i class="fas fa-lightbulb text-yellow-500"></i>
+                                    Examples of Rate Definitions
+                                </h4>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex items-start gap-2">
+                                        <span class="text-green-500">•</span>
+                                        <div>
+                                            <strong>Standard Weekly:</strong> 5-day rental week, minimum 1 week
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start gap-2">
+                                        <span class="text-blue-500">•</span>
+                                        <div>
+                                            <strong>Flexible Daily:</strong> Pay per day, no minimum
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start gap-2">
+                                        <span class="text-purple-500">•</span>
+                                        <div>
+                                            <strong>Monthly Contract:</strong> 30-day minimum for discounts
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="p-6 border-t border-gray-200 flex justify-between">
+                    <button onclick="closeCreateWizard()" class="px-4 py-2 text-gray-600 hover:text-gray-800">Cancel</button>
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg flex items-center gap-2">
+                        Next
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rate Details Modal -->
+    <div id="rateDetails" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full animate-slideIn">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-800">Rate Structure Preview</h3>
+                        <button onclick="closeRateDetails()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+
+                    <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6">
+                        <h4 class="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2">
+                            <i class="fas fa-chart-line text-blue-500"></i>
+                            Standard Weekly Rate - Visual Breakdown
+                        </h4>
+                        
+                        <div class="grid grid-cols-7 gap-2 mb-6">
+                            <div class="text-center">
+                                <div class="text-xs text-gray-600 mb-2">Mon</div>
+                                <div class="h-20 bg-gradient-to-t from-blue-500 to-blue-300 rounded flex items-end justify-center">
+                                    <span class="text-xs text-white font-bold mb-1">100%</span>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-xs text-gray-600 mb-2">Tue</div>
+                                <div class="h-20 bg-gradient-to-t from-blue-500 to-blue-300 rounded flex items-end justify-center">
+                                    <span class="text-xs text-white font-bold mb-1">100%</span>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-xs text-gray-600 mb-2">Wed</div>
+                                <div class="h-20 bg-gradient-to-t from-blue-500 to-blue-300 rounded flex items-end justify-center">
+                                    <span class="text-xs text-white font-bold mb-1">100%</span>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-xs text-gray-600 mb-2">Thu</div>
+                                <div class="h-20 bg-gradient-to-t from-blue-500 to-blue-300 rounded flex items-end justify-center">
+                                    <span class="text-xs text-white font-bold mb-1">100%</span>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-xs text-gray-600 mb-2">Fri</div>
+                                <div class="h-20 bg-gradient-to-t from-blue-500 to-blue-300 rounded flex items-end justify-center">
+                                    <span class="text-xs text-white font-bold mb-1">100%</span>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-xs text-gray-600 mb-2">Sat</div>
+                                <div class="h-8 bg-gray-200 rounded flex items-end justify-center">
+                                    <span class="text-xs text-gray-600 font-bold mb-1">-</span>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-xs text-gray-600 mb-2">Sun</div>
+                                <div class="h-8 bg-gray-200 rounded flex items-end justify-center">
+                                    <span class="text-xs text-gray-600 font-bold mb-1">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-lg p-4">
+                            <h5 class="font-semibold text-gray-700 mb-3">How it works:</h5>
+                            <ul class="space-y-2 text-sm text-gray-600">
+                                <li class="flex items-start gap-2">
+                                    <i class="fas fa-check text-green-500 mt-0.5"></i>
+                                    <span>Customers are charged for 5 days per week (Monday-Friday)</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fas fa-check text-green-500 mt-0.5"></i>
+                                    <span>Minimum rental period is 5 days</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fas fa-check text-green-500 mt-0.5"></i>
+                                    <span>Weekend days (Saturday-Sunday) are not billable</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end gap-3 mt-6">
+                        <button onclick="closeRateDetails()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Close</button>
+                        <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Edit Rate</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-2xl max-w-md w-full animate-slideIn">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">Need Help?</h3>
+                        <button onclick="closeHelp()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="bg-blue-50 rounded-lg p-4">
+                            <h4 class="font-semibold text-blue-900 mb-2">Quick Tips</h4>
+                            <ul class="space-y-2 text-sm text-blue-800">
+                                <li>• Rate definitions control product pricing over time</li>
+                                <li>• Set minimum rental periods to ensure profitability</li>
+                                <li>• Use templates to quickly create common rate structures</li>
+                                <li>• Test your rates with the calculator before saving</li>
+                            </ul>
+                        </div>
+                        <div class="text-center">
+                            <button onclick="closeHelp()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg">Got it!</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal functions
+        function showCreateWizard() {
+            document.getElementById('createWizard').classList.remove('hidden');
+        }
+
+        function closeCreateWizard() {
+            document.getElementById('createWizard').classList.add('hidden');
+        }
+
+        function showRateDetails() {
+            document.getElementById('rateDetails').classList.remove('hidden');
+        }
+
+        function closeRateDetails() {
+            document.getElementById('rateDetails').classList.add('hidden');
+        }
+
+        function showHelp() {
+            document.getElementById('helpModal').classList.remove('hidden');
+        }
+
+        function closeHelp() {
+            document.getElementById('helpModal').classList.add('hidden');
+        }
+
+        // Add click outside to close modals
+        document.addEventListener('click', function(event) {
+            const createWizard = document.getElementById('createWizard');
+            const rateDetails = document.getElementById('rateDetails');
+            const helpModal = document.getElementById('helpModal');
+            
+            if (event.target === createWizard) {
+                closeCreateWizard();
+            }
+            if (event.target === rateDetails) {
+                closeRateDetails();
+            }
+            if (event.target === helpModal) {
+                closeHelp();
+            }
+        });
+
+        // Animate elements on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.card-hover');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'all 0.5s ease-out';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 50);
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

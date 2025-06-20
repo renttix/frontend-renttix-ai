@@ -1,0 +1,218 @@
+/* RouteCapacityIndicator.css */
+
+.route-capacity-indicator {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.route-capacity-indicator.horizontal {
+  flex-direction: column;
+}
+
+.route-capacity-indicator.vertical {
+  flex-direction: row;
+  align-items: center;
+}
+
+/* Detailed view styles */
+.route-capacity-indicator.detailed {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.route-capacity-indicator.detailed:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode */
+.dark .route-capacity-indicator.detailed {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+/* Size variations */
+.route-capacity-indicator.small {
+  font-size: 0.75rem;
+}
+
+.route-capacity-indicator.small.detailed {
+  padding: 0.5rem;
+}
+
+.route-capacity-indicator.large {
+  font-size: 1rem;
+}
+
+.route-capacity-indicator.large.detailed {
+  padding: 1.25rem;
+}
+
+/* Header section */
+.capacity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.route-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.route-name {
+  font-weight: 600;
+  color: #374151;
+}
+
+.dark .route-name {
+  color: #f3f4f6;
+}
+
+.capacity-status-tag {
+  font-size: 0.625rem !important;
+  padding: 0.125rem 0.375rem !important;
+}
+
+.capacity-numbers {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  font-family: monospace;
+}
+
+.current-load {
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: #111827;
+}
+
+.dark .current-load {
+  color: #f9fafb;
+}
+
+.separator {
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+.max-capacity {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.dark .max-capacity {
+  color: #d1d5db;
+}
+
+/* Progress bar container */
+.route-capacity-progress {
+  width: 100%;
+  margin: 0.5rem 0;
+}
+
+.route-capacity-progress .p-progressbar {
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+
+.route-capacity-progress .p-progressbar-value {
+  transition: width 0.5s ease;
+}
+
+/* Footer section */
+.capacity-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.utilization-text {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.dark .utilization-text {
+  color: #9ca3af;
+}
+
+.available-text {
+  color: #10b981;
+  font-weight: 500;
+}
+
+.dark .available-text {
+  color: #34d399;
+}
+
+/* Compact mode (no details) */
+.route-capacity-indicator:not(.detailed) {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.route-capacity-indicator:not(.detailed) .route-capacity-progress {
+  width: 100px;
+  margin: 0;
+}
+
+.route-capacity-indicator.vertical:not(.detailed) .route-capacity-progress {
+  width: 8px;
+  height: 60px;
+}
+
+.route-capacity-indicator.vertical:not(.detailed) .p-progressbar {
+  transform: rotate(-90deg);
+  transform-origin: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .capacity-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .capacity-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+}
+
+/* Animation for capacity changes */
+@keyframes capacityPulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.route-capacity-indicator.updating {
+  animation: capacityPulse 1s ease-in-out;
+}
+
+/* Critical capacity warning */
+.route-capacity-indicator.detailed.critical {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+.dark .route-capacity-indicator.detailed.critical {
+  border-color: #dc2626;
+  background-color: rgba(239, 68, 68, 0.1);
+}

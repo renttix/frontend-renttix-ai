@@ -1,0 +1,4 @@
+productName,companyProductName,productDescription,status,rentPrice,rentDuration,salePrice,quantity,totalQuantity,minHireTime,range,vat,uniqueAssetNo,rate,lenghtUnit,weightUnit,weight,length,width,height,isActive,rating
+Product A,Company A,Description A,Active,100,7 days,500,10,50,1 day,Small,10%,Asset001,Rate001,cm,kg,1.5,30,20,10,Active,4.5
+Product B,Company B,Description B,Inactive,200,14 days,1000,5,25,2 days,Medium,12%,Asset002,Rate002,cm,kg,2,40,30,15,Inactive,3.8
+Product C,Company C,Description C,Active,150,30 days,750,20,100,3 days,Large,15%,Asset003,Rate003,cm,kg,3.5,50,40,20,Active,4

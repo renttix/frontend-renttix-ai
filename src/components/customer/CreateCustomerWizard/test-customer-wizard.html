@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Creation Wizard - Test Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .wizard-demo {
+            display: flex;
+            gap: 30px;
+        }
+        .steps-sidebar {
+            flex: 0 0 250px;
+        }
+        .step-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .step-item.active {
+            background: #007bff;
+            color: white;
+        }
+        .step-item.completed {
+            background: #28a745;
+            color: white;
+        }
+        .step-content {
+            flex: 1;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .required {
+            color: red;
+        }
+        .navigation {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .progress-bar {
+            height: 4px;
+            background: #e9ecef;
+            border-radius: 2px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #007bff;
+            transition: width 0.5s ease;
+        }
+        .info-box {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .success-box {
+            background: #e8f5e9;
+            border: 1px solid #4caf50;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .field-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .wizard-demo {
+                flex-direction: column;
+            }
+            .steps-sidebar {
+                flex: none;
+            }
+            .field-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Customer Creation Wizard - Elite UI/UX Demo</h1>
+        
+        <div class="info-box">
+            <strong>✅ Fixed Issues:</strong>
+            <ul>
+                <li>Removed Industry field (not required by backend)</li>
+                <li>Kept Customer Category field (required by backend as 'type')</li>
+                <li>Added proper field mapping for backend compatibility</li>
+                <li>All 5 steps are now accessible and functional</li>
+            </ul>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar" style="width: 20%"></div>
+        </div>
+
+        <div class="wizard-demo">
+            <div class="steps-sidebar">
+                <div class="step-item active" onclick="showStep(1)">
+                    <span>📝</span> 1. Basic Info
+                </div>
+                <div class="step-item" onclick="showStep(2)">
+                    <span>📞</span> 2. Contact
+                </div>
+                <div class="step-item" onclick="showStep(3)">
+                    <span>📍</span> 3. Address
+                </div>
+                <div class="step-item" onclick="showStep(4)">
+                    <span>💳</span> 4. Financial
+                </div>
+                <div class="step-item" onclick="showStep(5)">
+                    <span>✅</span> 5. Review
+                </div>
+            </div>
+
+            <div class="step-content">
+                <!-- Step 1: Basic Info -->
+                <div id="step1" class="step-panel">
+                    <h2>Basic Information</h2>
+                    <p>Let's start with the essential details about your customer</p>
+                    
+                    <div class="form-group">
+                        <label>Customer Type</label>
+                        <select id="customerType" onchange="toggleCustomerType()">
+                            <option value="company">Company</option>
+                            <option value="individual">Individual</option>
+                        </select>
+                    </div>
+
+                    <div id="companyFields">
+                        <div class="field-grid">
+                            <div class="form-group">
+                                <label>Company Name <span class="required">*</span></label>
+                                <input type="text" placeholder="Enter company name">
+                            </div>
+                            <div class="form-group">
+                                <label>Trading Name</label>
+                                <input type="text" placeholder="DBA or trading as">
+                            </div>
+                            <div class="form-group">
+                                <label>Registration Number</label>
+                                <input type="text" placeholder="Company registration">
+                            </div>
+                            <div class="form-group">
+                                <label>VAT Number</label>
+                                <input type="text" placeholder="VAT registration">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="individualFields" style="display: none;">
+                        <div class="field-grid">
+                            <div class="form-group">
+                                <label>First Name <span class="required">*</span></label>
+                                <input type="text" placeholder="Enter first name">
+                            </div>
+                            <div class="form-group">
+                                <label>Last Name <span class="required">*</span></label>
+                                <input type="text" placeholder="Enter last name">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Customer Category <span class="required">*</span></label>
+                        <select>
+                            <option value="">Select category</option>
+                            <option value="retail">Retail</option>
+                            <option value="wholesale">Wholesale</option>
+                            <option value="corporate">Corporate</option>
+                            <option value="government">Government</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Step 2: Contact -->
+                <div id="step2" class="step-panel" style="display: none;">
+                    <h2>Contact Information</h2>
+                    <p>How can we reach your customer?</p>
+                    
+                    <div class="field-grid">
+                        <div class="form-group">
+                            <label>Email <span class="required">*</span></label>
+                            <input type="email" placeholder="email@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="tel" placeholder="+1 (555) 123-4567">
+                        </div>
+                        <div class="form-group">
+                            <label>Mobile</label>
+                            <input type="tel" placeholder="+1 (555) 987-6543">
+                        </div>
+                        <div class="form-group">
+                            <label>Preferred Language</label>
+                            <select>
+                                <option value="en">English</option>
+                                <option value="es">Spanish</option>
+                                <option value="fr">French</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Address -->
+                <div id="step3" class="step-panel" style="display: none;">
+                    <h2>Address Information</h2>
+                    <p>Where is your customer located?</p>
+                    
+                    <div class="form-group">
+                        <label>Address Line 1 <span class="required">*</span></label>
+                        <input type="text" placeholder="Street address">
+                    </div>
+                    <div class="form-group">
+                        <label>Address Line 2</label>
+                        <input type="text" placeholder="Apartment, suite, etc.">
+                    </div>
+                    <div class="field-grid">
+                        <div class="form-group">
+                            <label>City <span class="required">*</span></label>
+                            <input type="text" placeholder="City">
+                        </div>
+                        <div class="form-group">
+                            <label>State/Province</label>
+                            <input type="text" placeholder="State">
+                        </div>
+                        <div class="form-group">
+                            <label>Postal Code <span class="required">*</span></label>
+                            <input type="text" placeholder="12345">
+                        </div>
+                        <div class="form-group">
+                            <label>Country <span class="required">*</span></label>
+                            <select>
+                                <option value="US">United States</option>
+                                <option value="CA">Canada</option>
+                                <option value="UK">United Kingdom</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Financial -->
+                <div id="step4" class="step-panel" style="display: none;">
+                    <h2>Financial Information</h2>
+                    <p>Set up payment and billing preferences</p>
+                    
+                    <div class="field-grid">
+                        <div class="form-group">
+                            <label>Payment Terms <span class="required">*</span></label>
+                            <select>
+                                <option value="">Select payment terms</option>
+                                <option value="net30">Net 30</option>
+                                <option value="net60">Net 60</option>
+                                <option value="cod">Cash on Delivery</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Invoice Run Code <span class="required">*</span></label>
+                            <select>
+                                <option value="">Select invoice run code</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Credit Limit</label>
+                            <input type="number" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label>Billing Period</label>
+                            <select>
+                                <option value="monthly">Monthly</option>
+                                <option value="quarterly">Quarterly</option>
+                                <option value="annually">Annually</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 5: Review -->
+                <div id="step5" class="step-panel" style="display: none;">
+                    <h2>Review & Submit</h2>
+                    <p>Please review the customer information before submitting</p>
+                    
+                    <div class="success-box">
+                        <strong>✅ All Required Information Collected!</strong>
+                        <p>The customer wizard now properly collects all required fields:</p>
+                        <ul>
+                            <li>Customer Type (maps to 'type' in backend)</li>
+                            <li>Payment Terms (required)</li>
+                            <li>Invoice Run Code (required)</li>
+                            <li>Status (automatically set to 'active')</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                        <h3>Summary</h3>
+                        <p><strong>Type:</strong> Company/Individual</p>
+                        <p><strong>Category:</strong> Selected Category</p>
+                        <p><strong>Contact:</strong> Email, Phone</p>
+                        <p><strong>Address:</strong> Full address details</p>
+                        <p><strong>Financial:</strong> Payment terms configured</p>
+                    </div>
+                </div>
+
+                <div class="navigation">
+                    <button class="btn-secondary" onclick="previousStep()" id="prevBtn" style="display: none;">
+                        Previous
+                    </button>
+                    <button class="btn-primary" onclick="nextStep()" id="nextBtn">
+                        Continue
+                    </button>
+                    <button class="btn-success" onclick="submitForm()" id="submitBtn" style="display: none;">
+                        Create Customer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 5;
+
+        function showStep(step) {
+            // Hide all steps
+            for (let i = 1; i <= totalSteps; i++) {
+                document.getElementById(`step${i}`).style.display = 'none';
+            }
+            
+            // Show current step
+            document.getElementById(`step${step}`).style.display = 'block';
+            currentStep = step;
+            
+            // Update sidebar
+            document.querySelectorAll('.step-item').forEach((item, index) => {
+                item.classList.remove('active', 'completed');
+                if (index + 1 === step) {
+                    item.classList.add('active');
+                } else if (index + 1 < step) {
+                    item.classList.add('completed');
+                }
+            });
+            
+            // Update progress bar
+            const progress = ((step - 1) / (totalSteps - 1)) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            
+            // Update navigation buttons
+            document.getElementById('prevBtn').style.display = step === 1 ? 'none' : 'block';
+            document.getElementById('nextBtn').style.display = step === totalSteps ? 'none' : 'block';
+            document.getElementById('submitBtn').style.display = step === totalSteps ? 'block' : 'none';
+        }
+
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                showStep(currentStep + 1);
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                showStep(currentStep - 1);
+            }
+        }
+
+        function toggleCustomerType() {
+            const type = document.getElementById('customerType').value;
+            document.getElementById('companyFields').style.display = type === 'company' ? 'block' : 'none';
+            document.getElementById('individualFields').style.display = type === 'individual' ? 'block' : 'none';
+        }
+
+        function submitForm() {
+            alert('Customer creation would be submitted here!\n\nAll required fields are properly mapped:\n- type (from customerTypeId)\n- status (default: active)\n- paymentTerm\n- invoiceRunCode');
+        }
+    </script>
+</body>
+</html>

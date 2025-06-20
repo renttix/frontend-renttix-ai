@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Route Numbers Demo - RentTix</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        #map {
+            height: 600px;
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .route-list {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        .route-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .route-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .route-label-marker {
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>RentTix Route Numbers Demo</h1>
+        <p class="description">
+            This demo shows how route numbers are displayed inside the route polygons on the map. 
+            Each route has a numbered label at its center for easy identification.
+        </p>
+        
+        <div id="map"></div>
+        
+        <div class="route-list">
+            <h3>Birmingham Depot Routes:</h3>
+            <div id="routesList"></div>
+        </div>
+    </div>
+
+    <script>
+        // Helper functions
+        function getPolygonCentroid(coordinates) {
+            let lat = 0;
+            let lng = 0;
+            const n = coordinates.length;
+
+            coordinates.forEach(coord => {
+                lat += coord[0];
+                lng += coord[1];
+            });
+
+            return {
+                lat: lat / n,
+                lng: lng / n
+            };
+        }
+
+        function getRouteDisplayNumber(routeName) {
+            const match = routeName.match(/\d+/);
+            if (match) {
+                return match[0];
+            }
+            
+            return routeName
+                .split(' ')
+                .map(word => word[0])
+                .join('')
+                .toUpperCase()
+                .slice(0, 3);
+        }
+
+        function createRouteLabel(L, text, color = '#3B82F6') {
+            return L.divIcon({
+                className: 'route-label-marker',
+                html: `
+                    <div style="
+                        background-color: ${color};
+                        color: white;
+                        border-radius: 50%;
+                        width: 40px;
+                        height: 40px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-weight: bold;
+                        font-size: 16px;
+                        border: 2px solid white;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                    ">
+                        ${text}
+                    </div>
+                `,
+                iconSize: [40, 40],
+                iconAnchor: [20, 20]
+            });
+        }
+
+        // Initialize map
+        const map = L.map('map').setView([52.5200, -1.8639], 11);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Birmingham depot location
+        const depotLocation = [52.51969, -1.8640];
+        L.marker(depotLocation)
+            .addTo(map)
+            .bindPopup('<b>Birmingham Depot</b><br>George Rd, Erdington');
+
+        // Sample routes data
+        const routes = [
+            {
+                name: 'Route 1',
+                color: '#3B82F6',
+                coordinates: [
+                    [52.5300, -1.8800],
+                    [52.5300, -1.8500],
+                    [52.5100, -1.8500],
+                    [52.5100, -1.8800],
+                    [52.5300, -1.8800]
+                ]
+            },
+            {
+                name: 'Route 2',
+                color: '#10B981',
+                coordinates: [
+                    [52.5250, -1.8450],
+                    [52.5250, -1.8150],
+                    [52.5050, -1.8150],
+                    [52.5050, -1.8450],
+                    [52.5250, -1.8450]
+                ]
+            },
+            {
+                name: 'Birmingham Tuesday Route',
+                color: '#F59E0B',
+                coordinates: [
+                    [52.5400, -1.8900],
+                    [52.5400, -1.8600],
+                    [52.5200, -1.8600],
+                    [52.5200, -1.8900],
+                    [52.5400, -1.8900]
+                ]
+            }
+        ];
+
+        // Add routes to map
+        const routesList = document.getElementById('routesList');
+        
+        routes.forEach((route, index) => {
+            // Add polygon
+            const polygon = L.polygon(route.coordinates, {
+                color: route.color,
+                fillColor: route.color,
+                fillOpacity: 0.2,
+                weight: 2
+            }).addTo(map);
+            
+            polygon.bindPopup(`<b>${route.name}</b>`);
+            
+            // Add route number label at polygon center
+            const centroid = getPolygonCentroid(route.coordinates);
+            const routeNumber = getRouteDisplayNumber(route.name);
+            const labelIcon = createRouteLabel(L, routeNumber, route.color);
+            
+            L.marker([centroid.lat, centroid.lng], {
+                icon: labelIcon,
+                interactive: false,
+                zIndexOffset: 1000
+            }).addTo(map);
+            
+            // Add to routes list
+            const routeItem = document.createElement('div');
+            routeItem.className = 'route-item';
+            routeItem.innerHTML = `
+                <div class="route-color" style="background-color: ${route.color}"></div>
+                <div>
+                    <strong>${route.name}</strong> - 
+                    Label shows: "${routeNumber}"
+                </div>
+            `;
+            routesList.appendChild(routeItem);
+        });
+
+        // Fit map to show all routes
+        const allCoords = routes.flatMap(r => r.coordinates);
+        const bounds = L.latLngBounds(allCoords);
+        map.fitBounds(bounds.pad(0.1));
+    </script>
+</body>
+</html>

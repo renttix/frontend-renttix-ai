@@ -1,0 +1,166 @@
+/* UnroutedTasksPanel.css */
+
+.unrouted-tasks-panel {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.unrouted-tasks-panel .p-card-content {
+  padding: 0;
+}
+
+.unrouted-tasks-panel .p-datatable {
+  border: none;
+}
+
+.unrouted-tasks-panel .p-datatable .p-datatable-header {
+  background: transparent;
+  border: none;
+}
+
+.unrouted-tasks-panel .p-datatable .p-datatable-tbody > tr > td {
+  padding: 0.75rem;
+}
+
+.unrouted-tasks-panel .p-datatable .p-datatable-tbody > tr:hover {
+  background-color: #f9fafb;
+}
+
+/* Route color indicator */
+.route-color-indicator {
+  display: inline-block;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Task summary in modal */
+.task-summary {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.task-summary h4 {
+  margin-bottom: 0.75rem;
+  color: #374151;
+}
+
+.task-item {
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s;
+}
+
+.task-item:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* Priority tag customization */
+.unrouted-tasks-panel .p-tag {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* Age indicator styling */
+.unrouted-tasks-panel .p-tag.p-tag-danger {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.unrouted-tasks-panel .p-tag.p-tag-warning {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.unrouted-tasks-panel .p-tag.p-tag-info {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+/* Assignment modal styling */
+.route-selection h4,
+.assignment-notes label {
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.route-selection .p-dropdown {
+  border-color: #d1d5db;
+}
+
+.route-selection .p-dropdown:hover {
+  border-color: #9ca3af;
+}
+
+.route-selection .p-dropdown.p-focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .unrouted-tasks-panel .p-datatable .p-datatable-tbody > tr > td {
+    padding: 0.5rem;
+  }
+  
+  .unrouted-tasks-panel h3 {
+    font-size: 1.1rem;
+  }
+  
+  .task-summary {
+    max-height: 150px;
+  }
+}
+
+/* Loading state */
+.unrouted-tasks-panel.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Empty state styling */
+.unrouted-tasks-panel .p-datatable-emptymessage {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* Batch selection checkbox styling */
+.unrouted-tasks-panel .p-checkbox .p-checkbox-box {
+  border-color: #d1d5db;
+}
+
+.unrouted-tasks-panel .p-checkbox .p-checkbox-box.p-highlight {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+/* Action button styling */
+.unrouted-tasks-panel .p-button-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.unrouted-tasks-panel .p-button-text {
+  color: #6b7280;
+}
+
+.unrouted-tasks-panel .p-button-text:hover {
+  color: #374151;
+  background-color: #f3f4f6;
+}
+
+/* Badge styling */
+.unrouted-tasks-panel .p-badge {
+  min-width: 1.5rem;
+  height: 1.5rem;
+  line-height: 1.5rem;
+  font-size: 0.75rem;
+}
+
+.unrouted-tasks-panel .p-badge.p-badge-warning {
+  background-color: #f59e0b;
+  color: #ffffff;
+}
