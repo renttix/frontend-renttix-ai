@@ -33,6 +33,8 @@ export default function AddressStep() {
     name: '',
     addressLine1: '',
     addressLine2: '',
+    lat:'',
+    lng:'',
     city: '',
     state: '',
     country: '',
@@ -103,6 +105,8 @@ export default function AddressStep() {
         addressLine2: `${place.city || ""}, ${place.state || ""}, ${place.country || ""}`,
         city: place.city,
         country: place.country,
+        lat:place.latitude,
+        lng:place.longitude,
         postCode: place.postalCode,
       });
     } catch (err) {
@@ -152,6 +156,8 @@ export default function AddressStep() {
       city: "",
       country: "",
       postCode: "",
+      lat:'',
+      lng:""
     });
   };
 
