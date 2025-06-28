@@ -83,7 +83,7 @@ const ProductFilters = ({ onFiltersChange }) => {
     try {
       // Fetch categories
       const categoriesResponse = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/categories/list`,
+        `${process.env.NEXT_PUBLIC_API_URL}/category`,
         {
           headers: { authorization: `Bearer ${token}` }
         }

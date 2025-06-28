@@ -19,23 +19,23 @@ export default function RootLayout({ children }) {
   const pathname = usePathname();
   const [isOnline, setIsOnline] = useState(true);
 
-  useEffect(() => {
-    const checkOnlineStatus = () => {
-      setIsOnline(navigator.onLine);
-      if (!navigator.onLine) {
-        localStorage.setItem("lastPage", pathname); // Store last visited page
-        router.push("/no-internet"); // Redirect to No Internet page
-      }
-    };
+  // useEffect(() => {
+  //   const checkOnlineStatus = () => {
+  //     setIsOnline(navigator.onLine);
+  //     if (!navigator.onLine) {
+  //       localStorage.setItem("lastPage", pathname); // Store last visited page
+  //       router.push("/no-internet"); // Redirect to No Internet page
+  //     }
+  //   };
 
-    window.addEventListener("online", checkOnlineStatus);
-    window.addEventListener("offline", checkOnlineStatus);
+  //   window.addEventListener("online", checkOnlineStatus);
+  //   window.addEventListener("offline", checkOnlineStatus);
 
-    return () => {
-      window.removeEventListener("online", checkOnlineStatus);
-      window.removeEventListener("offline", checkOnlineStatus);
-    };
-  }, [pathname, router]);
+  //   return () => {
+  //     window.removeEventListener("online", checkOnlineStatus);
+  //     window.removeEventListener("offline", checkOnlineStatus);
+  //   };
+  // }, [pathname, router]);
 
 
   return (

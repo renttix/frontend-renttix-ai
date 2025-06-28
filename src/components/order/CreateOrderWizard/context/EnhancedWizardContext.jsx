@@ -426,7 +426,7 @@ export function EnhancedWizardProvider({ children, vendorId, token }) {
     setRouteLoading(true);
     try {
       const response = await axios.post(
-        `${BaseURL}/api/routes/estimate`,
+        `${BaseURL}/routes/estimate`,
         {
           deliveryAddress,
           products,

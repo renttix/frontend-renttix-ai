@@ -94,7 +94,7 @@ export const lastOrdersService = {
     if (cached) return cached;
 
     try {
-      const response = await api.get('/widget-data/recent-orders', { params });
+      const response = await api.get('/widget-data/recent-orders', { params ,headers: token ? { Authorization: `Bearer ${token}` } : {}});
       widgetCache.set(cacheKey, params, response.data);
       return response.data;
     } catch (error) {
@@ -112,7 +112,7 @@ export const recentTransactionsService = {
     if (cached) return cached;
 
     try {
-      const response = await api.get('/widget-data/recent-transactions', { params });
+      const response = await api.get(`${baseURL}/widget-data/recent-transactions`, { params,headers: token ? { Authorization: `Bearer ${token}` } : {} });
       widgetCache.set(cacheKey, params, response.data);
       return response.data;
     } catch (error) {
@@ -123,7 +123,7 @@ export const recentTransactionsService = {
 
   async sendInvoiceReminder(invoiceId) {
     try {
-      const response = await api.post(`/invoices/${invoiceId}/reminder`);
+      const response = await api.post(`${baseURL}/invoices/${invoiceId}/reminder`);
       widgetCache.clear('/transactions/recent');
       return response.data;
     } catch (error) {
@@ -134,7 +134,7 @@ export const recentTransactionsService = {
 
   async retryPayment(paymentId) {
     try {
-      const response = await api.post(`/payments/${paymentId}/retry`);
+      const response = await api.post(`${baseURL}/payments/${paymentId}/retry`);
       widgetCache.clear('/transactions/recent');
       return response.data;
     } catch (error) {
@@ -145,7 +145,7 @@ export const recentTransactionsService = {
 
   async downloadInvoice(invoiceId) {
     try {
-      const response = await api.get(`/invoices/${invoiceId}/download`, {
+      const response = await api.get(`${baseURL}/invoices/${invoiceId}/download`, {
         responseType: 'blob'
       });
       return response.data;
@@ -164,7 +164,7 @@ export const todaysDeliveriesService = {
     if (cached) return cached;
 
     try {
-      const response = await api.get('/widget-data/todays-deliveries', { params });
+      const response = await api.get(`${baseURL}/widget-data/todays-deliveries`, { params });
       widgetCache.set(cacheKey, params, response.data);
       return response.data;
     } catch (error) {
@@ -175,7 +175,7 @@ export const todaysDeliveriesService = {
 
   async updateRouteStatus(routeId, status) {
     try {
-      const response = await api.patch(`/routes/${routeId}/status`, { status });
+      const response = await api.patch(`${baseURL}/routes/${routeId}/status`, { status });
       widgetCache.clear('/routes/today');
       return response.data;
     } catch (error) {

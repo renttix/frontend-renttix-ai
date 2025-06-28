@@ -155,6 +155,7 @@ export default function ContactStep() {
                 <i className="pi pi-envelope"></i>
               </span>
               <InputText
+              type='email'
                 value={formData.email || ''}
                 onChange={(e) => updateFormData({ email: e.target.value })}
                 className={`w-full ${errors.email ? 'p-invalid' : ''}`}
@@ -200,6 +201,7 @@ export default function ContactStep() {
                 <i className="pi pi-print"></i>
               </span>
               <InputText
+              type='number'
                 value={formData.fax || ''}
                 onChange={(e) => updateFormData({ fax: e.target.value })}
                 className="w-full"
@@ -215,6 +217,7 @@ export default function ContactStep() {
                 <i className="pi pi-globe"></i>
               </span>
               <InputText
+              type='url'
                 value={formData.website || ''}
                 onChange={(e) => updateFormData({ website: e.target.value })}
                 className="w-full"
@@ -386,6 +389,7 @@ export default function ContactStep() {
               value={newContact.email}
               onChange={(e) => setNewContact({ ...newContact, email: e.target.value })}
               className={`w-full ${contactErrors.email ? 'p-invalid' : ''}`}
+              type='email'
               placeholder="email@example.com"
             />
             {contactErrors.email && (
@@ -398,6 +402,7 @@ export default function ContactStep() {
               <label className="block text-sm font-medium mb-2">Phone</label>
               <InputText
                 value={newContact.phone}
+                type='telephone'
                 onChange={(e) => setNewContact({ ...newContact, phone: e.target.value })}
                 className={`w-full ${contactErrors.phone && !newContact.mobile ? 'p-invalid' : ''}`}
                 placeholder="Phone number"
@@ -410,6 +415,7 @@ export default function ContactStep() {
                 value={newContact.mobile}
                 onChange={(e) => setNewContact({ ...newContact, mobile: e.target.value })}
                 className="w-full"
+                type='telephone'
                 placeholder="Mobile number"
               />
             </div>

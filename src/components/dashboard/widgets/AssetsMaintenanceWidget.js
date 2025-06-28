@@ -8,12 +8,15 @@ import { Toast } from 'primereact/toast';
 import { ProgressBar } from 'primereact/progressbar';
 import BaseWidget from '../BaseWidget';
 import { formatDate, getDaysUntil } from '../../../utils/formatters';
+import { BaseURL } from '../../../../utils/baseUrl';
+import { useSelector } from 'react-redux';
 
 const AssetsMaintenanceWidget = ({ widgetId, config = {} }) => {
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const toast = useRef(null);
+  const { token } = useSelector((state) => state?.authReducer);
 
   // Fetch assets in maintenance
   useEffect(() => {
@@ -37,9 +40,9 @@ const AssetsMaintenanceWidget = ({ widgetId, config = {} }) => {
       if (config.depotId) params.append('depotId', config.depotId);
       if (config.includeScheduled) params.append('includeScheduled', 'true');
       
-      const response = await fetch(`/api/assets/maintenance?${params}`, {
+      const response = await fetch(`${BaseURL}/assets/maintenance?${params}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         }
       });
       

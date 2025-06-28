@@ -223,7 +223,7 @@ export const dashboardAPI = {
   },
   
   getLayout: (layoutId) =>
-    api.get(`/dashboard/layouts/${layoutId}`),
+    api.get(`/dashboard/layouts/${layoutId}`,{headers: token ? { Authorization: `Bearer ${token}` } : {}}),
   
   createLayout: (data) =>
     api.post('/dashboard/layouts', data),
@@ -241,19 +241,19 @@ export const dashboardAPI = {
 // Widget Data APIs
 export const widgetDataAPI = {
   getRecurringContracts: (params) =>
-    api.get('/widget-data/recurring-contracts', { params }),
+    api.get(`${BaseURL}/widget-data/recurring-contracts`, { params,headers: token ? { Authorization: `Bearer ${token}` } : {} }),
   
   getDraftOrders: (params) =>
-    api.get('/widget-data/draft-orders', { params }),
+    api.get(`${BaseURL}/widget-data/draft-orders`, { params,headers: token ? { Authorization: `Bearer ${token}` } : {} }),
   
   getCustomerMessages: (params) =>
-    api.get('/widget-data/customer-messages', { params }),
+    api.get(`${BaseURL}/widget-data/customer-messages`, { params,headers: token ? { Authorization: `Bearer ${token}` } : {} }),
   
   getInvoiceRunSummary: (params) =>
-    api.get('/widget-data/invoice-run-summary', { params }),
+    api.get(`${BaseURL}/widget-data/invoice-run-summary`, { params,headers: token ? { Authorization: `Bearer ${token}` } : {} }),
   
   getRecentOrders: (params) =>
-    api.get('/widget-data/recent-orders', { params }),
+    api.get(`${BaseURL}/widget-data/recent-orders`, { params ,headers: token ? { Authorization: `Bearer ${token}` } : {}}),
 };
 
 // Utility functions

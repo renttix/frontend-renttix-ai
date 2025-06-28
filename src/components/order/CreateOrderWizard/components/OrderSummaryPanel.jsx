@@ -3,10 +3,13 @@ import React, { useState } from 'react';
 import { useWizard } from '../context/WizardContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatCurrency } from '../../../../../utils/helper';
+import { useSelector } from 'react-redux';
 
 export default function OrderSummaryPanel() {
   const { state } = useWizard();
   const { formData, pricing } = state;
+    const { token, user } = useSelector((state) => state?.authReducer);
+
   
   // Calculate rental duration if dates are set
   const getRentalDuration = () => {
@@ -22,20 +25,37 @@ export default function OrderSummaryPanel() {
   const rentalDuration = getRentalDuration();
   
   // Calculate pricing based on products
-  const calculatePricing = () => {
-    if (!formData.products || formData.products.length === 0) {
-      return { subtotal: 0, tax: 0, total: 0 };
-    }
-    
-    const duration = rentalDuration || 1;
-    const subtotal = formData.products.reduce((total, product) =>
-      total + (product.quantity * product.dailyRate * duration), 0
-    );
-    const tax = subtotal * 0.20; // 20% VAT
-    const total = subtotal + tax;
-    
-    return { subtotal, tax, total };
+ const calculatePricing = () => {
+  if (!formData.products || formData.products.length === 0) {
+    return { subtotal: 0, tax: 0, total: 0 };
+  }
+
+  const duration = rentalDuration || 1;
+  let subtotal = 0;
+  let totalTax = 0;
+
+  formData.products.forEach((product) => {
+    const effectiveDuration = duration <= product.minimumRentalPeriod 
+      ? product.minimumRentalPeriod 
+      : duration;
+
+    const productSubtotal = product.quantity * product.dailyRate * Number(effectiveDuration);
+    const productTaxRate = product.taxRate || 0;
+    const productTax = productSubtotal * (productTaxRate / 100);
+
+    subtotal += productSubtotal;
+    totalTax += productTax;
+  });
+
+  const total = subtotal + totalTax;
+
+  return {
+    subtotal,
+    tax: totalTax,
+    total
   };
+};
+
   
   const calculatedPricing = calculatePricing();
   
@@ -132,12 +152,12 @@ export default function OrderSummaryPanel() {
                         <div className="flex justify-between">
                           <span className="text-gray-600">{product.name}</span>
                           <span className="text-gray-800">
-                            {product.quantity} × £{product.dailyRate.toFixed(2)}
+                            {product.quantity} × {formatCurrency(product.dailyRate.toFixed(2),user.currencyKey)}
                           </span>
                         </div>
                         {rentalDuration && (
                           <div className="text-right text-gray-500">
-                            = £{(product.quantity * product.dailyRate * rentalDuration).toFixed(2)}
+                            = {formatCurrency((product.quantity * product.dailyRate * Number(rentalDuration<=product.minimumRentalPeriod?product.minimumRentalPeriod:rentalDuration)).toFixed(2),user.currencyKey)}
                           </div>
                         )}
                       </div>
@@ -147,9 +167,9 @@ export default function OrderSummaryPanel() {
                         <div className="flex justify-between text-sm font-medium">
                           <span>Products Total:</span>
                           <span>
-                            £{formData.products.reduce((total, p) =>
-                              total + (p.quantity * p.dailyRate * rentalDuration), 0
-                            ).toFixed(2)}
+                            {formatCurrency(formData.products.reduce((total, p) =>
+                              total + (p.quantity * p.dailyRate * Number(rentalDuration<=p.minimumRentalPeriod?p.minimumRentalPeriod:rentalDuration)), 0
+                            ).toFixed(2),user.currencyKey)}
                           </span>
                         </div>
                       </div>
@@ -167,7 +187,7 @@ export default function OrderSummaryPanel() {
                     <span>{formatCurrency(calculatedPricing.subtotal)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Tax (20%):</span>
+                    <span className="text-gray-500">Tax:</span>
                     <span>{formatCurrency(calculatedPricing.tax)}</span>
                   </div>
                   <div className="pt-2 border-t">

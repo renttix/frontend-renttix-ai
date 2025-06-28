@@ -40,8 +40,9 @@ const useActiveRentals = (filters, token) => {
 
       if (response.data.success) {
         const rentalData = response.data.data || [];
-        setRentals(Array.isArray(rentalData) ? rentalData : []);
-        setTotalRecords(response.data.totalRecords || 0);
+        console.log({rentalData})
+        setRentals(rentalData.rentals);
+        setTotalRecords(rentalData.totalRecords || 0);
       } else {
         throw new Error(response.data.message || "Failed to fetch rentals");
       }

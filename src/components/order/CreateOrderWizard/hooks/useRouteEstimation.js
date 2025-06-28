@@ -21,7 +21,7 @@ export const useRouteEstimation = () => {
 
     try {
       const response = await axios.post(
-        `${BaseURL}/api/routes/estimate`,
+        `${BaseURL}/routes/estimate`,
         {
           deliveryAddress: {
             address1: deliveryAddress.address1,
@@ -77,7 +77,7 @@ export const useRouteEstimation = () => {
 
     try {
       const response = await axios.get(
-        `${BaseURL}/api/routes/delivery-windows`,
+        `${BaseURL}/routes/delivery-windows`,
         {
           params: {
             date: deliveryDate,
@@ -114,7 +114,7 @@ export const useRouteEstimation = () => {
 
     try {
       const response = await axios.post(
-        `${BaseURL}/api/routes/recurring-setup`,
+        `${BaseURL}/routes/recurring-setup`,
         {
           deliveryDetails,
           recurrencePattern: {
@@ -156,7 +156,7 @@ export const useRouteEstimation = () => {
 
     try {
       const response = await axios.post(
-        `${BaseURL}/api/routes/optimize`,
+        `${BaseURL}/routes/optimize`,
         {
           deliveries: deliveries.map(d => ({
             address: d.address,

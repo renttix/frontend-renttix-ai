@@ -10,6 +10,8 @@ import { Dialog } from 'primereact/dialog';
 import { InputTextarea } from 'primereact/inputtextarea';
 import BaseWidget from '../BaseWidget';
 import { formatDate } from '../../../utils/formatters';
+import { BaseURL } from '../../../../utils/baseUrl';
+import { useSelector } from 'react-redux';
 
 const CustomerMessagesWidget = ({ widgetId, config = {} }) => {
   const [messages, setMessages] = useState([]);
@@ -21,6 +23,7 @@ const CustomerMessagesWidget = ({ widgetId, config = {} }) => {
   const [replyText, setReplyText] = useState('');
   const [sendingReply, setSendingReply] = useState(false);
   const toast = useRef(null);
+  const { token } = useSelector((state) => state?.authReducer);
 
   // Fetch customer messages
   useEffect(() => {
@@ -45,9 +48,9 @@ const CustomerMessagesWidget = ({ widgetId, config = {} }) => {
       if (config.priority) params.append('priority', config.priority);
       if (config.channel) params.append('channel', config.channel);
       
-      const response = await fetch(`/api/widget-data/customer-messages?${params}`, {
+      const response = await fetch(`${BaseURL}/widget-data/customer-messages?${params}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         }
       });
       

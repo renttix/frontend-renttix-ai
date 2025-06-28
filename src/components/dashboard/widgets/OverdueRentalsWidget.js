@@ -9,6 +9,8 @@ import { Badge } from 'primereact/badge';
 import { SplitButton } from 'primereact/splitbutton';
 import BaseWidget from '../BaseWidget';
 import { formatDate, getDaysOverdue } from '../../../utils/formatters';
+import { BaseURL } from '../../../../utils/baseUrl';
+import { useSelector } from 'react-redux';
 
 const OverdueRentalsWidget = ({ widgetId, config = {} }) => {
   const [rentals, setRentals] = useState([]);
@@ -16,6 +18,7 @@ const OverdueRentalsWidget = ({ widgetId, config = {} }) => {
   const [error, setError] = useState(null);
   const [sendingReminders, setSendingReminders] = useState(new Set());
   const toast = useRef(null);
+  const { token } = useSelector((state) => state?.authReducer);
 
   // Fetch overdue rentals
   useEffect(() => {
@@ -42,9 +45,9 @@ const OverdueRentalsWidget = ({ widgetId, config = {} }) => {
         params.append('includeGracePeriod', config.includeGracePeriod);
       }
       
-      const response = await fetch(`/api/rentals/overdue?${params}`, {
+      const response = await fetch(`${BaseURL}/rentals/overdue?${params}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         }
       });
       

@@ -11,7 +11,7 @@ import { BaseURL } from "../../../utils/baseUrl";
 import { useSelector } from "react-redux";
 
 const TerminateRentalFilters = ({ filters, onFilterChange }) => {
-  const { token } = useSelector((state) => state?.authReducer);
+  const { token ,user} = useSelector((state) => state?.authReducer);
   const [customers, setCustomers] = useState([]);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -19,6 +19,7 @@ const TerminateRentalFilters = ({ filters, onFilterChange }) => {
   const [filteredCustomers, setFilteredCustomers] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
 
+  console.log({categories})
   const statusOptions = [
     { label: "Active", value: "active" },
     { label: "Overdue", value: "overdue" },
@@ -32,7 +33,7 @@ const TerminateRentalFilters = ({ filters, onFilterChange }) => {
   const fetchFilterOptions = async () => {
     try {
       // Fetch customers
-      const customersRes = await axios.get(`${BaseURL}/customer/get-customers`, {
+      const customersRes = await axios.get(`${BaseURL}/customer`, {
         headers: { authorization: `Bearer ${token}` }
       });
       if (customersRes.data.success) {
@@ -40,23 +41,34 @@ const TerminateRentalFilters = ({ filters, onFilterChange }) => {
       }
 
       // Fetch products
-      const productsRes = await axios.get(`${BaseURL}/product/get-products`, {
-        headers: { authorization: `Bearer ${token}` }
-      });
+      // const productsRes = await axios.post(`${BaseURL}/product/product-lists`, {
+      //   headers: { authorization: `Bearer ${token}` }
+      // });
+const vendorId = user._id
+       const productsRes = await axios.post(
+        `${BaseURL}/product/product-lists?page=1&limit=100`,
+        { vendorId },
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
       if (productsRes.data.success) {
         setProducts(productsRes.data.data || []);
       }
 
       // Fetch categories
-      const categoriesRes = await axios.get(`${BaseURL}/categories/get-categories`, {
+      const categoriesRes = await axios.get(`${BaseURL}/category`, {
         headers: { authorization: `Bearer ${token}` }
       });
-      if (categoriesRes.data.success) {
-        setCategories(categoriesRes.data.data || []);
+      if (categoriesRes.data) {
+        setCategories(categoriesRes.data || []);
       }
 
       // Fetch depots
-      const depotsRes = await axios.get(`${BaseURL}/depots/get-depots`, {
+      const depotsRes = await axios.get(`${BaseURL}/depots`, {
         headers: { authorization: `Bearer ${token}` }
       });
       if (depotsRes.data.success) {
@@ -120,7 +132,7 @@ const TerminateRentalFilters = ({ filters, onFilterChange }) => {
           value={filters.customerId}
           suggestions={filteredCustomers}
           completeMethod={searchCustomers}
-          field="name.name"
+          field="name"
           placeholder="Select Customer"
           onChange={(e) => onFilterChange({ customerId: e.value })}
           dropdown

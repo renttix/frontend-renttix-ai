@@ -20,7 +20,7 @@ const calendarService = {
   // Fetch all routes with their capacities
   fetchRoutes: async () => {
     try {
-      const response = await apiService.get('/api/routes');
+      const response = await apiService.get('/routes');
       return response.data;
     } catch (error) {
       console.error('Error fetching routes:', error);
@@ -68,7 +68,7 @@ const calendarService = {
   // Get route capacity for a specific date
   getRouteCapacity: async (routeId, date) => {
     try {
-      const response = await apiService.get(`/api/routes/${routeId}/capacity`, {
+      const response = await apiService.get(`/routes/${routeId}/capacity`, {
         params: { date: date.toISOString() }
       });
       return response.data;

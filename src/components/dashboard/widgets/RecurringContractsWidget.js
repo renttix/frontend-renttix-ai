@@ -9,6 +9,8 @@ import { Badge } from 'primereact/badge';
 import BaseWidget from '../BaseWidget';
 import { useRouter } from 'next/navigation';
 import { formatDate } from '../../../utils/formatters';
+import { useSelector } from 'react-redux';
+import { BaseURL } from '../../../../utils/baseUrl';
 
 const RecurringContractsWidget = ({ widgetId, config = {} }) => {
   const [contracts, setContracts] = useState([]);
@@ -16,6 +18,8 @@ const RecurringContractsWidget = ({ widgetId, config = {} }) => {
   const [error, setError] = useState(null);
   const router = useRouter();
   const toast = useRef(null);
+  const { token } = useSelector((state) => state?.authReducer);
+
 
   // Fetch recurring contracts
   useEffect(() => {
@@ -39,9 +43,9 @@ const RecurringContractsWidget = ({ widgetId, config = {} }) => {
       if (config.depotId) params.append('depotId', config.depotId);
       if (config.daysAhead) params.append('daysAhead', config.daysAhead);
       
-      const response = await fetch(`/api/widget-data/recurring-contracts?${params}`, {
+      const response = await fetch(`${BaseURL}/widget-data/recurring-contracts?${params}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         }
       });
       

@@ -16,7 +16,7 @@ import { ProgressSpinner } from "primereact/progressspinner";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Badge } from "primereact/badge";
 import axios from "axios";
-import { BaseURL } from "../../../../../utils/baseUrl";
+import { BaseURL, imageBaseURL } from "../../../../../utils/baseUrl";
 import { useSelector } from "react-redux";
 import {
   formatCurrency,
@@ -204,6 +204,7 @@ export default function ProductBuilderStep() {
           const newProduct = {
             productId: product._id,
             name: product.productName || product.name,
+            productName:product.productName || product.name,
             sku: product.sku,
             category: product.category?.name || "Uncategorized",
             dailyRate: product.rentPrice || product.price || 0,
@@ -268,13 +269,14 @@ export default function ProductBuilderStep() {
     updateFormData({ products: updatedProducts });
   };
 
-  const calculateSubtotal = () => {
-    return selectedProducts.reduce(
-      (total, product) =>
-        total + product.quantity * product.dailyRate * rentalDuration,
-      0,
-    );
-  };
+const calculateSubtotal = () => {
+  return selectedProducts.reduce((total, product) => {
+    const baseAmount = product.quantity * product.dailyRate * Number(rentalDuration<=product.minimumRentalPeriod?product.minimumRentalPeriod:rentalDuration);
+    const tax = baseAmount * (product.taxRate / 100); // taxRate is assumed to be a number like 10, 13, etc.
+    return total + baseAmount + tax;
+  }, 0);
+};
+
 
   const validateStep = () => {
     const newErrors = {};
@@ -327,7 +329,8 @@ export default function ProductBuilderStep() {
   const imageBodyTemplate = (product) => {
     return (
       <img
-        src={product.images?.[0] || "/images/product/placeholder.webp"}
+       onError={(e) => (e.currentTarget.src = "/images/product/placeholder.webp")}
+        src={`${imageBaseURL}${product.images?.[0]}`}
         alt={product.name}
         className="h-16 w-16 rounded object-cover"
       />
@@ -338,7 +341,7 @@ export default function ProductBuilderStep() {
     return (
       <div>
         <div className="font-medium">{product.productName}</div>
-        <div className="text-sm text-gray-500">SKU: {product.sku}</div>
+        {/* <div className="text-sm text-gray-500">SKU: {product.sku}</div> */}
       </div>
     );
   };
@@ -354,40 +357,44 @@ export default function ProductBuilderStep() {
         : product.quantity > 10
           ? "warning"
           : "danger";
-    return <Tag value={`${product.quantity} available`} severity={severity} />;
+    return <div className="flex items-center gap-3 whitespace-nowrap"><Tag value={`${product.quantity} available`} severity={severity} /></div> ;
   };
 
   const assetSelectionBodyTemplate = (product) => {
     const selectedAssets = productAssets[product._id] || [];
-    const productPrice = product.rentPrice || product.price || 0;
+    const productPrice = product.rentPrice+product.rentPrice*product.taxClass.taxRate/100 || product.price || 0;
 
     return (
-      <div className="flex items-center gap-2">
-        <Button
-          label={
-            selectedAssets.length > 0
-              ? `${selectedAssets.length} Assets Selected`
-              : "Select Assets"
-          }
-          icon="pi pi-box"
-          className={
-            selectedAssets.length > 0 ? "p-button-success" : "p-button-outlined"
-          }
-          onClick={() => handleAssetSelection(product._id)}
-          badge={
-            selectedAssets.length > 0 ? selectedAssets.length.toString() : null
-          }
-          badgeClassName="p-badge-success"
-        />
-        {selectedAssets.length > 0 && (
-          <span className="text-sm font-medium">
-            ={" "}
-            {formatCurrency(
-              selectedAssets.length * productPrice * rentalDuration,
-            )}
-          </span>
-        )}
-      </div>
+ <div className="flex items-center gap-3 whitespace-nowrap">
+  <Button
+    label={
+      selectedAssets.length > 0
+        ? `${selectedAssets.length} Assets Selected`
+        : "Select Assets"
+    }
+    icon="pi pi-box"
+    className={`px-3 py-2 text-sm ${
+      selectedAssets.length > 0 ? "p-button-success" : "p-button-outlined"
+    }`}
+    onClick={() => handleAssetSelection(product._id)}
+  />
+
+  {selectedAssets.length > 0 && (
+    <span className="text-sm font-semibold text-gray-700">
+      ={" "}
+      {formatCurrency(
+        selectedAssets.length *
+          productPrice *
+          Number(
+            rentalDuration <= product.rateDefinition.minimumRentalPeriod
+              ? product.rateDefinition.minimumRentalPeriod
+              : rentalDuration
+          )
+      )}
+    </span>
+  )}
+</div>
+
     );
   };
 
@@ -508,6 +515,9 @@ export default function ProductBuilderStep() {
               />
               <Column body={nameBodyTemplate} header="Product" />
               <Column field="category.name" header="Category" />
+              <Column field="rateDefinition.minimumRentalPeriod" body={(item)=>(
+                <Tag severity={'warning'} value={`${item.rateDefinition.minimumRentalPeriod} days`}/>
+              )} header="MinRentalPeriod" />
               <Column body={priceBodyTemplate} header="Daily Rate" />
               <Column body={stockBodyTemplate} header="Stock" />
               <Column
@@ -548,8 +558,9 @@ export default function ProductBuilderStep() {
                   <div className="flex w-full items-center justify-between">
                     <div className="flex items-center gap-3">
                       <img
-                        src={product.image}
+                        src={`${imageBaseURL}${product.image}`}
                         alt={product.name}
+                         onError={(e) => (e.currentTarget.src = "/images/product/placeholder.webp")}
                         className="h-12 w-12 rounded object-cover"
                       />
                       <div>
@@ -557,14 +568,15 @@ export default function ProductBuilderStep() {
                         <p className="text-sm text-gray-500">
                           {product.quantity} assets ×{" "}
                           {formatCurrency(product.dailyRate)}/day ×{" "}
-                          {rentalDuration} days
+                          {rentalDuration<=product.minimumRentalPeriod?product.minimumRentalPeriod:rentalDuration} days +  {product.taxRate}% tax
                         </p>
+                         <p className="text-sm text-red-500">Minimum rental period {product.minimumRentalPeriod} days</p>
                       </div>
                     </div>
                     <div className="mr-4 text-right">
                       <p className="font-semibold text-blue-600">
                         {formatCurrency(
-                          product.quantity * product.dailyRate * rentalDuration,
+                          product.quantity * product.dailyRate * Number(rentalDuration<=product.minimumRentalPeriod?product.minimumRentalPeriod:rentalDuration)+product.quantity * product.dailyRate * Number(rentalDuration<=product.minimumRentalPeriod?product.minimumRentalPeriod:rentalDuration)*product.taxRate/100,
                         )}
                       </p>
                     </div>

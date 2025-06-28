@@ -84,6 +84,7 @@ const menuGroups = [
           { label: "Orders", route: "/order/list" },
           { label: "Create Order", route: "/order/create" },
           { label: "Terminate Rental", route: "/order/terminate" },
+          { label: "Quick Off Hire", route: "/order/quick-off-hire" },
         ],
       },
       {

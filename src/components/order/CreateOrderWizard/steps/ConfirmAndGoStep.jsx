@@ -11,6 +11,7 @@ import { Divider } from 'primereact/divider';
 import { formatDate, formatCurrency, calculateDaysBetween } from '../../../../../utils/helper';
 import { useSelector } from 'react-redux';
 import RouteAssignmentDisplay from '../components/RouteAssignmentDisplay';
+import { imageBaseURL } from '../../../../../utils/baseUrl';
 
 export default function ConfirmAndGoStep() {
   const { state, setStep, updateFormData } = useWizard();
@@ -30,18 +31,30 @@ export default function ConfirmAndGoStep() {
   
   // Calculate pricing
   const calculatePricing = () => {
-    if (!formData.products || formData.products.length === 0) {
-      return { subtotal: 0, tax: 0, total: 0 };
-    }
-    
-    const subtotal = formData.products.reduce((total, product) =>
-      total + (product.quantity * product.dailyRate * rentalDuration), 0
-    );
-    const tax = subtotal * 0.20; // 20% VAT
-    const total = subtotal + tax;
-    
-    return { subtotal, tax, total };
+  if (!formData.products || formData.products.length === 0) {
+    return { subtotal: 0, tax: 0, total: 0 };
+  }
+
+  let subtotal = 0;
+  let totalTax = 0;
+
+  formData.products.forEach(product => {
+    const baseAmount = product.quantity * product.dailyRate * Number(rentalDuration<=product.minimumRentalPeriod?product.minimumRentalPeriod:rentalDuration);
+    const productTax = baseAmount * (product.taxRate / 100 || 0); // default to 0 if taxRate missing
+
+    subtotal += baseAmount;
+    totalTax += productTax;
+  });
+
+  const total = subtotal + totalTax;
+
+  return {
+    subtotal,
+    tax: totalTax,
+    total
   };
+};
+
   
   const calculatedPricing = calculatePricing();
   
@@ -77,6 +90,7 @@ export default function ConfirmAndGoStep() {
            formData.invoiceRunCode;
   };
   
+  console.log(formData)
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -91,8 +105,10 @@ export default function ConfirmAndGoStep() {
       
       {/* Order Summary Card */}
       <Card className="bg-gradient-to-r from-blue-50 to-indigo-50">
-        <div className="space-y-3">
-          <h3 className="text-lg font-semibold">Order Summary for {formData.customerDetails?.name}</h3>
+        <div className="">
+         <div className="">
+           <h3 className="text-lg font-semibold py-3">Order Summary for {formData.customerDetails?.name}</h3>
+         </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div className="flex items-center gap-2">
@@ -105,7 +121,7 @@ export default function ConfirmAndGoStep() {
             </div>
             <div className="flex items-center gap-2">
               <i className="pi pi-truck text-blue-600"></i>
-              <span>Route: {formData.assignedRoute?.name || 'Floating Task'}</span>
+              <span>Route: {formData.assignedRoute?.routeName || 'Floating Task'}</span>
             </div>
           </div>
         </div>
@@ -124,15 +140,16 @@ export default function ConfirmAndGoStep() {
               <div className="flex items-center gap-3">
                 {product.image && (
                   <img
-                    src={product.image}
+                    src={`${imageBaseURL}${product.image}`}
                     alt={product.name}
+                     onError={(e) => (e.currentTarget.src = "/images/product/placeholder.webp")}
                     className="w-12 h-12 object-cover rounded"
                   />
                 )}
                 <div>
                   <p className="font-medium">{product.name}</p>
                   <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <span>{product.quantity} × £{product.dailyRate}/day</span>
+                    <span>{product.quantity} × {formatCurrency(product.dailyRate,user?.currencyKey)}/day + {product.taxRate}% tax</span>
                     {product.maintenanceConfig && (
                       <>
                         <span>•</span>
@@ -148,8 +165,9 @@ export default function ConfirmAndGoStep() {
               </div>
               <div className="text-right">
                 <p className="font-medium">
-                  £{(product.quantity * product.dailyRate * rentalDuration).toFixed(2)}
+                  {formatCurrency(Number((product.quantity * product.dailyRate * Number(rentalDuration<=product.minimumRentalPeriod?product.minimumRentalPeriod:rentalDuration)).toFixed(2))+(product.quantity * product.dailyRate * Number(rentalDuration<=product.minimumRentalPeriod?product.minimumRentalPeriod:rentalDuration)).toFixed(2)*product.taxRate/100, user?.currencyKey)}
                 </p>
+              
               </div>
             </div>
           ))}
@@ -164,7 +182,7 @@ export default function ConfirmAndGoStep() {
             <span>{formatCurrency(calculatedPricing.subtotal)}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">VAT (20%):</span>
+            <span className="text-gray-600">VAT:</span>
             <span>{formatCurrency(calculatedPricing.tax)}</span>
           </div>
           <Divider />
@@ -233,7 +251,7 @@ export default function ConfirmAndGoStep() {
             <p className="text-sm text-gray-600">Payment Terms</p>
             <p className="font-medium">
               {formData.paymentTerm ?
-                (typeof formData.paymentTerm === 'object' ? formData.paymentTerm.name : 'Payment Term Set') :
+                            <Tag severity={'success'} value={formData.customerDetails.paymentTerm.name}/>:
                 <span className="text-red-500">Not Set</span>
               }
             </p>
@@ -241,8 +259,9 @@ export default function ConfirmAndGoStep() {
           <div>
             <p className="text-sm text-gray-600">Invoice Run Code</p>
             <p className="font-medium">
+              
               {formData.invoiceRunCode ?
-                (typeof formData.invoiceRunCode === 'object' ? formData.invoiceRunCode.name : 'Invoice Code Set') :
+              <Tag severity={'success'} value={formData.customerDetails.invoiceRunCode.name}/>:
                 <span className="text-red-500">Not Set</span>
               }
             </p>

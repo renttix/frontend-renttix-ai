@@ -9,6 +9,8 @@ import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Chart } from 'primereact/chart';
 import BaseWidget from '../BaseWidget';
 import { formatCurrency } from '../../../utils/formatters';
+import { BaseURL } from '../../../../utils/baseUrl';
+import { useSelector } from 'react-redux';
 
 const InvoiceRunSummaryWidget = ({ widgetId, config = {} }) => {
   const [summary, setSummary] = useState(null);
@@ -16,6 +18,7 @@ const InvoiceRunSummaryWidget = ({ widgetId, config = {} }) => {
   const [error, setError] = useState(null);
   const [runningInvoices, setRunningInvoices] = useState(false);
   const toast = useRef(null);
+  const { token } = useSelector((state) => state?.authReducer);
 
   // Chart options
   const chartOptions = {
@@ -47,9 +50,9 @@ const InvoiceRunSummaryWidget = ({ widgetId, config = {} }) => {
       setLoading(true);
       setError(null);
       
-      const response = await fetch('/api/widget-data/invoice-run-summary', {
+      const response = await fetch(`${BaseURL}/widget-data/invoice-run-summary`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         }
       });
       

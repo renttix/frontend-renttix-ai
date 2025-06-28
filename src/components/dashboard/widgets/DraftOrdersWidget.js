@@ -9,6 +9,8 @@ import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import BaseWidget from '../BaseWidget';
 import { useRouter } from 'next/navigation';
 import { formatDate } from '../../../utils/formatters';
+import { BaseURL } from '../../../../utils/baseUrl';
+import { useSelector } from 'react-redux';
 
 const DraftOrdersWidget = ({ widgetId, config = {} }) => {
   const [drafts, setDrafts] = useState([]);
@@ -16,6 +18,7 @@ const DraftOrdersWidget = ({ widgetId, config = {} }) => {
   const [error, setError] = useState(null);
   const router = useRouter();
   const toast = useRef(null);
+  const { token } = useSelector((state) => state?.authReducer);
 
   // Fetch draft orders
   useEffect(() => {
@@ -41,9 +44,9 @@ const DraftOrdersWidget = ({ widgetId, config = {} }) => {
       if (config.depotId) params.append('depotId', config.depotId);
       if (config.maxAge) params.append('maxAge', config.maxAge);
       
-      const response = await fetch(`/api/widget-data/draft-orders?${params}`, {
+      const response = await fetch(`${BaseURL}/widget-data/draft-orders?${params}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         }
       });
       
