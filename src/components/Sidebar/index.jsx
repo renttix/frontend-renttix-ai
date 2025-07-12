@@ -450,7 +450,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, className }) => {
         </div>
         {/* <!-- SIDEBAR HEADER --> */}
 
-        <div className="no-scrollbar  flex flex-col overflow-y-hidden  duration-300 ease-linear">
+        <div className="no-scrollbar  flex flex-col overflow-y-auto  duration-300 ease-linear ">
           {/* <!-- Sidebar Menu --> */}
           <nav className="mt-1 px-4 lg:px-6">
             {filteredMenu.map((group, groupIndex) => (

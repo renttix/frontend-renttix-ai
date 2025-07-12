@@ -167,6 +167,8 @@ export default function SmartStartStep() {
       invoiceRunCode: customer.invoiceRunCode?._id || formData.invoiceRunCode || '',
       invoiceInBatch: customer.invoiceInBatch ?? formData.invoiceInBatch ?? false,
       billingPeriod: customer.billingPeriod || formData.billingPeriod || '',
+      cunstomerQuickbookId: customer?.customerID || '',
+
     });
   };
   

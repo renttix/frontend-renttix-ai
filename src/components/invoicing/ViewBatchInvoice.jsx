@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { useParams } from "next/navigation";
 import moment from "moment";
 import Link from "next/link";
-import { FaCodepen } from "react-icons/fa";
+import { FaCodepen, FaEdit } from "react-icons/fa";
 import { BaseURL } from "../../../utils/baseUrl";
 
 import Breadcrumb from "../Breadcrumbs/Breadcrumb";
@@ -14,6 +14,8 @@ import Loader from "../common/Loader";
 import InvoiceBatchModel from "./InvoiceBatchModel";
 import { MdDelete } from "react-icons/md";
 import { PiPrinterFill } from "react-icons/pi";
+import EditInvoiceModal from "./EditInvoiceModal";
+import { Button } from "primereact/button";
 
 import {
   IoIosCheckmarkCircle,
@@ -26,9 +28,9 @@ import { formatCurrency } from "../../../utils/helper";
 const ViewBatchInvoice = () => {
   const [data, setdata] = useState({});
   const [loading, setloading] = useState(false);
-  const { token,user } = useSelector((state) => state?.authReducer);
+  const { token, user } = useSelector((state) => state?.authReducer);
   const [loader, setloader] = useState(false);
-
+  const [editVisible, setEditVisible] = useState(false);
   const [refreshFlag, setRefreshFlag] = useState(false);
 
   const params = useParams();
@@ -108,12 +110,22 @@ const ViewBatchInvoice = () => {
 
   return (
     <>
-    <div className="flex gap-3">
-    <GoPrevious route={`/invoicing/invoice-batch/${params.id}`}/>
-       <h2 className="text-[26px] font-bold leading-[30px] text-dark dark:text-white ">
-       Detail Invoice
-      </h2>
-    </div>
+      <div className="flex gap-3">
+        <GoPrevious route={`/invoicing/invoice-batch/${params.id}`} />
+        <EditInvoiceModal
+          visible={editVisible}
+          setVisible={setEditVisible}
+          invoice={data}
+          batchId={params.id}
+          invoiceId={params.invoiceId}
+          token={token}
+          onSuccess={handleRefresh}
+        />
+
+        <h2 className="text-[26px] font-bold leading-[30px] text-dark dark:text-white ">
+          Detail Invoice
+        </h2>
+      </div>
       {loading ? (
         <div className="my-auto flex min-h-[50vh] items-center justify-center">
           <Loader />
@@ -128,7 +140,7 @@ const ViewBatchInvoice = () => {
 
                 <label
                   htmlFor=""
-                  className="text-center text-[20px] font-semibold text-dark-2 min-w-[100px] text-[14px] dark:text-white"
+                  className="min-w-[100px] text-center text-[14px] text-[20px] font-semibold text-dark-2 dark:text-white"
                 >
                   Invoice : {data?.invocie}
                 </label>
@@ -136,7 +148,7 @@ const ViewBatchInvoice = () => {
             </div>
             <div className="col-span-3  p-4 ">
               <label
-                className="text-[20px] font-semibold text-dark-2 min-w-[100px] text-[14px] dark:text-white "
+                className="min-w-[100px] text-[14px] text-[20px] font-semibold text-dark-2 dark:text-white "
                 htmlFor="Action"
               >
                 Customer Information
@@ -145,23 +157,25 @@ const ViewBatchInvoice = () => {
                 <div className="flex  ">
                   <label
                     htmlFor=""
-                    className="font-semibold text-dark-2 min-w-[100px] text-[14px] dark:text-white "
+                    className="min-w-[100px] text-[14px] font-semibold text-dark-2 dark:text-white "
                   >
                     Name
                   </label>
                   <div className="text-start">
-                    <label className="font-light text-[14px]">{data.customerName}</label>
+                    <label className="text-[14px] font-light">
+                      {data.customerName}
+                    </label>
                   </div>
                 </div>
                 <div className="flex  ">
                   <label
                     htmlFor=""
-                    className="font-semibold text-dark-2 min-w-[100px] text-[14px] dark:text-white "
+                    className="min-w-[100px] text-[14px] font-semibold text-dark-2 dark:text-white "
                   >
                     Address
                   </label>
                   <div className="text-start">
-                    <label className="font-light text-[14px]">
+                    <label className="text-[14px] font-light">
                       {" "}
                       {` ${data.customerAddress} ${data.customerCity} ${data.customerCountry}`}
                     </label>
@@ -170,40 +184,45 @@ const ViewBatchInvoice = () => {
                 <div className="flex  ">
                   <label
                     htmlFor=""
-                    className="font-semibold text-dark-2 min-w-[100px] text-[14px] dark:text-white "
+                    className="min-w-[100px] text-[14px] font-semibold text-dark-2 dark:text-white "
                   >
                     Email
                   </label>
-                  <label className="font-light text-[14px]">{data.customerEmail}</label>
+                  <label className="text-[14px] font-light">
+                    {data.customerEmail}
+                  </label>
                 </div>
                 <div className="flex  ">
                   <label
                     htmlFor=""
-                    className="font-semibold text-dark-2 min-w-[100px] text-[14px] dark:text-white "
+                    className="min-w-[100px] text-[14px] font-semibold text-dark-2 dark:text-white "
                   >
                     Delivery Address
                   </label>
-                  <label className="font-light text-[14px]">
+                  <label className="text-[14px] font-light">
                     {` ${data.deliveryAddress} ${data.deliveryPlaceName}`}
                   </label>
                 </div>
                 <div className="flex  ">
                   <label
                     htmlFor=""
-                    className="font-semibold text-dark-2 min-w-[100px] text-[14px] dark:text-white "
+                    className="min-w-[100px] text-[14px] font-semibold text-dark-2 dark:text-white "
                   >
                     Order Number
                   </label>
-                  <label className="font-light text-[14px]"> {data.orderId}</label>
+                  <label className="text-[14px] font-light">
+                    {" "}
+                    {data.orderId}
+                  </label>
                 </div>
                 <div className="flex  ">
                   <label
                     htmlFor=""
-                    className="font-semibold text-dark-2 min-w-[100px] text-[14px] dark:text-white "
+                    className="min-w-[100px] text-[14px] font-semibold text-dark-2 dark:text-white "
                   >
                     Invoice Date
                   </label>
-                  <label className="font-light text-[14px]">
+                  <label className="text-[14px] font-light">
                     {" "}
                     {moment(data.invoiceDate).format("lll")}
                   </label>
@@ -211,11 +230,11 @@ const ViewBatchInvoice = () => {
                 <div className="flex  ">
                   <label
                     htmlFor=""
-                    className="font-semibold text-dark-2 min-w-[100px] text-[14px] dark:text-white "
+                    className="min-w-[100px] text-[14px] font-semibold text-dark-2 dark:text-white "
                   >
                     Invoice up to Date
                   </label>
-                  <label className="font-light text-[14px]">
+                  <label className="text-[14px] font-light">
                     {" "}
                     {moment(data.invoiceUptoDate).format("lll")}
                   </label>
@@ -224,7 +243,7 @@ const ViewBatchInvoice = () => {
               <div className="mt-5 flex  gap-4">
                 <div className="">
                   <label
-                    className="font-semibold text-dark-2 min-w-[100px] text-[14px] dark:text-white "
+                    className="min-w-[100px] text-[14px] font-semibold text-dark-2 dark:text-white "
                     htmlFor="Action"
                   >
                     Action
@@ -295,22 +314,34 @@ const ViewBatchInvoice = () => {
                 </div>
                 <div className="">
                   <label
-                    className="font-semibold text-dark-2 min-w-[100px] text-[14px] dark:text-white "
+                    className="min-w-[100px] text-[14px] font-semibold text-dark-2 dark:text-white "
                     htmlFor="Action"
                   >
                     Document
                   </label>
-                  <div className="flex">
+                  <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2">
                       <PiPrinterFill />
                       <button
                         onClick={handleDownloadInvoice}
-                        className="cursor-pointer text-[#3182ce] text-[14px]"
-                       
+                        className="cursor-pointer text-[14px] text-[#3182ce]"
                       >
                         Invoice
                       </button>
                     </div>
+                    {data?.status === "Draft" && (
+                      <div className="flex items-center gap-2">
+                        <FaEdit />
+                        <button
+                          label="Edit Invoice"
+                          icon="pi pi-pencil"
+                          className="cursor-pointer text-[14px] text-[#3182ce]"
+                          onClick={() => setEditVisible(true)}
+                        >
+                          Edit Invoice
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -318,7 +349,7 @@ const ViewBatchInvoice = () => {
 
             <div className="col-span-3  p-4">
               <label
-                className="text-[20px] font-semibold text-dark-2 min-w-[100px] text-[14px] dark:text-white "
+                className="min-w-[100px] text-[14px] text-[20px] font-semibold text-dark-2 dark:text-white "
                 htmlFor="Action"
               >
                 Total Items
@@ -327,38 +358,47 @@ const ViewBatchInvoice = () => {
                 <div className="flex  ">
                   <label
                     htmlFor=""
-                    className="font-semibold text-dark-2 min-w-[100px] text-[14px] dark:text-white "
+                    className="min-w-[100px] text-[14px] font-semibold text-dark-2 dark:text-white "
                   >
                     Excluding Tax
                   </label>
-                  <label className="font-light text-[14px]">{formatCurrency(data?.goods,user?.currencyKey)}</label>
+                  <label className="text-[14px] font-light">
+                    {formatCurrency(data?.goods, user?.currencyKey)}
+                  </label>
                 </div>
                 <div className="flex  ">
                   <label
                     htmlFor=""
-                    className="font-semibold text-dark-2 min-w-[100px] text-[14px] dark:text-white "
+                    className="min-w-[100px] text-[14px] font-semibold text-dark-2 dark:text-white "
                   >
                     Tax
                   </label>
-                  <label className="font-light text-[14px]">{formatCurrency(data?.tax,user?.currencyKey)}</label>
+                  <label className="text-[14px] font-light">
+                    {formatCurrency(data?.tax, user?.currencyKey)}
+                  </label>
                 </div>
                 <div className="flex  ">
                   <label
                     htmlFor=""
-                    className="font-semibold text-dark-2 min-w-[100px] text-[14px] dark:text-white "
+                    className="min-w-[100px] text-[14px] font-semibold text-dark-2 dark:text-white "
                   >
                     Suspension
                   </label>
-                  <label className="font-light text-[14px] text-red">{formatCurrency(data?.suspensionAmount,user?.currencyKey)}</label>
+                  <label className="text-[14px] font-light text-red">
+                    {formatCurrency(data?.suspensionAmount, user?.currencyKey)}
+                  </label>
                 </div>
                 <div className="flex  ">
                   <label
                     htmlFor=""
-                    className="font-semibold text-dark-2 min-w-[100px] text-[14px] dark:text-white "
+                    className="min-w-[100px] text-[14px] font-semibold text-dark-2 dark:text-white "
                   >
                     Including Tax
                   </label>
-                  <label className="font-light text-[14px]"> {formatCurrency(data?.total,user?.currencyKey)}</label>
+                  <label className="text-[14px] font-light">
+                    {" "}
+                    {formatCurrency(data?.total, user?.currencyKey)}
+                  </label>
                 </div>
               </div>
             </div>

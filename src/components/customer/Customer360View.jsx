@@ -41,7 +41,7 @@ const Customer360View = () => {
   const params = useParams();
   const router = useRouter();
   const { user } = useSelector((state) => state?.authReducer);
-  const { isIntegrationActive } = useIntegrationStatus();
+  const { getChannelStatus } = useIntegrationStatus();
   
   const [loading, setLoading] = useState(true);
   const [customer, setCustomer] = useState(null);
@@ -73,7 +73,7 @@ const Customer360View = () => {
 
 
   const checkWhatsAppStatus = async () => {
-    const isActive = await isIntegrationActive('whatsapp');
+    const isActive = await getChannelStatus('whatsapp');
     setWhatsappEnabled(isActive);
   };
   useEffect(() => {
@@ -117,7 +117,7 @@ const Customer360View = () => {
       
     } catch (error) {
       console.error("Error fetching customer data:", error);
-      toast.current.show({
+      toast.current?.show({
         severity: "error",
         summary: "Error",
         detail: "Failed to load customer data",
@@ -173,8 +173,11 @@ const Customer360View = () => {
       ["pending", "processing", "delivered"].includes(order.status?.toLowerCase())
     ).length || 0;
     
-    const totalRevenue = invoiceData?.reduce((sum, inv) => sum + (inv.totalPrice || 0), 0) || 0;
-    const outstandingBalance = customerData.totalPrice || 0;
+    const totalRevenue =  invoiceData
+  .filter(invoice => invoice.paymentStatus === "paid") || 0;
+    const outstandingBalance =  invoiceData
+  .filter(invoice => invoice.paymentStatus === "unpaid")
+  .reduce((sum, invoice) => sum + invoice.total, 0);
     
     const lastOrder = customerData.orders?.sort((a, b) =>
       new Date(b.createdAt) - new Date(a.createdAt)
@@ -394,7 +397,7 @@ const Customer360View = () => {
               <div className="customer-info-grid">
                 <div className="info-item">
                   <FiPhone className="info-icon" />
-                  <span>{customer?.number || 'No phone'}</span>
+                  <span>{customer?.mobile || 'No phone'}</span>
                 </div>
                 <div className="info-item">
                   <FiMail className="info-icon" />
@@ -596,14 +599,14 @@ const Customer360View = () => {
                               className="order-status"
                             />
                           </div>
-                          <div className="order-details">
+                          {/* <div className="order-details">
                             <span className="order-date">
                               {moment(order.createdAt).format('DD MMM YYYY')}
                             </span>
                             <span className="order-amount">
                               {formatCurrency(order.totalPrice || 0, user?.currencyKey)}
                             </span>
-                          </div>
+                          </div> */}
                         </div>
                       ))}
                       {orders.length > 5 && (
@@ -628,11 +631,11 @@ const Customer360View = () => {
                       {invoices.slice(0, 5).map((invoice) => (
                         <div key={invoice._id} className="invoice-item">
                           <div className="invoice-header">
-                            <Link href={`/invoice/${invoice._id}`} className="invoice-id">
+                            <Link href={`/order/quick-off-hire/${invoice._id}`} className="invoice-id">
                               #{invoice.invoiceNumber}
                             </Link>
                             <Tag 
-                              value={invoice.status || 'Pending'} 
+                              value={invoice.paymentStatus || 'Pending'} 
                               severity={getStatusColor(invoice.status)}
                               className="invoice-status"
                             />
@@ -642,7 +645,7 @@ const Customer360View = () => {
                               {moment(invoice.createdAt).format('DD MMM YYYY')}
                             </span>
                             <span className="invoice-amount">
-                              {formatCurrency(invoice.totalPrice || 0, user?.currencyKey)}
+                              {formatCurrency(invoice.total || 0, user?.currencyKey)}
                             </span>
                           </div>
                         </div>

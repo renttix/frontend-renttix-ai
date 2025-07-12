@@ -509,3 +509,9 @@
 .dark .filter-content::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
 }
+
+.custom-speed-dial-btn {
+  width: 2rem !important;
+  height: 2rem !important;
+  font-size: 0.8rem !important;
+}

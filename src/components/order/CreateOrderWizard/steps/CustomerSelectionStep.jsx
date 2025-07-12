@@ -51,6 +51,7 @@ export default function CustomerSelectionStep() {
   };
   
   const handleSelectCustomer = (customer) => {
+    console.log(customer)
     setSelectedCustomer(customer);
     updateFormData({
       customerId: customer._id,
@@ -63,7 +64,7 @@ export default function CustomerSelectionStep() {
       city: customer.city || '',
       country: customer.country || '',
       postcode: customer.postCode || '',
-      cunstomerQuickbookId: customer.customerID || '',
+      cunstomerQuickbookId: customer?.customerID || '',
       paymentTerm: customer.paymentTerm?._id || '',
       invoiceRunCode: customer.invoiceRunCode?._id || '',
     });

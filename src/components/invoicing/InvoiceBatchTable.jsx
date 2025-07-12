@@ -15,14 +15,19 @@ import {
 import { Tag } from "primereact/tag";
 import moment from "moment";
 import { formatCurrency } from "../../../utils/helper";
+import { SpeedDial } from "primereact/speeddial";
+import { Menu } from 'primereact/menu';
+import { Button } from "primereact/button";
 
-const InvoiceBatchTable = ({ columnData }) => {
+const InvoiceBatchTable = ({ columnData ,onSelectionChange }) => {
   const toast = useRef();
   const params = useParams();
   const [filterData, setfilterData] = useState(columnData);
   const { token, user } = useSelector((state) => state?.authReducer);
   const [loader, setloader] = useState(false);
   const router = useRouter();
+    const [selectedInvoices, setSelectedInvoices] = useState([]);
+
   const handleDelte = (id) => {
     const output = filterData.filter((item) => item._id !== id);
     setfilterData(output);
@@ -144,16 +149,26 @@ const InvoiceBatchTable = ({ columnData }) => {
   };
 
   return (
-    <div className="">
+   <div className="">
       <Toast ref={toast}></Toast>
-      <div className="card ">
+      <div className="card">
         <DataTable
           value={filterData?.invoices || []}
+          selection={selectedInvoices}
+          onSelectionChange={(e) => {
+            setSelectedInvoices(e.value);
+            onSelectionChange && onSelectionChange(e.value);
+          }}
+          dataKey="_id"
+         
           tableStyle={{ minWidth: "50rem" }}
+             rowSelectionMode="multiple"               // ✅ required
+
         >
+          <Column   selectionMode="multiple" headerStyle={{ width: '3em' }} />
           <Column
             field="name"
-            header="Name"
+            header="Customer"
             body={(item) => {
               return (
                 <>
@@ -202,6 +217,11 @@ const InvoiceBatchTable = ({ columnData }) => {
                 <Tag value={"Invoice"} size={"sm"} />
               </>
             )}
+          ></Column>
+                <Column
+            field="deliveryAddress"
+            header="Address"
+         
           ></Column>
           <Column
             field="quantity"
@@ -272,30 +292,43 @@ const InvoiceBatchTable = ({ columnData }) => {
               );
             }}
           ></Column>
-          <Column
-            field="action"
-            header="Action"
-            body={(item) => {
-              return (
-                <>
-                  <div className="flex gap-6">
-                    <i
-                      onClick={() => handleDownloadInvoice(item.id)}
-                      className="pi pi-print cursor-pointer"
-                    ></i>
-                    <i
-                      onClick={() =>
-                        router.push(
-                          `/invoice/invoice-batches/${filterData._id}/invoice/${item.id}`,
-                        )
-                      }
-                      className="pi pi-external-link cursor-pointer"
-                    ></i>
-                  </div>
-                </>
-              );
-            }}
-          ></Column>
+<Column
+  field="action"
+  header="Action"
+  body={(item) => {
+    const menuRef = useRef(null);
+
+    const menuItems = [
+      {
+        label: 'Print',
+        icon: 'pi pi-print',
+        command: () => handleDownloadInvoice(item._id),
+      },
+      {
+        label: 'View',
+        icon: 'pi pi-external-link',
+        command: () =>
+          router.push(
+            `/invoicing/invoice-batch/${filterData._id}/invoice/${item._id}`
+          ),
+      },
+    ];
+
+    return (
+      <div className="p-2 flex justify-center">
+        <Menu model={menuItems} popup ref={menuRef} />
+        <Button
+          icon="pi pi-ellipsis-v"
+          className="p-button-text p-button-sm"
+          onClick={(e) => menuRef.current.toggle(e)}
+        />
+      </div>
+    );
+  }}
+></Column>
+
+
+
         </DataTable>
       </div>
     </div>

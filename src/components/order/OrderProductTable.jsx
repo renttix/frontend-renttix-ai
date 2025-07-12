@@ -35,6 +35,8 @@ const OrderProductTable = ({
   const dispatch = useDispatch();
   const { modelOpen, modalData } = useSelector((state) => state.modal);
   const [data, setdata] = useState({});
+const [visibleAssets, setVisibleAssets] = useState([]);
+const [assetDialogVisible, setAssetDialogVisible] = useState(false);
 
   const handleDelte = (id) => {
     const output = filterData.filter((item) => item?._id !== id);
@@ -127,60 +129,27 @@ const OrderProductTable = ({
     );
   };
 
-    const assetNumbersBodyTemplate = (item) => {
-// const item =  rowData.selectedAssets    
-return (
-      <div className="w-48 z-1">
-            {item.selectedAssets && item.selectedAssets.length > 0 ? (
-              <div className="relative group">
-                <button className="px-3 py-1 text-sm border rounded hover:bg-gray-50 cursor-pointer">
-                  {item.selectedAssets.length} Asset{item.selectedAssets.length > 1 ? 's' : ''}
-                </button>
-                <div className="absolute z-10 hidden group-hover:block bg-white border rounded shadow-lg mt-1 max-h-60 overflow-y-auto min-w-[200px]">
-              {item.selectedAssets.map((asset, index) => {
-  const assetObj = typeof asset === 'string'
-    ? { number: asset, status: 'available' }
-    : {
-        number: asset?.assetNumber || asset?.number || 'unknown',
-        status: asset?.status || 'available',
-      };
-
-  const assetNumber = assetObj.number;
-
+  const assetNumbersBodyTemplate = (item) => {
   return (
-    <Link
-      key={index}
-      href={`/asset/${encodeURIComponent(assetNumber)}`}
-      className="block px-3 py-2 hover:bg-gray-100 text-sm whitespace-nowrap no-underline z-1"
-    >
-      <div className="flex justify-between items-center">
-        <span className="text-[#0068d6] hover:underline">{assetNumber}</span>
-        <span
-          className={`ml-2 px-2 py-1 text-xs rounded ${
-            assetObj.status === 'available'
-              ? 'bg-green-100 text-green-800'
-              : assetObj.status === 'rented'
-              ? 'bg-yellow-100 text-yellow-800'
-              : assetObj.status === 'maintenance'
-              ? 'bg-blue-100 text-blue-800'
-              : 'bg-red-100 text-red-800'
-          }`}
+    <div className="w-full">
+      {item.selectedAssets && item.selectedAssets.length > 0 ? (
+        <button
+          className="px-3 py-1 text-sm border rounded hover:bg-gray-50 cursor-pointer"
+          onClick={() => {
+            setVisibleAssets(item.selectedAssets);
+            setAssetDialogVisible(true);
+          }}
         >
-          {assetObj.status}
-        </span>
-      </div>
-    </Link>
+          {item.selectedAssets.length} Asset
+          {item.selectedAssets.length > 1 ? "s" : ""}
+        </button>
+      ) : (
+        <span className="text-gray-400">No assets</span>
+      )}
+    </div>
   );
-})}
+};
 
-                </div>
-              </div>
-            ) : (
-              <span className="text-gray-400">No assets</span>
-            )}
-          </div>
-    );
-  };
 
   const accept = () => {
     handleDelete(data._id);
@@ -292,6 +261,49 @@ return (
   return (
     <div className="p-4">
       <Toast ref={toast} />
+      <Dialog
+  header="Asset Numbers"
+  visible={assetDialogVisible}
+  style={{ width: "40vw", maxHeight: "70vh" ,}}
+  onHide={() => setAssetDialogVisible(false)}
+>
+  <div className="overflow-y-auto max-h-[60vh] space-y-2 ">
+    {visibleAssets.map((asset, index) => {
+      const assetObj =
+        typeof asset === "string"
+          ? { number: asset, status: "available" }
+          : {
+              number: asset?.assetNumber || asset?.number || "unknown",
+              status: asset?.status || "available",
+            };
+
+      return (
+        <div key={index} className="flex justify-between items-center border-b pb-1  p-4">
+          <Link
+            href={`/asset/${encodeURIComponent(assetObj.number)}`}
+            className="text-[#0068d6] hover:underline text-sm"
+          >
+            {assetObj.number}
+          </Link>
+          <span
+            className={`ml-2 px-2 py-1 text-xs rounded ${
+              assetObj.status === "available"
+                ? "bg-green-100 text-green-800"
+                : assetObj.status === "rented"
+                ? "bg-yellow-100 text-yellow-800"
+                : assetObj.status === "maintenance"
+                ? "bg-blue-100 text-blue-800"
+                : "bg-red-100 text-red-800"
+            }`}
+          >
+            {assetObj.status}
+          </span>
+        </div>
+      );
+    })}
+  </div>
+</Dialog>
+
 <AllocatedModel
   onAllocate={async ({ productItemId, quantity, revert }) => {
     try {

@@ -7,6 +7,8 @@ import apiServices from "../../../services/apiService";
 import { setUpdateUser } from "@/store/authSlice";
 import { setSidebarOpen } from "@/store/uiSlice";
 import { useRouter } from "next/navigation";
+import axios from "axios";
+import { BaseURL } from "../../../utils/baseUrl";
 
 export default function DefaultLayout({ children }) {
   const [sidebarOpen, setLocalSidebarOpen] = useState(false);
@@ -67,7 +69,7 @@ export default function DefaultLayout({ children }) {
     const fetchUserData = async () => {
       try {
         console.log("📡 [DefaultLayout] Fetching user profile data...");
-        const res = await apiServices.get("/auth/profile");
+        const res = await axios.get(`${BaseURL}/vender/profile/${user?._id}`);
         
         console.log("✅ [DefaultLayout] User profile fetched:", {
           success: res.data?.success,

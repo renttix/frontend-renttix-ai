@@ -18,6 +18,7 @@ const InvoiceBatchModel = ({
   data,
   code,
   fetchOldData,
+  selectedInvoices
 }) => {
   //   const { isOpen, onOpen, onClose } = useDisclosure()
   const [loading, setloading] = useState(false);
@@ -30,9 +31,9 @@ const InvoiceBatchModel = ({
   const [position, setPosition] = useState("center");
 console.log({ title,data,user})
 
-
+console.log({selectedInvoices})
 const multipleInvoices = (() => {
-  if (title === "Post Batch" && data?.invoices?.length) {
+  if (title === "Post All" && data?.invoices?.length) {
     return data.invoices.map(item => ({
       invoiceId: item?._id,
       amount: item?.total,
@@ -151,7 +152,7 @@ const handleInvoicePayment = async () => {
   //     };
 
   //     const res =
-  //       title === "Confirm Batch"
+  //       title === "Confirm All"
   //         ? await axios.put(
   //             `${BaseURL}/invoice/invoice-status`,
   //             payload,
@@ -163,7 +164,7 @@ const handleInvoicePayment = async () => {
   //               allocationData,
   //               config,
   //             )
-  //           : title === "Post Batch"
+  //           : title === "Post All"
   //             ? await axios.post(
   //                 `${BaseURL}/invoice/invoice-post-all/`,
   //                 { id: params.id },
@@ -219,7 +220,7 @@ const handleInvoicePayment = async () => {
   
       let res;
   
-      if (title === "Confirm Batch") {
+      if (title === "Confirm All") {
         res = await axios.put(`${BaseURL}/invoice/invoice-status`, payload, config);
       } else if (title === "Post invoice") {
         res = await axios.post(`${BaseURL}/invoice/invoice-post/`, allocationData, config);
@@ -228,8 +229,8 @@ const handleInvoicePayment = async () => {
         if (res?.data?.success) {
           await handleInvoicePayment();
         }
-      } else if (title === "Post Batch") {
-        console.log("🚀 Sending Post Batch request");
+      } else if (title === "Post All") {
+        console.log("🚀 Sending Post All request");
         try {
           res = await axios.post(`${BaseURL}/invoice/invoice-post-all/`, { id: params.id }, config);
          if(res.data.success){
@@ -237,7 +238,7 @@ const handleInvoicePayment = async () => {
 
          }
         } catch (err) {
-          console.error("❌ Post Batch error:", err.response?.data || err.message);
+          console.error("❌ Post All error:", err.response?.data || err.message);
         }
       } else if (title === "Confirm Invoice") {
         res = await axios.post(`${BaseURL}/invoice/invoice-confirmed`, allocationData, config);
@@ -339,7 +340,7 @@ const handleInvoicePayment = async () => {
             </div>
           </div>
         )}
-        {subTitle == "Post Batch" && (
+        {subTitle == "Post All" && (
           <div className="mb-5 flex flex-col gap-3">
             <div>
               <label className="font-semibold text-red">
@@ -358,7 +359,7 @@ const handleInvoicePayment = async () => {
         )}
         <label
           className={`flex ${
-            (title === "Delete Invoice Batch" || title === "Post Batch") &&
+            (title === "Delete Invoice Batch" || title === "Post All") &&
             "flex-col"
           }`}
         >

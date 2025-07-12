@@ -75,7 +75,7 @@ const AvatarUpload = ({completionPercentage}) => {
   const dispatch = useDispatch();
   const toast = useRef();
   const [imagePreviewUrl, setImagePreviewUrl] = useState(
-    `${imageBaseURL}${user?.profile_Picture}`,
+    `${imageBaseURL}/${user?.profile_Picture}`,
   );
 
   const photoUpload = async (e) => {

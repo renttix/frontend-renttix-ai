@@ -41,6 +41,7 @@ const AssetSelector = ({
 
   useEffect(() => {
     if (visible && product) {
+          setSelectionMode('manual'); // reset mode
       fetchAvailableAssets();
     }
   }, [visible, product, startDate, endDate]);
@@ -71,7 +72,18 @@ const AssetSelector = ({
           !asset.isUnderMaintenance &&
           !asset.hasConflictingBooking
         );
-        setAvailableAssets(available);
+       // Build a set of selected asset IDs to compare
+const previouslySelectedIds = new Set(selectedAssets.map(a => a.assetId));
+
+// Mark previously selected assets as 'rented'
+const hydratedAssets = available.map(asset => ({
+  ...asset,
+  status: previouslySelectedIds.has(asset.assetId) ? 'rented' : 'available'
+}));
+
+setAvailableAssets(hydratedAssets);
+setSelectedAssetIds(previouslySelectedIds);
+
       }
     } catch (error) {
       console.error('Failed to fetch assets:', error);
@@ -94,45 +106,68 @@ const AssetSelector = ({
     }
   };
 
-  const handleManualSelection = (assetId) => {
-    const newSelection = new Set(selectedAssetIds);
-    if (newSelection.has(assetId)) {
-      newSelection.delete(assetId);
-    } else {
-      newSelection.add(assetId);
+const handleManualSelection = (assetId) => {
+  const newSelection = new Set(selectedAssetIds);
+
+  const updatedAssets = availableAssets.map(asset => {
+    if (asset.assetId === assetId) {
+      const isSelected = newSelection.has(assetId);
+      if (isSelected) {
+        newSelection.delete(assetId);
+        return { ...asset, status: 'available',isAvailable:true, }; // Unselect -> make available
+      } else {
+        newSelection.add(assetId);
+        return { ...asset, status: 'rented',isAvailable:false }; // Select -> make rented
+      }
     }
-    setSelectedAssetIds(newSelection);
-  };
+    return asset;
+  });
 
-  const handleAutoAssign = () => {
-    let sortedAssets = [...availableAssets];
-    
-    // Sort based on strategy
-    switch (autoAssignStrategy) {
-      case 'oldest':
-        sortedAssets.sort((a, b) => new Date(a.lastMaintenanceDate) - new Date(b.lastMaintenanceDate));
-        break;
-      case 'newest':
-        sortedAssets.sort((a, b) => new Date(b.lastMaintenanceDate) - new Date(a.lastMaintenanceDate));
-        break;
-      case 'least-used':
-        sortedAssets.sort((a, b) => a.usageCount - b.usageCount);
-        break;
-    }
+  setSelectedAssetIds(newSelection);
+  setAvailableAssets(updatedAssets);
+};
 
-    // Select the requested quantity
-    const autoSelected = sortedAssets.slice(0, Math.min(autoAssignQuantity, sortedAssets.length));
-    setSelectedAssetIds(new Set(autoSelected.map(a => a.assetId)));
-  };
 
-  const handleConfirm = () => {
-    const selectedAssetObjects = availableAssets.filter(asset => 
-      selectedAssetIds.has(asset.assetId)
-    );
-    
-    onAssetsChange(selectedAssetObjects);
-    onHide();
-  };
+const handleAutoAssign = () => {
+  let sortedAssets = [...availableAssets];
+
+  switch (autoAssignStrategy) {
+    case 'oldest':
+      sortedAssets.sort((a, b) => new Date(a.lastMaintenanceDate) - new Date(b.lastMaintenanceDate));
+      break;
+    case 'newest':
+      sortedAssets.sort((a, b) => new Date(b.lastMaintenanceDate) - new Date(a.lastMaintenanceDate));
+      break;
+    case 'least-used':
+      sortedAssets.sort((a, b) => a.usageCount - b.usageCount);
+      break;
+  }
+
+  const autoSelected = sortedAssets.slice(0, Math.min(autoAssignQuantity, sortedAssets.length));
+  const selectedIds = new Set(autoSelected.map(a => a.assetId));
+
+  const updatedAssets = availableAssets.map(asset => ({
+    ...asset,
+    status: selectedIds.has(asset.assetId) ? 'rented' : 'available',
+  }));
+
+  setSelectedAssetIds(selectedIds);
+  setAvailableAssets(updatedAssets);
+};
+
+
+const handleConfirm = () => {
+  const selectedAssetObjects = availableAssets
+    .filter(asset => selectedAssetIds.has(asset.assetId))
+    .map(asset => ({
+      ...asset,
+      productId: product._id 
+    }));
+
+  onAssetsChange(selectedAssetObjects);
+  onHide();
+};
+
 
   const statusBodyTemplate = (asset) => {
     const severity = asset.status === 'available' ? 'success' : 

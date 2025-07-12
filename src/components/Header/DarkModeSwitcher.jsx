@@ -2,7 +2,7 @@ import useColorMode from "@/hooks/useColorMode";
 import Head from "next/head";
 import { useEffect } from "react";
 // import "primereact/resources/themes/lara-light-orange/theme.css"
-import '../../../public/themes/lara-light-orange/theme.css'
+import '../../../public/themes/lara-light-pink/theme.css'
 
 const DarkModeSwitcher = () => {
   const [colorMode, setColorMode] = useColorMode();

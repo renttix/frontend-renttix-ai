@@ -21,6 +21,8 @@ import {
 } from "react-icons/io";
 import GoPrevious from "../common/GoPrevious/GoPrevious";
 import { formatCurrency } from "../../../utils/helper";
+import BulkInvoiceStatusModal from "./BulkInvoiceStatusModal";
+import { Button } from "primereact/button";
 
 const InvoiceBatch = () => {
   const [data, setdata] = useState({});
@@ -28,7 +30,14 @@ const InvoiceBatch = () => {
   const { token,user } = useSelector((state) => state?.authReducer);
   const [refreshFlag, setRefreshFlag] = useState(false);
   const [pdfUrl, setpdfUrl] = useState("");
+const [selectedInvoices, setSelectedInvoices] = useState([]);
+const [confirmModalVisible, setConfirmModalVisible] = useState(false);
+const [postModalVisible, setPostModalVisible] = useState(false);
 
+
+// Filtered arrays:
+const draftInvoices = selectedInvoices.filter((inv) => inv.status === "Draft");
+const confirmedInvoices = selectedInvoices.filter((inv) => inv.status === "Confirmed");
   const [products, setProducts] = useState([
     {
       id: "1000",
@@ -68,6 +77,7 @@ const InvoiceBatch = () => {
   }, [refreshFlag]);
   const handleRefresh = () => {
     setRefreshFlag((prevFlag) => !prevFlag);
+    // setSelectedInvoices([])
   };
 
   function areAllStatusesPosted(data, value) {
@@ -168,7 +178,7 @@ const InvoiceBatch = () => {
                             <IoIosCheckmarkCircleOutline />
 
                             <InvoiceBatchModel
-                              title="Confirm Batch"
+                              title="Confirm All"
                               subTitle={"Confirm Batch"}
                               fetchOldData={handleRefresh}
                               batchId={data?._id}
@@ -186,7 +196,7 @@ const InvoiceBatch = () => {
                             <IoIosCheckmarkCircle />
                             <InvoiceBatchModel
                               fetchOldData={handleRefresh}
-                              title="Post Batch"
+                              title="Post All"
                               subTitle={"Post Batch"}
                               data={data}
                               code={data?.batchNumber}
@@ -230,6 +240,7 @@ const InvoiceBatch = () => {
                     </div>
                   </div>
                 </div>
+                
               </div>
             </div>
 
@@ -291,7 +302,66 @@ const InvoiceBatch = () => {
               Total Invoice: {data?.totalInvoice}
             </label>
           </div>
-          <InvoiceBatchTable columnData={data} />
+{selectedInvoices.length > 0 && (
+  <div className="mt-6">
+    <label className="font-semibold text-dark-2 dark:text-white block mb-2">
+      Bulk Actions for Selected Invoices
+    </label>
+    <div className="flex gap-4 mb-4">
+      {/* ✅ Confirm Draft Invoices */}
+      {draftInvoices.length > 0 && (
+        <>
+          <Button
+            label={`Confirm ${draftInvoices.length} Selected`}
+            icon="pi pi-check"
+            className="p-button-warning"
+            size="small"
+            onClick={() => setConfirmModalVisible(true)}
+          />
+
+          <BulkInvoiceStatusModal
+            visible={confirmModalVisible}
+            setVisible={setConfirmModalVisible}
+            title={`Confirm ${draftInvoices.length} Selected`}
+            description="Are you sure you want to confirm the selected draft invoices?"
+            selectedInvoiceIds={draftInvoices.map((inv) => inv._id)}
+            status="Confirmed"
+            fetchOldData={handleRefresh}
+          />
+        </>
+      )}
+
+      {/* ✅ Post Confirmed Invoices */}
+      {confirmedInvoices.length > 0 && (
+        <>
+          <Button
+            label={`Post ${confirmedInvoices.length} Selected`}
+            icon="pi pi-send"
+            className="p-button-success"
+            size="small"
+            onClick={() => setPostModalVisible(true)}
+          />
+
+          <BulkInvoiceStatusModal
+            visible={postModalVisible}
+            setVisible={setPostModalVisible}
+            title={`Post ${confirmedInvoices.length} Selected`}
+            description="Are you sure you want to post the selected confirmed invoices?"
+            selectedInvoiceIds={confirmedInvoices.map((inv) => inv._id)}
+            status="Posted"
+            fetchOldData={handleRefresh}
+          />
+        </>
+      )}
+    </div>
+  </div>
+)}
+
+
+         <InvoiceBatchTable
+  columnData={data}
+  onSelectionChange={setSelectedInvoices}
+/>
         </div>
       )}
     </>
