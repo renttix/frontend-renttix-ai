@@ -1,63 +1,88 @@
+
+// import { NextResponse } from "next/server";
+
+// // Middleware function
+// export function middleware(request) {
+//   const xpdx = request.cookies.get("xpdx")?.value; // Authentication status
+//   const xpdx_r = request.cookies.get("xpdx_r")?.value; // User role
+//   const xpdx_s = request.cookies.get("xpdx_s")?.value; // User status
+
+//   const dashboardPaths = new Set([
+//     "/dashboard"
+//   ]);
+
+//   const adminOnlyPaths = new Set(["/", "/users"]); // Admin-only paths
+//   const authPaths = new Set(["/auth/register", "/auth/login"]);
+
+//   const restrictedStatuses = ["deactive"]; // Restricted statuses
+//   // const restrictedStatuses = ["inactive", "pending", "deactive"]; // Restricted statuses
+
+//   const url = new URL(request.url);
+
+//   // Allow access to the /dashboard for restricted users to prevent loops
+//   if (xpdx_s && restrictedStatuses.includes(xpdx_s)) {
+//     if (dashboardPaths.has(request.nextUrl.pathname)) {
+//       return NextResponse.redirect(new URL("/dashboard", url));
+//     }
+//     // If already on /dashboard, allow access
+//     if (request.nextUrl.pathname === "/dashboard") {
+//       return NextResponse.next();
+//     }
+//   }
+
+//   // Admin-only access to specific paths
+//   if (adminOnlyPaths.has(request.nextUrl.pathname)) {
+//     if (xpdx_r !== "Admin") {
+//       return NextResponse.redirect(new URL("/dashboard", url));
+//     }
+//   }
+
+//   // Redirect logged-in users away from auth routes
+//   if (xpdx && authPaths.has(request.nextUrl.pathname)) {
+//     return NextResponse.redirect(new URL("/dashboard", url));
+//   }
+
+//   // Redirect guests to login for protected routes, including dynamic routes
+//   const protectedRoutes = [
+//     ...dashboardPaths,
+//     "/order/",
+//     "/product/",
+//     "/customer/",
+//     "/invoicing/",
+//     "/system-setup/",
+//   ];
+//   const isProtected = protectedRoutes.some((path) =>
+//     request.nextUrl.pathname.startsWith(path),
+//   );
+
+//   if (!xpdx && isProtected) {
+//     return NextResponse.redirect(new URL("/", url));
+//   }
+// }
+
+// // Configuration for the middleware matcher
+// export const config = {
+//   matcher: [
+//     "/((?!api|_next/static|_next/image|favicon.ico).*)", // Exclude static files and APIs
+//     "/order/:path*", // Include dynamic route patterns explicitly
+//     "/product/:path*", // Include dynamic route patterns explicitly
+//   ],
+// };
+
+
 import { NextResponse } from "next/server";
 
 // Middleware function
 export function middleware(request) {
-  const url = new URL(request.url);
-  const path = request.nextUrl.pathname;
 
-  const xpdx = request.cookies.get("xpdx")?.value; // Auth token
-  const xpdx_r = request.cookies.get("xpdx_r")?.value; // Role
-  const xpdx_s = request.cookies.get("xpdx_s")?.value; // Status
-
-  const dashboardPaths = new Set(["/dashboard"]);
-  const adminOnlyPaths = new Set(["/", "/users"]);
-  const authPaths = new Set(["/auth/register", "/auth/login"]);
-  const restrictedStatuses = ["deactive"]; // Adjust if needed
-
-  const protectedRoutes = [
-    ...dashboardPaths,
-    "/order/",
-    "/product/",
-    "/customer/",
-    "/invoicing/",
-    "/system-setup/",
-  ];
-
-  const isProtected = protectedRoutes.some((route) => path.startsWith(route));
-
-  // ✅ Always allow /dashboard to break redirect loops
-  if (path === "/dashboard") {
-    return NextResponse.next();
-  }
-
-  // 🚫 If user is restricted (e.g., deactive), redirect them to dashboard
-  if (xpdx_s && restrictedStatuses.includes(xpdx_s)) {
-    return NextResponse.redirect(new URL("/dashboard", url));
-  }
-
-  // 🔐 Redirect non-Admin users away from admin-only paths
-  if (adminOnlyPaths.has(path) && xpdx_r !== "Admin") {
-    return NextResponse.redirect(new URL("/dashboard", url));
-  }
-
-  // 🔁 Redirect logged-in users away from login/register pages
-  if (xpdx && authPaths.has(path)) {
-    return NextResponse.redirect(new URL("/dashboard", url));
-  }
-
-  // 🔒 Redirect guests or restricted users from protected routes
-  if ((!xpdx || restrictedStatuses.includes(xpdx_s)) && isProtected) {
-    return NextResponse.redirect(new URL("/", url));
-  }
-
-  return NextResponse.next();
 }
 
 // Configuration for the middleware matcher
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico).*)", // Exclude static files
-    "/order/:path*", // Dynamic route patterns
-    "/product/:path*",
+    "/((?!api|_next/static|_next/image|favicon.ico).*)", // Exclude static files and APIs
+    "/order/:path*", // Include dynamic route patterns explicitly
+    "/product/:path*", // Include dynamic route patterns explicitly
   ],
 };
+

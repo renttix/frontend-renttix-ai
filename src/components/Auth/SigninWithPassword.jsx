@@ -36,21 +36,21 @@ export default function SigninWithPassword() {
 };
 
 
-  useEffect(() => {
-    const autoLogin = async () => {
-      try {
-        const response = await axios.post(`${BaseURL}/vender-login`, autoLoginCredentials);
-        const output = response?.data;
+  // useEffect(() => {
+  //   const autoLogin = async () => {
+  //     try {
+  //       const response = await axios.post(`${BaseURL}/vender-login`, autoLoginCredentials);
+  //       const output = response?.data;
 
-        dispatch(setLoginData(output));
-        router.push("/dashboard");
-      } catch (err) {
-        console.error("Auto login failed", err);
-      }
-    };
+  //       dispatch(setLoginData(output));
+  //       router.push("/dashboard");
+  //     } catch (err) {
+  //       console.error("Auto login failed", err);
+  //     }
+  //   };
 
-    autoLogin();
-  }, []);
+  //   autoLogin();
+  // }, []);
   const handleSubmit = async (values, { setSubmitting, setErrors }) => {
     setloader(true);
     try {
