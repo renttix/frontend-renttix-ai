@@ -77,7 +77,7 @@ const confirmedInvoices = selectedInvoices.filter((inv) => inv.status === "Confi
   }, [refreshFlag]);
   const handleRefresh = () => {
     setRefreshFlag((prevFlag) => !prevFlag);
-    // setSelectedInvoices([])
+    setSelectedInvoices([])
   };
 
   function areAllStatusesPosted(data, value) {

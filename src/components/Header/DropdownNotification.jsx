@@ -11,11 +11,11 @@ import moment from "moment";
 import { FiMessageCircle, FiUser } from "react-icons/fi";
 import useIntegrationStatus from "@/hooks/useIntegrationStatus";
 
-// const socket = io("http://localhost:7000");
-const socket = io("https://saasrental.io", {
-  path: "/socket.io",
-  transports: ["websocket"],
-});
+const socket = io("http://localhost:8000");
+// const socket = io("https://saasrental.io", {
+//   path: "/socket.io",
+//   transports: ["websocket"],
+// });
 
 
 const DropdownNotification = () => {
@@ -193,7 +193,7 @@ const DropdownNotification = () => {
                   <Image
                     width={40}
                     height={40}
-                    src={`${imageBaseURL}images/${removeImagePrefix(item?.data?.user?.profile_Picture)}`}
+                    src={`${imageBaseURL}/images/${removeImagePrefix(item?.data?.user?.profile_Picture)}`}
                     alt="User"
                     className="rounded-full object-cover w-10 h-10 border border-gray-300 dark:border-dark-4"
                   />

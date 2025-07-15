@@ -90,6 +90,8 @@ const QuickOffHireInvoice = () => {
               <th className="p-3 border border-gray-200 text-left rounded-tl-lg">Description</th>
               <th className="p-3 border border-gray-200 text-left">Qty</th>
               <th className="p-3 border border-gray-200 text-left">Type</th>
+              <th className="p-3 border border-gray-200 text-left">suspendedDays</th>
+              <th className="p-3 border border-gray-200 text-left">chargedDays</th>
               <th className="p-3 border border-gray-200 text-left rounded-tr-lg">Amount</th>
             </tr>
           </thead>
@@ -99,6 +101,8 @@ const QuickOffHireInvoice = () => {
                 <td className="p-3 border border-gray-200">{item.description}</td>
                 <td className="p-3 border border-gray-200">{item.qty}</td>
                 <td className="p-3 border border-gray-200">{item.type}</td>
+                <td className="p-3 border border-gray-200">{item.suspendedDays||0}</td>
+                <td className="p-3 border border-gray-200">{item.chargedDays}</td>
                 <td className="p-3 border border-gray-200">
                   {item.amount.toLocaleString("en-PK", {
                     style: "currency",
@@ -113,6 +117,7 @@ const QuickOffHireInvoice = () => {
         <div className="bg-gray-50 p-5 rounded-lg w-full sm:w-1/2 ml-auto text-right text-sm shadow-sm border">
           <div className="mb-1">Subtotal: <strong>{invoice.subtotal.toLocaleString("en-PK", { style: "currency", currency: "PKR" })}</strong></div>
           <div className="mb-1">Tax: <strong>{invoice.tax.toLocaleString("en-PK", { style: "currency", currency: "PKR" })}</strong></div>
+          <div className="mb-1 text-red">Suspension Amount: <strong>{invoice.suspensionDeduction.toLocaleString("en-PK", { style: "currency", currency: "PKR" })}</strong></div>
           <div className="text-lg font-bold mt-2 text-indigo-600">
             Total: {invoice.total.toLocaleString("en-PK", { style: "currency", currency: "PKR" })}
           </div>
