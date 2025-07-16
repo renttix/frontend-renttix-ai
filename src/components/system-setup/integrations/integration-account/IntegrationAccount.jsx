@@ -12,8 +12,11 @@ import { BaseURL } from "../../../../../utils/baseUrl";
 
 const IntegrationAccount = () => {
   const [loading, setLoading] = useState(false);
-  const { user } = useSelector((state) => state?.authReducer);
+  const { user,token } = useSelector((state) => state?.authReducer);
   const [quickBookStatus, setQuickBookStatus] = useState(false);
+  const [revokeLoading, setRevokeLoading] = useState(false);
+const [syncLoading, setSyncLoading] = useState(false);
+
   const toast = React.useRef(null);
 
   const startQuickBooksAuth = () => {
@@ -94,26 +97,91 @@ const IntegrationAccount = () => {
               </h3>
             </div>
             <div className="flex flex-col">
-              <div className="flex gap-3">
-                {!quickBookStatus && user?.isQuickBook ? (
-                  <Button
-                    label="Revoke QuickBooks"
-                    loading={loading}
-                    style={{ background: "red" }}
-                    icon="pi pi-times"
-                    className="p-button-danger"
-                    onClick={RevokeQuickbookAuth}
-                  />
-                ) : (
-                  <Button
-                    label="Connect to QuickBooks"
-                    icon="pi pi-check"
-                    className="p-button-primary"
-                    onClick={startQuickBooksAuth}
-                  />
-                )}
-              </div>
-            </div>
+  <div className="flex gap-3 flex-wrap">
+    {!quickBookStatus && user?.isQuickBook ? (
+      <>
+   <Button
+  label="Revoke QuickBooks"
+  loading={revokeLoading}
+  style={{ background: "red" }}
+  icon="pi pi-times"
+  className="p-button-danger"
+  onClick={() => {
+    setRevokeLoading(true);
+    axios
+      .post(`${BaseURL}/disconnect-quickbook`, {
+        vendorId: user._id,
+      })
+      .then((response) => {
+        setQuickBookStatus(response.data.status);
+        toast.current.show({
+          severity: "error",
+          summary: "QuickBooks",
+          detail: response.data.message,
+          life: 2000,
+        });
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      })
+      .finally(() => {
+        setRevokeLoading(false);
+      });
+  }}
+/>
+
+<Button
+  label="Sync Customers to QuickBooks"
+  icon="pi pi-refresh"
+  className="p-button-success"
+  loading={syncLoading}
+  onClick={async () => {
+    setSyncLoading(true);
+    try {
+      const { data } = await axios.post(
+        `${BaseURL}/sync-customers-to-quickbooks`,
+        { vendorId: user._id },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      toast.current.show({
+        severity: "success",
+        summary: "Sync Complete",
+        detail: `${data.synced.length} customers synced.`,
+        life: 3000,
+      });
+    } catch (error) {
+      console.error("❌ Sync error:", error);
+      toast.current.show({
+        severity: "error",
+        summary: "Sync Failed",
+        detail:
+          error.response?.data?.message ||
+          "Failed to sync customers.",
+        life: 3000,
+      });
+    } finally {
+      setSyncLoading(false);
+    }
+  }}
+/>
+
+      </>
+    ) : (
+      <Button
+        label="Connect to QuickBooks"
+        icon="pi pi-check"
+        className="p-button-primary"
+        onClick={startQuickBooksAuth}
+      />
+    )}
+  </div>
+</div>
+
           </div>
         </div>
       </div>
