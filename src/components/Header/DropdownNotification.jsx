@@ -11,11 +11,11 @@ import moment from "moment";
 import { FiMessageCircle, FiUser } from "react-icons/fi";
 import useIntegrationStatus from "@/hooks/useIntegrationStatus";
 
-const socket = io("http://localhost:8000");
-// const socket = io("https://saasrental.io", {
-//   path: "/socket.io",
-//   transports: ["websocket"],
-// });
+// const socket = io("http://localhost:8000");
+const socket = io("https://saasrental.io", {
+  path: "/socket.io",
+  transports: ["websocket"],
+});
 
 
 const DropdownNotification = () => {

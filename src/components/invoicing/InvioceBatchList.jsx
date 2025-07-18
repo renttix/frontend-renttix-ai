@@ -227,7 +227,7 @@ export default function InvioceBatchList() {
         return (
           <i
             className="pi pi-trash ml-2 cursor-pointer text-red"
-            onClick={() => confirmDeleteinvoice(rowData)}
+            onClick={() => confirmDeleteinvoice(item)}
           />
         );
       default:
