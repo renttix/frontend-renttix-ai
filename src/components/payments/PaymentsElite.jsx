@@ -234,19 +234,20 @@ export default function PaymentsElite() {
               {invoice.paymentStatus}
             </span>
           </div>
+{(['posted', 'off-hired'].includes(invoice.status?.toLowerCase()) &&
+  invoice.paymentStatus?.toLowerCase() === 'unpaid') && (
+    <Button
+      icon={<FiCreditCard className="w-4 h-4" />}
+      label="Pay Now"
+      className="w-full p-button-sm bg-gradient-to-r from-blue-600 to-purple-600 border-0"
+      onClick={() => {
+        setSelectedInvoice(invoice);
+        setPaymentDialog(true);
+      }}
+    />
+)}
 
-          {/* Actions */}
-          {invoice.status === 'Posted' && invoice.paymentStatus === 'Unpaid' && (
-            <Button
-              icon={<FiCreditCard className="w-4 h-4" />}
-              label="Pay Now"
-              className="w-full p-button-sm bg-gradient-to-r from-blue-600 to-purple-600 border-0"
-              onClick={() => {
-                setSelectedInvoice(invoice);
-                setPaymentDialog(true);
-              }}
-            />
-          )}
+
         </div>
       </motion.div>
     );

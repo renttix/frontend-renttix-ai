@@ -559,6 +559,44 @@ const ProductList = React.memo(() => {
             )}
           </div>
         );
+        case "onRent":
+        return (
+          <div className="w-48">
+            {item.assetNumbers && item.assetNumbers.length > 0 ? (
+              <div className="relative group">
+                <button className="px-3 py-1 text-sm border rounded hover:bg-gray-50 cursor-pointer">
+                  {item?.assetNumbers.filter(item=>item.status==='rented').length} Asset{item.assetNumbers.length > 1 ? 's' : ''}
+                </button>
+                <div className="absolute z-10 hidden group-hover:block bg-white border rounded shadow-lg mt-1 max-h-60 overflow-y-auto min-w-[200px]">
+                  {item?.assetNumbers.filter(item=>item.status==='rented').map((asset, index) => {
+                    const assetObj = typeof asset === 'string' ? { number: asset, status: 'available' } : asset;
+                    return (
+                      <Link
+                        key={index}
+                        href={`/asset/${assetObj.number || assetObj}`}
+                        className="block px-3 py-2 hover:bg-gray-100 text-sm whitespace-nowrap no-underline"
+                      >
+                        <div className="flex justify-between items-center">
+                          <span className="text-[#0068d6] hover:underline">{assetObj.number || assetObj}</span>
+                          <span className={`ml-2 px-2 py-1 text-xs rounded ${
+                            assetObj.status === 'available' ? 'bg-green-100 text-green-800' :
+                            assetObj.status === 'rented' ? 'bg-yellow-100 text-yellow-800' :
+                            assetObj.status === 'maintenance' ? 'bg-blue-100 text-blue-800' :
+                            'bg-red-100 text-red-800'
+                          }`}>
+                            {assetObj.status || 'available'}
+                          </span>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <span className="text-gray-400">No assets</span>
+            )}
+          </div>
+        );
       case "action":
         return (
           <React.Fragment>

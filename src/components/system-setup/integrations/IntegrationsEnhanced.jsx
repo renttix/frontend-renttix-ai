@@ -18,7 +18,7 @@ const IntegrationsEnhanced = () => {
       id: 'xero',
       title: 'Xero',
       description: 'Connect with Xero accounting platform to sync invoices, payment terms, and customer data. Features automatic token refresh and secure OAuth 2.0 authentication.',
-      icon: '/images/Xero.png',
+      icon: '/images/xero.png',
       link: '/system-setup/integrations/xero',
       category: 'accounting'
     },

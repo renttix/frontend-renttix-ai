@@ -216,6 +216,9 @@ export default function ProductBuilderStep() {
             product: product._id,
             price: product.rentPrice || product.price || 0,
             taxRate: product?.taxClass?.taxRate,
+            xeroTaxTypeId: product?.taxClass?.xeroTaxTypeId,
+            quickBooksTaxId: product?.taxClass?.quickBooksTaxId,
+            zohoTaxId: product?.taxClass?.zohoTaxId,
             rentalDaysPerWeek: product?.rateDefinition?.rentalDaysPerWeek,
         minimumRentalPeriod: product?.rateDefinition?.minimumRentalPeriod,
 
@@ -386,8 +389,8 @@ const calculateSubtotal = () => {
         selectedAssets.length *
           productPrice *
           Number(
-            rentalDuration <= product.rateDefinition.minimumRentalPeriod
-              ? product.rateDefinition.minimumRentalPeriod
+            rentalDuration <= product.rateDefinition?.minimumRentalPeriod
+              ? product.rateDefinition?.minimumRentalPeriod
               : rentalDuration
           )
       )}
@@ -516,7 +519,7 @@ const calculateSubtotal = () => {
               <Column body={nameBodyTemplate} header="Product" />
               <Column field="category.name" header="Category" />
               <Column field="rateDefinition.minimumRentalPeriod" body={(item)=>(
-                <Tag severity={'warning'} value={`${item.rateDefinition.minimumRentalPeriod} days`}/>
+                <Tag severity={'warning'} value={`${item?.rateDefinition?.minimumRentalPeriod||0} days`}/>
               )} header="MinRentalPeriod" />
               <Column body={priceBodyTemplate} header="Daily Rate" />
               <Column body={stockBodyTemplate} header="Stock" />

@@ -16,6 +16,8 @@ const XeroIntegration = () => {
 const [loadingPaymentTerms, setLoadingPaymentTerms] = useState(false);
 const [loadingDisconnect, setLoadingDisconnect] = useState(false);
 const [loadingConnect, setLoadingConnect] = useState(false);
+const [loadingSyncTaxes, setLoadingSyncTaxes] = useState(false);
+const [loadingRemoveAll, setLoadingRemoveAll] = useState(false);
 
   const [checkingStatus, setCheckingStatus] = useState(true);
   const { user, token } = useSelector((state) => state?.authReducer);
@@ -60,6 +62,39 @@ const [loadingConnect, setLoadingConnect] = useState(false);
   }
 };
 
+const removeAllXeroConfig = async () => {
+  try {
+    setLoadingRemoveAll(true);
+    const response = await axios.post(
+      `${BaseURL}/xero/remove-all`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    toast.current.show({
+      severity: "success",
+      summary: "Removed",
+      detail: response.data.message || "All Xero configuration removed",
+      life: 3000,
+    });
+
+    await checkXeroStatus();
+  } catch (error) {
+    console.error("Error removing all Xero config:", error);
+    toast.current.show({
+      severity: "error",
+      summary: "Error",
+      detail: "Failed to remove all Xero configuration",
+      life: 3000,
+    });
+  } finally {
+    setLoadingRemoveAll(false);
+  }
+};
 
   const checkXeroStatus = async () => {
     try {
@@ -163,6 +198,49 @@ const syncPaymentTerms = async () => {
     setLoadingPaymentTerms(false);
   }
 };
+const syncTaxesToXero = async () => {
+  try {
+    setLoadingSyncTaxes(true);
+    const response = await axios.post(
+      `${BaseURL}/tax/sync-all-xero`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const { synced = [], failed = [] } = response.data;
+
+    const successMsg = synced.length > 0
+      ? `✅ ${synced.length} tax${synced.length > 1 ? "es" : ""} synced:\n` +
+        synced.map(t => `• ${t.name} → ${t.xeroTaxTypeId}`).join("\n")
+      : "No new taxes synced.";
+
+    const failedMsg = failed.length > 0
+      ? `❌ ${failed.length} failed:\n` +
+        failed.map(t => `• ${t.name}: ${t.error?.Message || t.error}`).join("\n")
+      : "";
+
+    toast.current.show({
+      severity: failed.length > 0 ? "warn" : "success",
+      summary: "Xero Tax Sync Completed",
+      detail: `${successMsg}${failedMsg ? `\n\n${failedMsg}` : ""}`,
+      life: 8000,
+    });
+  } catch (error) {
+    console.error("Error syncing taxes to Xero:", error);
+    toast.current.show({
+      severity: "error",
+      summary: "Error",
+      detail: "❌ Failed to sync taxes to Xero",
+      life: 5000,
+    });
+  } finally {
+    setLoadingSyncTaxes(false);
+  }
+};
 
 
   if (checkingStatus) {
@@ -178,7 +256,7 @@ const syncPaymentTerms = async () => {
   return (
     <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card">
       <Toast ref={toast} />
-      <div className="w-[80%]">
+      <div className="w-[100%]">
         <h2 className="font-bold">Integration: Xero</h2>
         <div className="mt-8 flex">
           <div className="flex w-[20%] items-center justify-center">
@@ -254,43 +332,64 @@ const syncPaymentTerms = async () => {
               )}
             </div>
             <div className="flex flex-col">
-              <div className="flex gap-3">
-                {xeroStatus?.connected ? (
-                  <>
+             <div className="flex gap-3">
+  {xeroStatus?.connected ? (
+    <>
       <Button
-  label="Sync Payment Terms"
-  loading={loadingPaymentTerms}
-  icon="pi pi-sync"
-  className="p-button-success"
-  onClick={syncPaymentTerms}
-/>
-<Button
-  label="Sync Customers"
-  loading={loadingSyncCustomers}
-  icon="pi pi-users"
-  className="p-button-warning"
-  onClick={syncCustomersToXero}
-/>
-<Button
-  label="Disconnect Xero"
-  loading={loadingDisconnect}
-  style={{ background: "red" }}
-  icon="pi pi-times"
+        size="small"
+        label="Sync Payment Terms"
+        loading={loadingPaymentTerms}
+        icon="pi pi-sync"
+        className="p-button-success"
+        onClick={syncPaymentTerms}
+      />
+      <Button
+        size="small"
+        label="Sync Customers"
+        loading={loadingSyncCustomers}
+        icon="pi pi-users"
+        className="p-button-warning"
+        onClick={syncCustomersToXero}
+      />
+      <Button
+        size="small"
+        label="Sync Taxes"
+        loading={loadingSyncTaxes}
+        icon="pi pi-percentage"
+        className="p-button-info"
+        onClick={syncTaxesToXero}
+      />
+      <Button
+        size="small"
+        label="Disconnect Xero"
+        loading={loadingDisconnect}
+        style={{ background: "red" }}
+        icon="pi pi-times"
+        className="p-button-danger"
+        onClick={disconnectXero}
+      />
+      <Button
+  size="small"
+  label="Remove All Config"
+  loading={loadingRemoveAll}
+  icon="pi pi-trash"
   className="p-button-danger"
-  onClick={disconnectXero}
+  severity="danger"
+  onClick={removeAllXeroConfig}
 />
 
-                  </>
-                ) : (
-                  <Button
-                    label="Connect to Xero"
-                    loading={loading}
-                    icon="pi pi-check"
-                    className="p-button-primary"
-                    onClick={startXeroAuth}
-                  />
-                )}
-              </div>
+    </>
+  ) : (
+    <Button
+      label="Connect to Xero"
+      loading={loading}
+      icon="pi pi-check"
+      className="p-button-primary"
+      onClick={startXeroAuth}
+    />
+  )}
+</div>
+
             </div>
           </div>
         </div>
