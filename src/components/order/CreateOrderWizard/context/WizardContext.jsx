@@ -26,7 +26,7 @@ const initialState = {
     useExpectedReturnDate: false,
     expectedReturnDate: '',
     rentalDuration: 1, // Added for quick duration selection
-    
+    orderDiscount:0,
     // Step 2: Product Builder
     products: [],
     productBundles: [], // Added for bundle selection

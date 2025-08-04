@@ -51,18 +51,24 @@ export default function PaymentsElite() {
   const abortControllerRef = useRef(null);
   
   const { user } = useSelector((state) => state?.authReducer);
+const [summaryStats, setSummaryStats] = useState({
+  total: 0,
+  paid: 0,
+  unpaid: 0,
+  overdue: 0
+});
 
   // Calculate summary statistics
-  const summaryStats = useMemo(() => {
-    const total = invoices.reduce((sum, inv) => sum + (inv.total || 0), 0);
-    const paid = invoices.filter(inv => inv.paymentStatus === 'Paid').length;
-    const unpaid = invoices.filter(inv => inv.paymentStatus === 'Unpaid').length;
-    const overdue = invoices.filter(inv => 
-      inv.paymentStatus === 'Unpaid' && new Date(inv.invoiceUptoDate) < new Date()
-    ).length;
+  // const summaryStats = useMemo(() => {
+  //   const total = invoices.reduce((sum, inv) => sum + (inv.total || 0), 0);
+  //   const paid = invoices.filter(inv => inv.paymentStatus === 'Paid').length;
+  //   const unpaid = invoices.filter(inv => inv.paymentStatus === 'Unpaid').length;
+  //   const overdue = invoices.filter(inv => 
+  //     inv.paymentStatus === 'Unpaid' && new Date(inv.invoiceUptoDate) < new Date()
+  //   ).length;
     
-    return { total, paid, unpaid, overdue };
-  }, [invoices]);
+  //   return { total, paid, unpaid, overdue };
+  // }, [invoices]);
 
   // Fetch invoices
   const fetchInvoices = useCallback(async () => {
@@ -83,6 +89,15 @@ export default function PaymentsElite() {
       if (response.data?.success) {
         setInvoices(response.data.data);
         setTotalRecords(response.data.pagination?.total || 0);
+             if (response.data.states) {
+        setSummaryStats({
+          total: response.data.states.totalAmount || 0,
+          paid: response.data.states.paidInvoices || 0,
+          unpaid: response.data.states.unpaidInvoices || 0,
+          overdue: response.data.states.overdueInvoices || 0
+        });
+      }
+    
       }
     } catch (error) {
       if (!axios.isCancel(error)) {
@@ -655,7 +670,7 @@ export default function PaymentsElite() {
               Invoice Status
             </label>
             <div className="flex flex-wrap gap-2">
-              {['', 'Draft', 'Confirmed', 'Posted'].map((status) => (
+              {['', 'Draft', 'Confirmed', 'Posted','Off-hired'].map((status) => (
                 <button
                   key={status}
                   onClick={() => setFilters({ ...filters, status })}

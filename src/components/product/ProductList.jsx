@@ -429,7 +429,7 @@ const ProductList = React.memo(() => {
   );
 
   const handleEditProduct = useCallback((productId) => {
-    router.push(`/product/${productId}`);
+    router.push(`/product/${productId._id}`);
   }, [router]);
 
   const renderColumnsBody = useCallback((field, item) => {
@@ -603,7 +603,7 @@ const ProductList = React.memo(() => {
             <Button
               icon="pi pi-pen-to-square"
               className="p-button-rounded p-button-text p-button-sm mr-2"
-              onClick={() => handleEditProduct(item.id)}
+              onClick={() => handleEditProduct(item)}
               aria-label={`Edit ${item.productName}`}
               style={{ minWidth: '40px', minHeight: '40px' }}
             />

@@ -23,40 +23,56 @@ export default function ConfirmAndGoStep() {
     requireSignature: formData.requireSignature || false,
     addToRecurring: false
   });
-  
+  const orderDiscount = Number(formData.orderDiscount) || 0;
+
   const rentalDuration = calculateDaysBetween(
     new Date(formData.chargingStartDate || formData.deliveryDate), 
     new Date(formData.expectedReturnDate)
   ) || 1;
   
   // Calculate pricing
-  const calculatePricing = () => {
-  if (!formData.products || formData.products.length === 0) {
-    return { subtotal: 0, tax: 0, total: 0 };
-  }
-
+// Calculate pricing
+const calculatePricing = () => {
   let subtotal = 0;
-  let totalTax = 0;
+  let taxTotal = 0;
 
-  formData.products.forEach(product => {
-    const baseAmount = product.quantity * product.dailyRate * Number(rentalDuration<=product.minimumRentalPeriod?product.minimumRentalPeriod:rentalDuration);
-    const productTax = baseAmount * (product.taxRate / 100 || 0); // default to 0 if taxRate missing
+  formData.products?.forEach((product) => {
+    const salePriceNum = Number(product.salePrice);
+    const hasSalePrice = !isNaN(salePriceNum) && salePriceNum > 0;
 
-    subtotal += baseAmount;
-    totalTax += productTax;
+    if (hasSalePrice) {
+      subtotal += product.quantity * salePriceNum;
+    } else {
+      const minDays =
+        rentalDuration <= product.minimumRentalPeriod
+          ? product.minimumRentalPeriod
+          : rentalDuration;
+
+      const baseAmount = product.quantity * product.dailyRate * minDays;
+      const taxAmount = baseAmount * (product.taxRate / 100);
+
+      subtotal += baseAmount;
+      taxTotal += taxAmount;
+    }
   });
 
-  const total = subtotal + totalTax;
+  const totalBeforeDiscount = subtotal + taxTotal;
+  const discountAmount = (totalBeforeDiscount * orderDiscount) / 100;
+  const totalAfterDiscount = totalBeforeDiscount - discountAmount;
 
   return {
     subtotal,
-    tax: totalTax,
-    total
+    tax: taxTotal,
+    discountAmount,
+    total: totalAfterDiscount,
   };
 };
 
+
+const calculatedPricing = calculatePricing();
+
+
   
-  const calculatedPricing = calculatePricing();
   
   const handleTermsChange = (checked) => {
     setTermsAccepted(checked);
@@ -91,6 +107,7 @@ export default function ConfirmAndGoStep() {
   };
   
   console.log(formData)
+  
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -128,70 +145,114 @@ export default function ConfirmAndGoStep() {
       </Card>
       
       {/* Products & Services */}
-      <Card>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">Products & Services</h3>
-          <EditButton step={2} />
-        </div>
-        
-        <div className="space-y-3">
-          {formData.products?.map((product) => (
-            <div key={product.productId} className="flex items-center justify-between p-3 bg-gray-50 rounded">
-              <div className="flex items-center gap-3">
-                {product.image && (
-                  <img
-                    src={`${imageBaseURL}${product.image}`}
-                    alt={product.name}
-                     onError={(e) => (e.currentTarget.src = "/images/product/placeholder.webp")}
-                    className="w-12 h-12 object-cover rounded"
-                  />
+     <Card>
+  <div className="flex items-center justify-between mb-4">
+    <h3 className="text-lg font-semibold">Products & Services</h3>
+    <EditButton step={2} />
+  </div>
+
+  {/* Product Rows */}
+  <div className="space-y-3">
+    {formData.products?.map((product) => {
+      const salePriceNum = Number(product.salePrice);
+      const hasSalePrice = !isNaN(salePriceNum) && salePriceNum > 0;
+
+      const minDays =
+        rentalDuration <= product.minimumRentalPeriod
+          ? product.minimumRentalPeriod
+          : rentalDuration;
+
+      const baseAmount = product.quantity * product.dailyRate * minDays;
+      const taxAmount = baseAmount * (product.taxRate / 100);
+
+      return (
+        <div
+          key={product.productId}
+          className="flex items-center justify-between p-3 bg-gray-50 rounded"
+        >
+          <div className="flex items-center gap-3">
+            {product.image && (
+              <img
+                src={`${imageBaseURL}${product.image}`}
+                alt={product.name}
+                onError={(e) =>
+                  (e.currentTarget.src = "/images/product/placeholder.webp")
+                }
+                className="w-12 h-12 object-cover rounded"
+              />
+            )}
+            <div>
+              <p className="font-medium">{product.name}</p>
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                {hasSalePrice ? (
+                  <span>
+                    {product.quantity} ×{" "}
+                    {formatCurrency(salePriceNum, user?.currencyKey)}
+                  </span>
+                ) : (
+                  <span>
+                    {product.quantity} ×{" "}
+                    {formatCurrency(product.dailyRate, user?.currencyKey)}/day +{" "}
+                    {product.taxRate}% tax
+                  </span>
                 )}
-                <div>
-                  <p className="font-medium">{product.name}</p>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <span>{product.quantity} × {formatCurrency(product.dailyRate,user?.currencyKey)}/day + {product.taxRate}% tax</span>
-                    {product.maintenanceConfig && (
-                      <>
-                        <span>•</span>
-                        <Tag 
-                          value={`Maintenance: ${product.maintenanceConfig.frequency}`} 
-                          severity="info" 
-                          className="text-xs"
-                        />
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="font-medium">
-                  {formatCurrency(Number((product.quantity * product.dailyRate * Number(rentalDuration<=product.minimumRentalPeriod?product.minimumRentalPeriod:rentalDuration)).toFixed(2))+(product.quantity * product.dailyRate * Number(rentalDuration<=product.minimumRentalPeriod?product.minimumRentalPeriod:rentalDuration)).toFixed(2)*product.taxRate/100, user?.currencyKey)}
-                </p>
-              
+                {product.maintenanceConfig && (
+                  <>
+                    <span>•</span>
+                    <Tag
+                      value={`Maintenance: ${product.maintenanceConfig.frequency}`}
+                      severity="info"
+                      className="text-xs"
+                    />
+                  </>
+                )}
               </div>
             </div>
-          ))}
+          </div>
+          <div className="text-right">
+            <p className="font-medium">
+              {hasSalePrice
+                ? formatCurrency(
+                    product.quantity * salePriceNum,
+                    user?.currencyKey
+                  )
+                : formatCurrency(baseAmount + taxAmount, user?.currencyKey)}
+            </p>
+          </div>
+          
         </div>
-        
-        <Divider />
-        
-        {/* Single Pricing Display */}
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Subtotal ({rentalDuration} days):</span>
-            <span>{formatCurrency(calculatedPricing.subtotal)}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">VAT:</span>
-            <span>{formatCurrency(calculatedPricing.tax)}</span>
-          </div>
-          <Divider />
-          <div className="flex justify-between text-lg font-semibold">
-            <span>Total:</span>
-            <span className="text-blue-600">{formatCurrency(calculatedPricing.total)}</span>
-          </div>
-        </div>
-      </Card>
+      );
+    })}
+  </div>
+
+  <Divider />
+
+  {/* Pricing Summary */}
+  <div className="space-y-2">
+    <div className="flex justify-between text-sm">
+      <span className="text-gray-600">Subtotal:</span>
+      <span>{formatCurrency(calculatedPricing.subtotal)}</span>
+    </div>
+    <div className="flex justify-between text-sm">
+      <span className="text-gray-600">VAT:</span>
+      <span>{formatCurrency(calculatedPricing.tax)}</span>
+    </div>
+    {orderDiscount > 0 && (
+    <div className="flex justify-between text-sm text-red-600">
+      <span>Discount ({orderDiscount}%)</span>
+      <span>-{formatCurrency(calculatedPricing.discountAmount)}</span>
+    </div>
+  )}
+    <Divider />
+    <div className="flex justify-between text-lg font-semibold">
+      <span>Total:</span>
+      <span className="text-blue-600">
+        {formatCurrency(calculatedPricing.total)}
+      </span>
+    </div>
+  </div>
+</Card>
+
       
       {/* Delivery Details */}
       <Card>

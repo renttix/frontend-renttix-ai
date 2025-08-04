@@ -114,10 +114,10 @@ const handleManualSelection = (assetId) => {
       const isSelected = newSelection.has(assetId);
       if (isSelected) {
         newSelection.delete(assetId);
-        return { ...asset, status: 'available',isAvailable:true, }; // Unselect -> make available
+        return { ...asset, status: 'available', isAvailable: true };
       } else {
         newSelection.add(assetId);
-        return { ...asset, status: 'rented',isAvailable:false }; // Select -> make rented
+        return { ...asset, status: 'selected', isAvailable: false };
       }
     }
     return asset;
@@ -126,6 +126,7 @@ const handleManualSelection = (assetId) => {
   setSelectedAssetIds(newSelection);
   setAvailableAssets(updatedAssets);
 };
+
 
 
 const handleAutoAssign = () => {
@@ -161,7 +162,8 @@ const handleConfirm = () => {
     .filter(asset => selectedAssetIds.has(asset.assetId))
     .map(asset => ({
       ...asset,
-      productId: product._id 
+      status: product.status === 'Rental' ? 'rented' : 'sold',
+      productId: product._id
     }));
 
   onAssetsChange(selectedAssetObjects);
@@ -169,11 +171,16 @@ const handleConfirm = () => {
 };
 
 
-  const statusBodyTemplate = (asset) => {
-    const severity = asset.status === 'available' ? 'success' : 
-                    asset.status === 'rented' ? 'danger' : 'warning';
-    return <Tag value={asset.status} severity={severity} />;
-  };
+
+const statusBodyTemplate = (asset) => {
+  let severity = 'success';
+  if (asset.status === 'selected') severity = 'info';
+  if (asset.status === 'rented') severity = 'danger';
+  if (asset.status === 'sold') severity = 'warning';
+  if (asset.status === 'maintenance') severity = 'warning';
+
+  return <Tag value={asset.status} severity={severity} />;
+};
 
   const conditionBodyTemplate = (asset) => {
     const severity = asset.condition === 'excellent' ? 'success' : 

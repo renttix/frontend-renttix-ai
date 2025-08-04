@@ -100,7 +100,7 @@ const UpdateProduct = () => {
     setPreviews((prevData) => prevData.filter((item, index) => index !== id));
   };
 
-  const id = !["Admin"].includes(user?.role)
+  const id = !["Admin","Seller"].includes(user?.role)
     ? user?.vendor
     : user?._id;
   if (status === "Sale") {
@@ -111,7 +111,7 @@ const UpdateProduct = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${BaseURL}/product/product-detail/${params.id}`,
+          `${BaseURL}/product/product/${params.id}`,
           {
             headers: {
               authorization: `Bearer ${token}`,

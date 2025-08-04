@@ -45,6 +45,7 @@ export default function ProductBuilderStep() {
   const [errors, setErrors] = useState({});
   const [activeTab, setActiveTab] = useState(0);
   const [maintenanceConfigs, setMaintenanceConfigs] = useState({});
+const [orderDiscount, setOrderDiscount] = useState(formData.orderDiscount || 0);
 
   // Asset selection states
   const [assetSelectorVisible, setAssetSelectorVisible] = useState(false);
@@ -75,6 +76,9 @@ export default function ProductBuilderStep() {
   useEffect(() => {
     fetchBundles();
   }, [user]);
+useEffect(() => {
+  updateFormData({ orderDiscount });
+}, [orderDiscount]);
 
   const fetchBundles = async () => {
     try {
@@ -214,7 +218,8 @@ export default function ProductBuilderStep() {
             maintenanceRequired: product.maintenanceRequired || false,
             currency: currencyKey,
             product: product._id,
-            price: product.rentPrice || product.price || 0,
+            price: product.rentPrice || product.salePrice || 0,
+            salePrice:product.salePrice,
             taxRate: product?.taxClass?.taxRate,
             xeroTaxTypeId: product?.taxClass?.xeroTaxTypeId,
             quickBooksTaxId: product?.taxClass?.quickBooksTaxId,
@@ -242,6 +247,11 @@ export default function ProductBuilderStep() {
     );
     handleAssetsChange(productId, updatedAssets);
   };
+const calculateTotalWithDiscount = () => {
+  const subtotal = calculateSubtotal();
+  const discountAmount = (subtotal * orderDiscount) / 100;
+  return subtotal - discountAmount;
+};
 
   const handleBundleSelect = async (bundle) => {
     try {
@@ -274,11 +284,29 @@ export default function ProductBuilderStep() {
 
 const calculateSubtotal = () => {
   return selectedProducts.reduce((total, product) => {
-    const baseAmount = product.quantity * product.dailyRate * Number(rentalDuration<=product.minimumRentalPeriod?product.minimumRentalPeriod:rentalDuration);
-    const tax = baseAmount * (product.taxRate / 100); // taxRate is assumed to be a number like 10, 13, etc.
-    return total + baseAmount + tax;
+    const salePriceNum = Number(product.salePrice);
+    const hasSalePrice = !isNaN(salePriceNum) && salePriceNum > 0;
+
+    if (hasSalePrice) {
+      // If salePrice exists → just multiply by quantity
+      return total + (product.quantity * salePriceNum);
+    } else {
+      // Otherwise → use rental calculation with tax
+      const minDays =
+        rentalDuration <= product.minimumRentalPeriod
+          ? product.minimumRentalPeriod
+          : rentalDuration;
+
+      const baseAmount =
+        product.quantity * product.dailyRate * minDays;
+
+      const tax = baseAmount * (product.taxRate / 100);
+
+      return total + baseAmount + tax;
+    }
   }, 0);
 };
+
 
 
   const validateStep = () => {
@@ -350,7 +378,7 @@ const calculateSubtotal = () => {
   };
 
   const priceBodyTemplate = (product) => {
-    return <span>{formatCurrency(product.rentPrice)}/day</span>;
+    return <span>{formatCurrency(product.rentPrice||product.salePrice)} {product.rentPrice?"/day":''}</span>;
   };
 
   const stockBodyTemplate = (product) => {
@@ -364,42 +392,60 @@ const calculateSubtotal = () => {
   };
 
   const assetSelectionBodyTemplate = (product) => {
-    const selectedAssets = productAssets[product._id] || [];
-    const productPrice = product.rentPrice+product.rentPrice*product.taxClass.taxRate/100 || product.price || 0;
+  const selectedAssets = productAssets[product._id] || [];
 
-    return (
- <div className="flex items-center gap-3 whitespace-nowrap">
-  <Button
-    label={
-      selectedAssets.length > 0
-        ? `${selectedAssets.length} Assets Selected`
-        : "Select Assets"
-    }
-    icon="pi pi-box"
-    className={`px-3 py-2 text-sm ${
-      selectedAssets.length > 0 ? "p-button-success" : "p-button-outlined"
-    }`}
-    onClick={() => handleAssetSelection(product._id)}
-  />
+  // Determine product price
+  let productPrice = 0;
 
-  {selectedAssets.length > 0 && (
-    <span className="text-sm font-semibold text-gray-700">
-      ={" "}
-      {formatCurrency(
-        selectedAssets.length *
-          productPrice *
-          Number(
-            rentalDuration <= product.rateDefinition?.minimumRentalPeriod
-              ? product.rateDefinition?.minimumRentalPeriod
-              : rentalDuration
-          )
+  if (product.salePrice) {
+    // Sale price: straight multiplication
+    productPrice = product.salePrice;
+  } else {
+    // Rental price with tax
+    productPrice =
+      product.rentPrice +
+      (product.rentPrice * (product.taxClass?.taxRate || 0)) / 100 ||
+      product.price ||
+      0;
+  }
+
+  return (
+    <div className="flex items-center gap-3 whitespace-nowrap">
+      <Button
+        label={
+          selectedAssets.length > 0
+            ? `${selectedAssets.length} Assets Selected`
+            : "Select Assets"
+        }
+        icon="pi pi-box"
+        className={`px-3 py-2 text-sm ${
+          selectedAssets.length > 0
+            ? "p-button-success"
+            : "p-button-outlined"
+        }`}
+        onClick={() => handleAssetSelection(product._id)}
+      />
+
+      {selectedAssets.length > 0 && (
+        <span className="text-sm font-semibold text-gray-700">
+          ={" "}
+          {formatCurrency(
+            selectedAssets.length *
+              productPrice *
+              (product.salePrice
+                ? 1 // No rental duration logic for sale items
+                : Number(
+                    rentalDuration <= product.rateDefinition?.minimumRentalPeriod
+                      ? product.rateDefinition?.minimumRentalPeriod
+                      : rentalDuration
+                  ))
+          )}
+        </span>
       )}
-    </span>
-  )}
-</div>
+    </div>
+  );
+};
 
-    );
-  };
 
   const maintenanceBodyTemplate = (product) => {
     const selectedAssets = productAssets[product._id] || [];
@@ -554,82 +600,153 @@ const calculateSubtotal = () => {
           </h4>
 
           <Accordion multiple>
-            {selectedProducts.map((product, index) => (
-              <AccordionTab
-                key={`selected-${product.productId}-${index}`}
-                header={
-                  <div className="flex w-full items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={`${imageBaseURL}${product.image}`}
-                        alt={product.name}
-                         onError={(e) => (e.currentTarget.src = "/images/product/placeholder.webp")}
-                        className="h-12 w-12 rounded object-cover"
-                      />
-                      <div>
-                        <p className="font-medium">{product.name}</p>
-                        <p className="text-sm text-gray-500">
-                          {product.quantity} assets ×{" "}
-                          {formatCurrency(product.dailyRate)}/day ×{" "}
-                          {rentalDuration<=product.minimumRentalPeriod?product.minimumRentalPeriod:rentalDuration} days +  {product.taxRate}% tax
-                        </p>
-                         <p className="text-sm text-red-500">Minimum rental period {product.minimumRentalPeriod} days</p>
-                      </div>
-                    </div>
-                    <div className="mr-4 text-right">
-                      <p className="font-semibold text-blue-600">
-                        {formatCurrency(
-                          product.quantity * product.dailyRate * Number(rentalDuration<=product.minimumRentalPeriod?product.minimumRentalPeriod:rentalDuration)+product.quantity * product.dailyRate * Number(rentalDuration<=product.minimumRentalPeriod?product.minimumRentalPeriod:rentalDuration)*product.taxRate/100,
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                }
-              >
-                {selectedAssetsTemplate(product)}
+  {selectedProducts.map((product, index) => {
+    const salePriceNum = Number(product.salePrice); // Convert salePrice to number
+    const hasSalePrice = !isNaN(salePriceNum) && salePriceNum > 0;
 
-                <div className="mt-3 flex gap-2">
-                  <Button
-                    label="Modify Asset Selection"
-                    icon="pi pi-pencil"
-                    className="p-button-sm p-button-outlined"
-                    onClick={() => handleAssetSelection(product.productId)}
-                  />
-                  <Button
-                    label="Remove All"
-                    icon="pi pi-trash"
-                    className="p-button-sm p-button-danger p-button-outlined"
-                    onClick={() => handleAssetsChange(product.productId, [])}
-                  />
-                </div>
-              </AccordionTab>
-            ))}
-          </Accordion>
+    const minRentalDays =
+      rentalDuration <= product.minimumRentalPeriod
+        ? product.minimumRentalPeriod
+        : rentalDuration;
+
+    const rentalTotal =
+      product.quantity * product.dailyRate * minRentalDays +
+      product.quantity *
+        product.dailyRate *
+        minRentalDays *
+        (product.taxRate / 100);
+
+    const saleTotal = product.quantity * salePriceNum;
+
+    return (
+      <AccordionTab
+        key={`selected-${product.productId}-${index}`}
+        header={
+          <div className="flex w-full items-center justify-between">
+            <div className="flex items-center gap-3">
+              <img
+                src={`${imageBaseURL}${product.image}`}
+                alt={product.name}
+                onError={(e) =>
+                  (e.currentTarget.src = "/images/product/placeholder.webp")
+                }
+                className="h-12 w-12 rounded object-cover"
+              />
+              <div>
+                <p className="font-medium">{product.name}</p>
+
+                {hasSalePrice ? (
+                  // SALE ITEM DISPLAY
+                  <p className="text-sm text-gray-500">
+                    {product.quantity} × {formatCurrency(salePriceNum)}
+                  </p>
+                ) : (
+                  // RENTAL ITEM DISPLAY
+                  <>
+                    <p className="text-sm text-gray-500">
+                      {product.quantity} assets ×{" "}
+                      {formatCurrency(product.dailyRate)}/day × {minRentalDays}{" "}
+                      days + {product.taxRate}% tax
+                    </p>
+                    <p className="text-sm text-red-500">
+                      Minimum rental period {product.minimumRentalPeriod} days
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="mr-4 text-right">
+              <p className="font-semibold text-blue-600">
+                {hasSalePrice
+                  ? formatCurrency(saleTotal)
+                  : formatCurrency(rentalTotal)}
+              </p>
+            </div>
+          </div>
+        }
+      >
+        {selectedAssetsTemplate(product)}
+
+        <div className="mt-3 flex gap-2">
+          <Button
+            label="Modify Asset Selection"
+            icon="pi pi-pencil"
+            className="p-button-sm p-button-outlined"
+            onClick={() => handleAssetSelection(product.productId)}
+          />
+          <Button
+            label="Remove All"
+            icon="pi pi-trash"
+            className="p-button-sm p-button-danger p-button-outlined"
+            onClick={() => handleAssetsChange(product.productId, [])}
+          />
+        </div>
+      </AccordionTab>
+    );
+  })}
+</Accordion>
+
         </Card>
       )}
 
       {/* Order Summary */}
-      {selectedProducts.length > 0 && (
-        <Card className="bg-blue-50">
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="text-lg font-semibold">Order Summary</h4>
-              <p className="text-sm text-gray-600">
-                {selectedProducts.length} product
-                {selectedProducts.length !== 1 ? "s" : ""} |{" "}
-                {selectedProducts.reduce((sum, p) => sum + p.quantity, 0)}{" "}
-                assets | {rentalDuration} day{rentalDuration !== 1 ? "s" : ""}
-              </p>
+        {selectedProducts.length > 0 && (
+          <Card className="bg-blue-50">
+            <div className="mb-3 flex items-center gap-3">
+    <label className="font-medium text-gray-700 w-28">Discount %</label>
+    <InputNumber
+      value={orderDiscount}
+      onValueChange={(e) => setOrderDiscount(e.value || 0)}
+      suffix="%"
+      min={0}
+      max={100}
+      showButtons
+      buttonLayout="horizontal"
+      decrementButtonClassName="p-button-danger"
+      incrementButtonClassName="p-button-success"
+      className="w-32"
+    />
+  </div>
+
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-lg font-semibold">Order Summary</h4>
+                <p className="text-sm text-gray-600">
+                  {selectedProducts.length} product
+                  {selectedProducts.length !== 1 ? "s" : ""} |{" "}
+                  {selectedProducts.reduce((sum, p) => sum + p.quantity, 0)}{" "}
+                  assets | {rentalDuration} day{rentalDuration !== 1 ? "s" : ""}
+                </p>
+              </div>
+              
+              <div className="text-right">
+    <p className="text-sm text-gray-600">Subtotal</p>
+    <p className="text-lg font-semibold text-gray-800">
+      {formatCurrency(calculateSubtotal())}
+    </p>
+
+    {orderDiscount > 0 && (
+      <>
+        <p className="text-sm text-red-500">
+          - {orderDiscount}% ({formatCurrency((calculateSubtotal() * orderDiscount) / 100)})
+        </p>
+        <p className="text-xl font-bold text-green-600">
+          {formatCurrency(calculateTotalWithDiscount())}
+        </p>
+      </>
+    )}
+
+    {orderDiscount === 0 && (
+      <p className="text-2xl font-bold text-blue-600">
+        {formatCurrency(calculateSubtotal())}
+      </p>
+    )}
+  </div>
+
             </div>
-            <div className="text-right">
-              <p className="text-sm text-gray-600">Subtotal</p>
-              <p className="text-2xl font-bold text-blue-600">
-                {formatCurrency(calculateSubtotal())}
-              </p>
-            </div>
-          </div>
-        </Card>
-      )}
+          </Card>
+        )}
 
       {/* Asset Selector Dialog */}
       {currentProductForAssets && (
