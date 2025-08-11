@@ -87,6 +87,32 @@ const menuGroups = [
           { label: "Quick Off Hire", route: "/order/quick-off-hire" },
         ],
       },
+         {
+        icon: (
+          <svg
+            className="fill-current"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M6 2C5.44772 2 5 2.44772 5 3V21C5 21.2761 5.22386 21.5 5.5 21.5C5.65379 21.5 5.8003 21.4473 5.9129 21.3536L8 19.5L10.0871 21.3536C10.2733 21.5128 10.5371 21.5128 10.7233 21.3536L12.8104 19.5L14.8975 21.3536C15.0837 21.5128 15.3475 21.5128 15.5337 21.3536L17.6208 19.5L19.7079 21.3536C19.8205 21.4473 19.967 21.5 20.1208 21.5C20.3969 21.5 20.6208 21.2761 20.6208 21V3C20.6208 2.44772 20.1731 2 19.6208 2H6ZM7 4H18.6208V19.2426L17.1208 18.0303C16.8769 17.8297 16.5205 17.8297 16.2766 18.0303L14.1895 19.8839L12.1024 18.0303C11.8585 17.8297 11.5021 17.8297 11.2582 18.0303L9.17109 19.8839L7 18.2426V4ZM9 7C8.44772 7 8 7.44772 8 8C8 8.55228 8.44772 9 9 9H15C15.5523 9 16 8.55228 16 8C16 7.44772 15.5523 7 15 7H9ZM8 12C8 11.4477 8.44772 11 9 11H15C15.5523 11 16 11.4477 16 12C16 12.5523 15.5523 13 15 13H9C8.44772 13 8 12.5523 8 12ZM9 15C8.44772 15 8 15.4477 8 16C8 16.5523 8.44772 17 9 17H13C13.5523 17 14 16.5523 14 16C14 15.4477 13.5523 15 13 15H9Z"
+              fill="currentColor"
+            />
+          </svg>
+        ),
+        label: "Purchasing",
+        route: "#",
+        children: [
+          { label: "Create New Purchase Order", route: "/purchasing/create-purchase-order" },
+          { label: "Existing Purchase Orders", route: "/purchasing/purchase-order-list" },
+          { label: "Suppliers", route: "/purchasing/suppliers" },
+        ],
+      },
       {
         icon: (
           <svg
