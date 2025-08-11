@@ -430,6 +430,18 @@ const Customer360View = () => {
 
       {/* Stats Cards */}
       <div className="stats-grid">
+         <div className="glass-card stat-card">
+          <div className="stat-icon-wrapper blue">
+            <FiPackage className="stat-icon" />
+          </div>
+          <div className="stat-content">
+            <h3 className="stat-value">{formatCurrency(Number(customer.creditBalance), user?.currencyKey)}</h3>
+            <p className="stat-label ">Credit Balance</p>
+            <div className="stat-trend">
+              {/* <span className="trend-value positive">{customer.creditBalance} active</span> */}
+            </div>
+          </div>
+        </div>
         <div className="glass-card stat-card">
           <div className="stat-icon-wrapper blue">
             <FiPackage className="stat-icon" />

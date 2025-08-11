@@ -262,7 +262,7 @@ const InvoiceBatchTable = ({ columnData ,onSelectionChange }) => {
           ></Column>
           <Column
             field="suspensionAmount"
-            header="Suspension Amount"
+            header="Suspension"
             body={(item) => {
               return (
                 <>
@@ -278,9 +278,27 @@ const InvoiceBatchTable = ({ columnData ,onSelectionChange }) => {
               );
             }}
           ></Column>
+             <Column
+            field="totalDiscount"
+            header="Discount"
+            body={(item) => {
+              return (
+                <>
+                  <label htmlFor="" className="text-green">
+                    {item?.totalDiscount
+                      ? formatCurrency(
+                          Number(item?.totalDiscount)?.toFixed(2),
+                          user?.currencyKey,
+                        )
+                      : "-"}
+                  </label>
+                </>
+              );
+            }}
+          ></Column>
           <Column
             field="total"
-            header="Total (Inc. TAX)"
+            header="Total"
             body={(item) => {
               return (
                 <>

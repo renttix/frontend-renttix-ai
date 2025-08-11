@@ -24,6 +24,7 @@ import {
 import SingleInvoiceTable from "./SingleInvoiceTable";
 import GoPrevious from "../common/GoPrevious/GoPrevious";
 import { formatCurrency } from "../../../utils/helper";
+import RefundModal from "./RefundModal";
 
 const ViewBatchInvoice = () => {
   const [data, setdata] = useState({});
@@ -32,7 +33,13 @@ const ViewBatchInvoice = () => {
   const [loader, setloader] = useState(false);
   const [editVisible, setEditVisible] = useState(false);
   const [refreshFlag, setRefreshFlag] = useState(false);
+  const [showRefund, setShowRefund] = useState(false);
 
+  const invoice = {
+    invoiceNumber: "INV-2025-0123",
+    preTaxSubtotal: 4950.0,
+    taxRate: 9.5,
+  };
   const params = useParams();
   console.log(params);
 
@@ -400,6 +407,9 @@ const ViewBatchInvoice = () => {
                     {formatCurrency(data?.total, user?.currencyKey)}
                   </label>
                 </div>
+                <div className="flex">
+ <Button label="Refund" className="bg-red-500 border-none" onClick={() => setShowRefund(true)} />
+      <RefundModal visible={showRefund} onHide={() => setShowRefund(false)} invoice={data} />                </div>
               </div>
             </div>
           </div>
