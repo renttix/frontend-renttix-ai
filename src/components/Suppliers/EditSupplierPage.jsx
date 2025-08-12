@@ -52,12 +52,14 @@ export default function EditSupplierPage() {
     }
   }, [id, router]);
 
-  if (loading) return <Loader />;
+  if (loading) return <div className="flex w-full justify-center items-center h-screen">
+    <Loader />
+  </div>;
 
   return (
     <div className="card">
       <Toast ref={toast} />
-      <GoPrevious route={"/purchases/suppliers"} />
+      <GoPrevious route={"/purchasing/suppliers"} />
       <h2 className="text-xl font-semibold mb-4">Edit Supplier</h2>
 
       {/* Pass the SAME object reference; do not spread */}

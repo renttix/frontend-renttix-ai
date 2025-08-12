@@ -25,6 +25,7 @@ import SingleInvoiceTable from "./SingleInvoiceTable";
 import GoPrevious from "../common/GoPrevious/GoPrevious";
 import { formatCurrency } from "../../../utils/helper";
 import RefundModal from "./RefundModal";
+import { RiRefund2Line } from "react-icons/ri";
 
 const ViewBatchInvoice = () => {
   const [data, setdata] = useState({});
@@ -336,6 +337,17 @@ const ViewBatchInvoice = () => {
                         Invoice
                       </button>
                     </div>
+                         <div className="flex items-center gap-2">
+                      <RiRefund2Line  />
+                       
+
+                      <button
+                       onClick={() => setShowRefund(true)} 
+                        className="cursor-pointer text-[14px] text-[#3182ce]"
+                      >
+                        Refund
+                      </button>
+                    </div>
                     {data?.status === "Draft" && (
                       <div className="flex items-center gap-2">
                         <FaEdit />
@@ -384,7 +396,7 @@ const ViewBatchInvoice = () => {
                     {formatCurrency(data?.tax, user?.currencyKey)}
                   </label>
                 </div>
-                <div className="flex  ">
+               {data?.suspensionAmount!=='0.00' && <div className="flex  ">
                   <label
                     htmlFor=""
                     className="min-w-[100px] text-[14px] font-semibold text-dark-2 dark:text-white "
@@ -394,7 +406,18 @@ const ViewBatchInvoice = () => {
                   <label className="text-[14px] font-light text-red">
                     {formatCurrency(data?.suspensionAmount, user?.currencyKey)}
                   </label>
-                </div>
+                </div>}
+              {data?.totalDiscount &&   <div className="flex  ">
+                  <label
+                    htmlFor=""
+                    className="min-w-[100px] text-[14px] font-semibold text-dark-2 dark:text-white "
+                  >
+                    Discount
+                  </label>
+                  <label className="text-[14px] font-light text-green">
+                    {formatCurrency(data?.totalDiscount, user?.currencyKey)}
+                  </label>
+                </div>}
                 <div className="flex  ">
                   <label
                     htmlFor=""
@@ -408,7 +431,6 @@ const ViewBatchInvoice = () => {
                   </label>
                 </div>
                 <div className="flex">
- <Button label="Refund" className="bg-red-500 border-none" onClick={() => setShowRefund(true)} />
       <RefundModal visible={showRefund} onHide={() => setShowRefund(false)} invoice={data} />                </div>
               </div>
             </div>

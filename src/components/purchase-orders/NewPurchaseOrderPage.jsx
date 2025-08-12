@@ -358,7 +358,7 @@ export default function NewPurchaseOrderPage() {
   return (
     <div className="card">
       <Toast ref={toast} />
-      <GoPrevious route={"/purchases/purchase-orders"} />
+      <GoPrevious route={"/purchasing/purchase-order-list"} />
       <h2 className="text-xl font-semibold mb-4">New Purchase Order</h2>
 
       {/* Supplier Details */}

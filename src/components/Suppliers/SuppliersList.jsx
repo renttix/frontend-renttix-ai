@@ -153,7 +153,7 @@ export default function SuppliersList() {
 
   return (
     <div className="card">
-      <GoPrevious route={"/purchases/"} />
+      <GoPrevious route={"/"} />
       <DeleteModel
         handleDeleteLocallay={() =>
           setSuppliers((prev) => prev.filter((x) => x._id !== supplierId))

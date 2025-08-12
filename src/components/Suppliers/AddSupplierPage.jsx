@@ -92,7 +92,7 @@ export default function AddSupplierPage() {
 
   return (
     <div className="card">
-      <GoPrevious route={"/purchases/suppliers"} />
+      <GoPrevious route={"/purchasing/suppliers"} />
       {/* <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-semibold">Add Supplier</h2>
         <div className="flex items-center gap-2">
