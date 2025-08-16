@@ -210,7 +210,11 @@ const menuGroups = [
           </svg>
         ),
         label: "Suspensions",
-        route: "/suspensions",
+        route: "#",
+            children: [
+          { label: "Suspensions", route: "/suspensions" },
+          { label: "Suspensions List", route: "/suspensions/list" },
+        ],
       },
       {
         icon: (

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
@@ -21,10 +21,13 @@ const emptyTax = { id: "", qbTaxCodeId: "", name: "", percent: "", label: "", va
 const emptyNominal = { id: "", qbAccountId: "", code: "", name: "", fq: "", type: "", label: "", value: "" };
 
 const genId = () =>
-  typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random());
+  typeof crypto !== "undefined" && crypto.randomUUID
+    ? crypto.randomUUID()
+    : String(Date.now() + Math.random());
 
-const newLineItem = () => ({
+const blankLine = () => ({
   _rowId: genId(),
+  _id: undefined,
   description: "",
   quantity: 1,
   unitPrice: 0,
@@ -34,6 +37,7 @@ const newLineItem = () => ({
   taxClassId: null,
   taxRatePercent: 0,
   capex: false,
+  receivedQty: 0,
 });
 
 const computeLine = (li) => {
@@ -65,15 +69,14 @@ const LineRow = React.memo(function LineRow({
   expenseAccounts = [],
   taxOptions = [],
   taxesLoading,
-  onCommit,       // (rowId, patchObj)
-  onRemove,       // (rowId)
+  onCommit, // (rowId, patchObj)
+  onRemove, // (rowId)
 }) {
-  // local states so typing doesn’t re-render parent
   const [desc, setDesc] = useState(li.description ?? "");
   const [qty, setQty] = useState(Number(li.quantity) || 0);
   const [price, setPrice] = useState(Number(li.unitPrice) || 0);
 
-  // sync local state only when row identity changes
+  // re-init local state only when row identity changes
   useEffect(() => {
     setDesc(li.description ?? "");
     setQty(Number(li.quantity) || 0);
@@ -82,12 +85,15 @@ const LineRow = React.memo(function LineRow({
 
   // debounced description commit
   const debounceRef = useRef(null);
-  const debouncedCommitDesc = useCallback((value) => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => onCommit(li._rowId, { description: value }), 200);
-  }, [li._rowId, onCommit]);
+  const debouncedCommitDesc = useCallback(
+    (value) => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => onCommit(li._rowId, { description: value }), 200);
+    },
+    [li._rowId, onCommit]
+  );
 
-  // live-commit qty/price (not typed as fast as text; fine to commit immediately)
+  // live commit qty/price
   useEffect(() => {
     onCommit(li._rowId, { quantity: qty });
   }, [qty, li._rowId, onCommit]);
@@ -97,7 +103,8 @@ const LineRow = React.memo(function LineRow({
   }, [price, li._rowId, onCommit]);
 
   const taxValue = li?.tax?.qbTaxCodeId || li?.taxClassId || "";
-  const { total } = computeLine({ ...li, quantity: qty, unitPrice: price });
+  const outstanding = Math.max(0, Number(qty || 0) - Number(li?.receivedQty || 0));
+  const { net, tax, total } = computeLine({ ...li, quantity: qty, unitPrice: price });
 
   return (
     <div className="grid grid-cols-12 gap-3 items-center">
@@ -108,27 +115,18 @@ const LineRow = React.memo(function LineRow({
           onChange={(e) => {
             const v = e.target.value;
             setDesc(v);
-            debouncedCommitDesc(v); // commit softly without blasting parent every keypress
+            debouncedCommitDesc(v);
           }}
-          onBlur={() => onCommit(li._rowId, { description: desc })} // ensure final sync
+          onBlur={() => onCommit(li._rowId, { description: desc })}
         />
       </div>
 
       <div className="col-span-1">
-        <InputNumber
-          placeholder="Qty"
-          min={0}
-          value={qty}
-          onValueChange={(e) => setQty(e?.value ?? 0)}
-        />
+        <InputNumber placeholder="Qty" min={0} value={qty} onValueChange={(e) => setQty(e?.value ?? 0)} />
       </div>
 
       <div className="col-span-2">
-        <InputNumber
-          {...GBP}
-          value={price}
-          onValueChange={(e) => setPrice(e?.value ?? 0)}
-        />
+        <InputNumber {...GBP} value={price} onValueChange={(e) => setPrice(e?.value ?? 0)} />
       </div>
 
       <div className="col-span-2">
@@ -233,6 +231,12 @@ const LineRow = React.memo(function LineRow({
 
       <div className="col-span-1 text-right font-medium">£{total.toFixed(2)}</div>
 
+      {/* helper footer */}
+      <div className="col-span-12 mt-1 -mb-1 flex justify-between text-xs text-zinc-500">
+        <span>Net: £{net.toFixed(2)} • VAT: £{tax.toFixed(2)}</span>
+        <span>Outstanding: {outstanding}</span>
+      </div>
+
       <div className="col-span-12">
         <div className="h-px bg-zinc-100 dark:bg-zinc-800" />
       </div>
@@ -246,10 +250,12 @@ const LineRow = React.memo(function LineRow({
   );
 });
 
-/* --------------------------- Page --------------------------- */
-export default function NewPurchaseOrderPage() {
+/* --------------------------- page --------------------------- */
+export default function EditPurchaseOrderPage() {
   const router = useRouter();
   const toast = useRef(null);
+  const params = useParams();
+  const poId = params?.id;
 
   // master data
   const [suppliers, setSuppliers] = useState([]);
@@ -263,20 +269,15 @@ export default function NewPurchaseOrderPage() {
   const [deliveryDate, setDeliveryDate] = useState(null);
   const [depotId, setDepotId] = useState(null);
   const [deliveryAddress, setDeliveryAddress] = useState("");
-  
   const [reference, setReference] = useState("");
   const [notes, setNotes] = useState("");
   const [paymentTermsDays, setPaymentTermsDays] = useState(14);
-  const [currency] = useState("GBP");
-const [isSave, setisSave] = useState(false)
+  const [currency, setCurrency] = useState("GBP");
+  const [status, setStatus] = useState("Draft");
+  const [isSave, setisSave] = useState(false)
 
-  const [lineItems, setLineItems] = useState([newLineItem()]);
-  const [charges, setCharges] = useState({
-    shipping: 0,
-    handling: 0,
-    other: 0,
-    otherDescription: "",
-  });
+  const [lineItems, setLineItems] = useState([blankLine()]);
+  const [charges, setCharges] = useState({ shipping: 0, handling: 0, other: 0, otherDescription: "" });
 
   const selectedSupplier = useMemo(
     () => (suppliers || []).find((s) => s._id === supplierId),
@@ -286,16 +287,14 @@ const [isSave, setisSave] = useState(false)
   useEffect(() => {
     if (selectedSupplier?.paymentTermsDays != null) {
       setPaymentTermsDays(Number(selectedSupplier.paymentTermsDays) || 14);
-    } else {
-      setPaymentTermsDays(14);
     }
   }, [selectedSupplier]);
 
-  // load expense accounts
+  /* --------- load expense accounts --------- */
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await apiServices.get(`/integrations/expense-accounts?limit=1000`);
+        const { data } = await apiServices.get("/integrations/expense-accounts?limit=1000");
         if (data?.success && Array.isArray(data.data)) setExpenseAccounts(data.data);
         else setExpenseAccounts([]);
       } catch (e) {
@@ -309,7 +308,7 @@ const [isSave, setisSave] = useState(false)
     })();
   }, []);
 
-  // taxes
+  /* --------- taxes: sync + load --------- */
   const loadTaxes = async () => {
     setTaxesLoading(true);
     try {
@@ -323,7 +322,7 @@ const [isSave, setisSave] = useState(false)
         label: t?.label || "",
         value: t?.value != null ? String(t.value) : "",
       }));
-      if (!(list || []).some((t) => Number(t.percent) === 0)) {
+      if (!(list || []).some((x) => Number(x.percent) === 0)) {
         list.unshift({ id: "zero", qbTaxCodeId: "", name: "Zero VAT", percent: 0, label: "Zero VAT (0%)", value: "" });
       }
       setTaxOptions(list || []);
@@ -354,43 +353,117 @@ const [isSave, setisSave] = useState(false)
     }
   };
 
-  // fetch master
+  /* ---------------- Master data ---------------- */
   useEffect(() => {
     (async () => {
       try {
         const supRes = await apiServices.get(`/suppliers?q=&page=1&limit=200`);
         setSuppliers(Array.isArray(supRes?.data?.data) ? supRes.data.data : []);
-        try {
-          const depRes = await apiServices.get(`/depots?page=1&limit=200`);
-          setDepots(Array.isArray(depRes?.data?.data) ? depRes.data.data : []);
-        } catch {
-          setDepots([]);
-        }
-        await syncAndLoadTaxes();
-      } catch {
-        toast.current?.show({ severity: "error", summary: "Error", detail: "Failed to load master data." });
-      }
+      } catch {}
+      try {
+        const depRes = await apiServices.get(`/depots?page=1&limit=200`);
+        setDepots(Array.isArray(depRes?.data?.data) ? depRes.data.data : []);
+      } catch {}
+      await syncAndLoadTaxes();
     })();
   }, []);
 
-  /* --------- totals --------- */
+  /* ---------------- Load PO ---------------- */
+  useEffect(() => {
+    if (!poId) return;
+    (async () => {
+      try {
+        const { data } = await apiServices.get(`/purchase-orders/${poId}`);
+        const po = data?.data ?? data;
+
+        setStatus(po.status || "Draft");
+        setCurrency(po.currency || "GBP");
+
+        setSupplierId(typeof po.supplierId === "object" ? po.supplierId._id : po.supplierId || null);
+        setDeliveryDate(po.deliveryDate ? new Date(po.deliveryDate) : null);
+
+        setDepotId(po.depotId?._id || po.depotId || null);
+        setDeliveryAddress(po.deliveryAddress || "");
+        setReference(po.reference || "");
+        setNotes(po.notes || "");
+        setPaymentTermsDays(Number(po.paymentTermsDays || 14));
+
+        const mappedLines = (po.lineItems || []).map((l) => {
+          const rowId = l._rowId || l._id || genId();
+          const nc = l.nominalCode && typeof l.nominalCode === "object" ? l.nominalCode : { ...emptyNominal };
+          const t = l.tax && typeof l.tax === "object" ? l.tax : { ...emptyTax };
+          const pct = Number(t.percent) || Number(l.taxRatePercent) || 0;
+
+          return {
+            _rowId: rowId,
+            _id: l._id,
+            description: l.description || "",
+            quantity: Number(l.quantity) || 0,
+            unitPrice: Number(l.unitPrice) || 0,
+            nominalCode: {
+              id: String(nc.id || ""),
+              qbAccountId: String(nc.qbAccountId || nc.value || ""),
+              code: String(nc.code || ""),
+              name: String(nc.name || ""),
+              fq: String(nc.fq || ""),
+              type: String(nc.type || ""),
+              label: String(nc.label || ""),
+              value: String(nc.value || nc.qbAccountId || ""),
+            },
+            expenseAccountRef: nc?.qbAccountId || null,
+            tax: {
+              id: String(t.id || ""),
+              qbTaxCodeId: String(t.qbTaxCodeId || ""),
+              name: String(t.name || ""),
+              percent: String(t.percent != null ? t.percent : pct),
+              label: String(t.label || ""),
+              value: String(t.value || t.qbTaxCodeId || ""),
+            },
+            taxClassId: t?.qbTaxCodeId || null,
+            taxRatePercent: Number(pct) || 0,
+            capex: !!l.capex,
+            receivedQty: Number(l.receivedQty || 0),
+          };
+        });
+
+        setLineItems(mappedLines.length ? mappedLines : [blankLine()]);
+
+        setCharges({
+          shipping: Number(po?.charges?.shipping || 0),
+          handling: Number(po?.charges?.handling || 0),
+          other: Number(po?.charges?.other || 0),
+          otherDescription: po?.charges?.otherDescription || "",
+        });
+      } catch (err) {
+        toast.current?.show({
+          severity: "error",
+          summary: "Error",
+          detail: err?.response?.data?.message || err.message,
+        });
+      }
+    })();
+  }, [poId]);
+
+  /* ---------------- Derived totals ---------------- */
   const { subTotal, taxTotal, chargesTotal, grandTotal } = useMemo(() => {
     const s = round2((lineItems || []).reduce((acc, li) => acc + computeLine(li).net, 0));
     const t = round2((lineItems || []).reduce((acc, li) => acc + computeLine(li).tax, 0));
-    const ct = round2((Number(charges?.shipping) || 0) + (Number(charges?.handling) || 0) + (Number(charges?.other) || 0));
+    const ct = round2(
+      (Number(charges?.shipping) || 0) + (Number(charges?.handling) || 0) + (Number(charges?.other) || 0)
+    );
     return { subTotal: s, taxTotal: t, chargesTotal: ct, grandTotal: round2(s + t + ct) };
   }, [lineItems, charges]);
 
-  /* --------- line item mutations (by rowId) --------- */
+  /* ---------------- Line mutations (by _rowId) ---------------- */
   const commitLinePatch = useCallback((rowId, patch) => {
     setLineItems((prev) => (prev || []).map((li) => (li._rowId === rowId ? { ...li, ...patch } : li)));
   }, []);
 
-  const addLine = useCallback(() => setLineItems((prev) => [...(prev || []), newLineItem()]), []);
+  const addLine = useCallback(() => setLineItems((prev) => [...(prev || []), blankLine()]), []);
   const removeLine = useCallback((rowId) => {
     setLineItems((prev) => {
       const arr = (prev || []).filter((li) => li._rowId !== rowId);
-      return arr.length ? arr : [newLineItem()];
+      return arr.length ? arr : [blankLine()];
     });
   }, []);
 
@@ -403,113 +476,129 @@ const [isSave, setisSave] = useState(false)
     return errs;
   };
 
-  const submitPO = async (status = "Draft") => {
+  // Build payload INCLUDING full objects and totals
+  const buildPayload = (overrideStatus) => {
+    const payloadLines = (lineItems || [])
+      .filter((li) => (li.description || "").trim().length > 0)
+      .map((li) => {
+        const nc = li.nominalCode && typeof li.nominalCode === "object" ? li.nominalCode : { ...emptyNominal };
+
+        let taxObj = { ...emptyTax };
+        if (li.tax && (li.tax.qbTaxCodeId || li.tax.name || li.tax.label)) {
+          taxObj = {
+            id: String(li.tax.id || ""),
+            qbTaxCodeId: String(li.tax.qbTaxCodeId || ""),
+            name: String(li.tax.name || ""),
+            percent: String(li.tax.percent != null ? li.tax.percent : li.taxRatePercent || 0),
+            label: String(li.tax.label || ""),
+            value: String(li.tax.value || li.tax.qbTaxCodeId || ""),
+          };
+        } else if (li.taxClassId) {
+          const t = (taxOptions || []).find((x) => String(x.qbTaxCodeId) === String(li.taxClassId));
+          if (t) {
+            taxObj = {
+              id: String(t.id || ""),
+              qbTaxCodeId: String(t.qbTaxCodeId || ""),
+              name: String(t.name || ""),
+              percent: String(t.percent != null ? t.percent : li.taxRatePercent || 0),
+              label: String(t.label || ""),
+              value: String(t.value || t.qbTaxCodeId || ""),
+            };
+          }
+        }
+
+        const { net, tax, total } = computeLine(li);
+
+        return {
+          _id: li._id, // keep for backend
+          description: String(li.description || "").trim(),
+          quantity: Number(li.quantity) || 0,
+          unitPrice: Number(li.unitPrice) || 0,
+          nominalCode: {
+            id: String(nc.id || ""),
+            qbAccountId: String(nc.qbAccountId || nc.value || ""),
+            code: String(nc.code || ""),
+            name: String(nc.name || ""),
+            fq: String(nc.fq || ""),
+            type: String(nc.type || ""),
+            label: String(nc.label || ""),
+            value: String(nc.value || nc.qbAccountId || ""),
+          },
+          tax: taxObj,
+          capex: !!li.capex,
+          netAmount: net,
+          taxAmount: tax,
+          additionalAmount: 0,
+          lineTotal: total,
+        };
+      });
+
+    return {
+      supplierId,
+      deliveryDate,
+      depotId: depotId || undefined,
+      deliveryAddress: (deliveryAddress || "").trim() || undefined,
+      reference: (reference || "").trim() || undefined,
+      notes: (notes || "").trim() || undefined,
+      paymentTermsDays,
+      currency,
+      lineItems: payloadLines,
+      charges: {
+        shipping: Number(charges?.shipping) || 0,
+        handling: Number(charges?.handling) || 0,
+        other: Number(charges?.other) || 0,
+        otherDescription: (charges?.otherDescription || "").trim(),
+      },
+      subTotal: Number(subTotal) || 0,
+      taxTotal: Number(taxTotal) || 0,
+      chargesTotal: Number(chargesTotal) || 0,
+      grandTotal: Number(grandTotal) || 0,
+      ...(overrideStatus ? { status: overrideStatus } : {}),
+    };
+  };
+
+  const saveChanges = async (overrideStatus = null) => {
+    const errs = validate();
+    if (errs.length) {
+      toast.current?.show({ severity: "warn", summary: "Missing fields", detail: `Please provide: ${errs.join(", ")}` });
+      return null;
+    }
+    const payload = buildPayload(overrideStatus);
+    const res = await apiServices.put(`/purchase-orders/${poId}`, payload);
+    if (!res?.data?.success) throw new Error(res?.data?.message || "Failed to update Purchase Order");
+    return res.data.data;
+  };
+
+  const onSave = async () => {
     setisSave(true)
     try {
-      const errs = validate();
-      if (errs.length) {
-        toast.current?.show({ severity: "warn", summary: "Missing fields", detail: `Please provide: ${errs.join(", ")}` });
-        return;
-      }
-
-      const payload = {
-        supplierId,
-        deliveryDate,
-        depotId: depotId || undefined,
-        deliveryAddress: (deliveryAddress || "").trim() || undefined,
-        reference: (reference || "").trim() || undefined,
-        notes: (notes || "").trim() || undefined,
-        paymentTermsDays,
-        currency,
-        lineItems: (lineItems || [])
-          .filter((li) => (li?.description || "").trim().length > 0)
-          .map((li) => {
-            const nc = li?.nominalCode && typeof li.nominalCode === "object" ? li.nominalCode : emptyNominal;
-
-            let taxObj = { ...emptyTax };
-            if (li?.tax && typeof li.tax === "object" && (li.tax.qbTaxCodeId || li.tax.label || li.tax.name)) {
-              taxObj = {
-                id: String(li.tax.id || ""),
-                qbTaxCodeId: String(li.tax.qbTaxCodeId || ""),
-                name: String(li.tax.name || ""),
-                percent: String(li.tax.percent != null ? li.tax.percent : li.taxRatePercent || 0),
-                label: String(li.tax.label || ""),
-                value: String(li.tax.value || li.tax.qbTaxCodeId || ""),
-              };
-            } else if (li?.taxClassId) {
-              const t = (taxOptions || []).find((x) => String(x.qbTaxCodeId) === String(li.taxClassId));
-              if (t) {
-                taxObj = {
-                  id: String(t.id || ""),
-                  qbTaxCodeId: String(t.qbTaxCodeId || ""),
-                  name: String(t.name || ""),
-                  percent: String(t.percent != null ? t.percent : li.taxRatePercent || 0),
-                  label: String(t.label || ""),
-                  value: String(t.value || t.qbTaxCodeId || ""),
-                };
-              }
-            }
-
-            const { net, tax, total } = computeLine(li);
-
-            return {
-              description: String(li.description || "").trim(),
-              quantity: Number(li.quantity) || 0,
-              unitPrice: Number(li.unitPrice) || 0,
-              nominalCode: {
-                id: String(nc.id || ""),
-                qbAccountId: String(nc.qbAccountId || nc.value || ""),
-                code: String(nc.code || ""),
-                name: String(nc.name || ""),
-                fq: String(nc.fq || ""),
-                type: String(nc.type || ""),
-                label: String(nc.label || ""),
-                value: String(nc.value || nc.qbAccountId || ""),
-              },
-              tax: taxObj,
-              capex: !!li.capex,
-              netAmount: net,
-              taxAmount: tax,
-              additionalAmount: 0,
-              lineTotal: total,
-            };
-          }),
-        charges: {
-          shipping: Number(charges?.shipping) || 0,
-          handling: Number(charges?.handling) || 0,
-          other: Number(charges?.other) || 0,
-          otherDescription: (charges?.otherDescription || "").trim(),
-        },
-        subTotal: Number(subTotal) || 0,
-        taxTotal: Number(taxTotal) || 0,
-        chargesTotal: Number(chargesTotal) || 0,
-        grandTotal: Number(grandTotal) || 0,
-        status,
-      };
-
-      const res = await apiServices.post("/purchase-orders", payload);
-      if (res?.data?.success) {
-        toast.current?.show({
-          severity: "success",
-          summary: status === "Submitted" ? "Submitted" : "Saved",
-          detail: status === "Submitted" ? "Purchase Order submitted for approval." : "Draft saved successfully.",
-        });
+      const updated = await saveChanges();
+      if (updated) {
+        setStatus(updated.status || status);
         setisSave(false)
-        router.push("/purchasing/purchase-order-list");
-      } else {
-        throw new Error(res?.data?.message || "Failed to save Purchase Order");
+        toast.current?.show({ severity: "success", summary: "Saved", detail: "Changes updated." });
       }
-    } catch (err) {
-      toast.current?.show({
-        severity: "error",
-        summary: "Error",
-        detail: err?.response?.data?.message || err?.message || "Unknown error",
-      });
-      setisSave(false)
+    } catch (e) {
+      toast.current?.show({ severity: "error", summary: "Error", detail: e?.response?.data?.message || e.message });
     }
   };
 
-  /* --------- UI bits --------- */
+  const onSubmitApproval = async () => {
+    try {
+      await saveChanges(); // save current edits
+      try {
+        await apiServices.post(`/purchase-orders/${poId}/send-for-approval`);
+      } catch {
+        await saveChanges("Submitted");
+      }
+      toast.current?.show({ severity: "success", summary: "Sent", detail: "Purchase Order sent for approval." });
+      setStatus("Submitted");
+    } catch (e) {
+      toast.current?.show({ severity: "error", summary: "Error", detail: e?.response?.data?.message || e.message });
+    }
+  };
+
+  /* ---------------- UI helpers ---------------- */
   const SupplierAddressCard = () =>
     !selectedSupplier ? null : (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -540,7 +629,10 @@ const [isSave, setisSave] = useState(false)
     <div className="card">
       <Toast ref={toast} />
       <GoPrevious route={"/purchasing/purchase-order-list"} />
-      <h2 className="text-xl font-semibold mb-4">New Purchase Order</h2>
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-xl font-semibold">Edit Purchase Order</h2>
+        <span className="text-sm px-2 py-1 rounded bg-zinc-100 dark:bg-zinc-800">{status}</span>
+      </div>
 
       {/* Supplier Details */}
       <Block title="Supplier Details">
@@ -556,6 +648,7 @@ const [isSave, setisSave] = useState(false)
               onChange={(e) => setSupplierId(e.value)}
               placeholder="Select supplier"
               filter
+              disabled={String(status || "").toLowerCase() !== "draft"}
             />
           </div>
           <div>
@@ -584,7 +677,12 @@ const [isSave, setisSave] = useState(false)
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Delivery Address</label>
-            <InputText className="w-full" placeholder="Enter specific delivery address or instructions" value={deliveryAddress} onChange={(e) => setDeliveryAddress(e.target.value)} />
+            <InputText
+              className="w-full"
+              placeholder="Enter specific delivery address or instructions"
+              value={deliveryAddress}
+              onChange={(e) => setDeliveryAddress(e.target.value)}
+            />
           </div>
         </div>
       </Block>
@@ -693,11 +791,11 @@ const [isSave, setisSave] = useState(false)
           <Button type="button" severity="secondary" outlined onClick={() => router.back()}>
             Cancel
           </Button>
-          <Button type="button" loading={isSave} onClick={() => submitPO("Draft")}>
-            Save as Draft
+          <Button loading={isSave} type="button" onClick={onSave}>
+            Save Changes
           </Button>
-          <Button type="button" severity="info" onClick={() => submitPO("Submitted")}>
-            Submit for Approval
+          <Button type="button" severity="info" onClick={onSubmitApproval} disabled={String(status || "").toLowerCase() !== "draft"}>
+            Send for Approval
           </Button>
         </div>
       </div>
