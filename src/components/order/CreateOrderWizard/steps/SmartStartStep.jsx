@@ -202,8 +202,8 @@ export default function SmartStartStep() {
       paymentTerm: customer.paymentTerm?._id || formData.paymentTerm || "",
       invoiceRunCode:
         customer.invoiceRunCode?._id || formData.invoiceRunCode || "",
-      invoiceInBatch:
-        customer.invoiceInBatch ?? formData.invoiceInBatch ?? false,
+      invoiceInBatch:false,
+        // customer.invoiceInBatch ?? formData.invoiceInBatch ?? false,
       billingPeriod: customer.billingPeriod || formData.billingPeriod || "",
       cunstomerQuickbookId: customer?.customerID || "",
     });
@@ -482,27 +482,35 @@ export default function SmartStartStep() {
               <label className="mb-2 block text-sm font-medium">
                 Return Date
               </label>
-              <Calendar
-                value={
-                  formData.expectedReturnDate
-                    ? new Date(formData.expectedReturnDate)
-                    : null
-                }
-                onChange={(e) =>
-                  updateFormData({
-                    expectedReturnDate: e.value.toISOString().split("T")[0],
-                  })
-                }
-                minDate={
-                  formData.deliveryDate
-                    ? new Date(formData.deliveryDate)
-                    : new Date()
-                }
-                dateFormat="dd/mm/yy"
-                showIcon
-                className="w-full"
-                placeholder="Select return date"
-              />
+            <Calendar
+  value={
+    formData.expectedReturnDate
+      ? new Date(formData.expectedReturnDate)
+      : null
+  }
+  onChange={(e) => {
+    if (e.value) {
+      // Format as YYYY-MM-DD in local time
+      const year = e.value.getFullYear();
+      const month = String(e.value.getMonth() + 1).padStart(2, "0");
+      const day = String(e.value.getDate()).padStart(2, "0");
+
+      updateFormData({
+        expectedReturnDate: `${year}-${month}-${day}`,
+      });
+    }
+  }}
+  minDate={
+    formData.deliveryDate
+      ? new Date(formData.deliveryDate)
+      : new Date()
+  }
+  dateFormat="dd/mm/yy"
+  showIcon
+  className="w-full"
+  placeholder="Select return date"
+/>
+
               {errors.returnDate && (
                 <small className="text-red-500">{errors.returnDate}</small>
               )}
@@ -634,7 +642,7 @@ export default function SmartStartStep() {
             </div>
 
             {/* Checkbox */}
-            <div className="flex items-center gap-2">
+            {/* <div className="flex items-center gap-2">
               <Checkbox
                 inputId="invoiceInBatch"
                 checked={formData.invoiceInBatch || false}
@@ -643,7 +651,7 @@ export default function SmartStartStep() {
               <label htmlFor="invoiceInBatch" className="cursor-pointer">
                 Include in batch invoicing
               </label>
-            </div>
+            </div> */}
 
             {/* Customer Invoice Notes */}
             <div>

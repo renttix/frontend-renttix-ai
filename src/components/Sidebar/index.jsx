@@ -172,6 +172,27 @@ const menuGroups = [
             <path
               fillRule="evenodd"
               clipRule="evenodd"
+              d="M3 5C3 3.89543 3.89543 3 5 3H19C20.1046 3 21 3.89543 21 5V7H3V5ZM3 9H21V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V9ZM7 14C7 13.4477 7.44772 13 8 13H10C10.5523 13 11 13.4477 11 14V16C11 16.5523 10.5523 17 10 17H8C7.44772 17 7 16.5523 7 16V14Z"
+              fill="currentColor"
+            />
+          </svg>
+        ),
+        label: "Refund",
+        route: "/refund",
+      },
+      {
+        icon: (
+          <svg
+            className="fill-current"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
               d="M11.9999 1.25C9.37654 1.25 7.24989 3.37665 7.24989 6C7.24989 8.62335 9.37654 10.75 11.9999 10.75C14.6232 10.75 16.7499 8.62335 16.7499 6C16.7499 3.37665 14.6232 1.25 11.9999 1.25ZM8.74989 6C8.74989 4.20507 10.205 2.75 11.9999 2.75C13.7948 2.75 15.2499 4.20507 15.2499 6C15.2499 7.79493 13.7948 9.25 11.9999 9.25C10.205 9.25 8.74989 7.79493 8.74989 6Z"
               fill=""
             />
@@ -307,6 +328,64 @@ const menuGroups = [
         ),
         label: "Calculator ",
         route: "/calculator ",
+      },
+       {
+        icon: (
+          <svg
+            className="fill-current"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            {/* outer body */}
+            <path
+              d="M4 2h16a1 1 0 011 1v18a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z"
+              fill="currentColor"
+            />
+            {/* display window */}
+            <path d="M6 5h12v3H6V5z" fill="white" />
+            {/* buttons row 1 */}
+            <rect
+              x="6"
+              y="10"
+              width="4"
+              height="4"
+              rx="0.5"
+              fill="currentColor"
+            />
+            <rect
+              x="11"
+              y="10"
+              width="4"
+              height="4"
+              rx="0.5"
+              fill="currentColor"
+            />
+            <rect x="16" y="10" width="2" height="2" fill="currentColor" />
+            {/* buttons row 2 */}
+            <rect
+              x="6"
+              y="15"
+              width="4"
+              height="4"
+              rx="0.5"
+              fill="currentColor"
+            />
+            <rect
+              x="11"
+              y="15"
+              width="4"
+              height="4"
+              rx="0.5"
+              fill="currentColor"
+            />
+            <rect x="16" y="15" width="2" height="2" fill="currentColor" />
+          </svg>
+        ),
+        label: "Reports",
+        route: "/reports ",
       },
     ],
   },

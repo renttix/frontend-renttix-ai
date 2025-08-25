@@ -70,8 +70,10 @@
     "react-select": "^5.8.0",
     "react-signature-canvas": "^1.1.0-alpha.2",
     "react-toastify": "^11.0.5",
+    "recharts": "^3.1.2",
     "redux-persist": "^6.0.0",
     "socket.io-client": "^4.8.1",
+    "swr": "^2.3.6",
     "tailwind-clip-path": "^1.0.0",
     "yup": "^1.5.0"
   },

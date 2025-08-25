@@ -11,19 +11,20 @@ import { useSelector } from "react-redux";
 
 export default function RefundModal({ visible, onHide, invoice }) {
   const { token } = useSelector((state) => state?.authReducer);
+  console.log(invoice)
 
-  if (!invoice) return null;
+  // if (!invoice) return null;
 
   const [step, setStep] = useState(1);
   const [creditType, setCreditType] = useState("Full Invoice Percentage");
-  const [percentage, setPercentage] = useState(invoice.orderDiscount || 0);
+  const [percentage, setPercentage] = useState(invoice?.orderDiscount || 0);
   const [internalNotes, setInternalNotes] = useState("");
   const [customerNotes, setCustomerNotes] = useState("");
   const [overrideTotal, setOverrideTotal] = useState(0);
   const [flatRefundAmount, setFlatRefundAmount] = useState(0);
   const [refundCategory, setRefundCategory] = useState("");
   const [applyTo, setApplyTo] = useState("");
-  const [updatedProducts, setUpdatedProducts] = useState(invoice.product || []);
+  const [updatedProducts, setUpdatedProducts] = useState(invoice?.product || []);
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -42,9 +43,9 @@ export default function RefundModal({ visible, onHide, invoice }) {
     setSubmitting(false);
   }, [invoice]);
 
-  const goodsValue = Number(invoice.goods) || 0;
-  const originalTotal = Number(invoice.total) || 0;
-  const taxRate = goodsValue > 0 ? (Number(invoice.tax) / goodsValue) * 100 : 0;
+  const goodsValue = Number(invoice?.goods) || 0;
+  const originalTotal = Number(invoice?.total) || 0;
+  const taxRate = goodsValue > 0 ? (Number(invoice?.tax) / goodsValue) * 100 : 0;
 
   const discountValue = useMemo(
     () => (goodsValue * (Number(percentage) || 0)) / 100,
@@ -358,16 +359,16 @@ const currentError = useMemo(() => {
       <div className="mt-2 flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-600">
         <div>
           <span className="font-medium text-gray-800">Invoice Number:</span>{" "}
-          <span className="text-blue-600 font-bold text-lg">#{invoice.invocie}</span>
+          <span className="text-blue-600 font-bold text-lg">#{invoice?.invocie}</span>
         </div>
         <div>
           <span className="font-medium text-gray-800">Customer:</span>{" "}
-          <span className="font-bold text-lg">{invoice.customerName}</span>
+          <span className="font-bold text-lg">{invoice?.customerName}</span>
         </div>
         <div>
           <span className="font-medium text-gray-800 ">Original Total:</span>{" "}
           <span className="text-green-600 font-bold text-lg">
-            ${Number(invoice.total).toLocaleString()}
+            ${Number(invoice?.total).toLocaleString()}
           </span>
         </div>
       </div>
@@ -844,7 +845,7 @@ const currentError = useMemo(() => {
           <h3 className="text-lg font-bold text-gray-700">Credit Successfully Applied</h3>
           <p className="text-sm text-gray-500 mb-6">
             The credit has been processed and applied to invoice{" "}
-            <strong>{invoice.invocie}</strong>.
+            <strong>{invoice?.invocie}</strong>.
           </p>
 
           <div className="bg-gray-50 border rounded-lg p-4 w-full sm:w-2/3 text-left text-sm">
