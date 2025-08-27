@@ -95,13 +95,21 @@ export default function ConfirmAndGoStep() {
 
     const totalBeforeDiscount = subtotal + taxTotal;
     const discountAmount = (totalBeforeDiscount * orderDiscount) / 100;
-    const totalAfterDiscount = totalBeforeDiscount - discountAmount;
+    const subtotalAfterDiscount = totalBeforeDiscount - discountAmount;
+
+    // Add damage waiver amount
+    const damageWaiverAmount = formData.damageWaiverCalculations?.totalAmount || 0;
+    const damageWaiverTax = formData.damageWaiverCalculations?.taxAmount || 0;
+
+    const total = subtotalAfterDiscount + damageWaiverAmount;
 
     return {
       subtotal,
       tax: taxTotal,
       discountAmount,
-      total: totalAfterDiscount,
+      damageWaiverAmount,
+      damageWaiverTax,
+      total,
     };
   };
 
@@ -499,3 +507,4 @@ export default function ConfirmAndGoStep() {
     </motion.div>
   );
 }
+

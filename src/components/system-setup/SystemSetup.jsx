@@ -27,6 +27,7 @@ import { FaDownload } from "react-icons/fa";
 
 import { LuFileText } from "react-icons/lu";
 import { FiMap } from "react-icons/fi";
+import { PiShieldCheck } from "react-icons/pi";
 import Link from "next/link";
 
 const rolesAndPermissions = {
@@ -239,6 +240,13 @@ const AccountingData = {
       description:
         "Invoice Run Codes can be used to group your orders in readiness for an invoice run.",
       icon: FaCube,
+    },
+    {
+      title: "Damage Waiver",
+      link: "/system-setup/damage-waiver",
+      description:
+        "Configure damage waiver levels and settings for equipment rental protection.",
+      icon: PiShieldCheck,
     },
   ],
 };

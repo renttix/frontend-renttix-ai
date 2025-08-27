@@ -14,6 +14,7 @@ import CategoriesStep from "./steps/CategoriesStep";
 import PricingStep from "./steps/PricingStep";
 import SpecificationsStep from "./steps/SpecificationsStep";
 import MaintenanceStepWithAlerts from "./steps/MaintenanceStepWithAlerts";
+import DamageWaiverStep from "./steps/DamageWaiverStep";
 import MediaStep from "./steps/MediaStep";
 import ReviewStep from "./steps/ReviewStep";
 
@@ -26,7 +27,7 @@ import QuickActions from "./components/QuickActions";
 // Icons
 import {
   FiPackage, FiTag, FiDollarSign, FiSettings,
-  FiTool, FiImage, FiCheckCircle, FiSave, FiX
+  FiTool, FiShield, FiImage, FiCheckCircle, FiSave, FiX
 } from "react-icons/fi";
 
 const generateRandomAssetNo = () =>
@@ -38,8 +39,9 @@ const wizardSteps = [
   { id: 3, name: "Pricing", icon: FiDollarSign, component: PricingStep },
   { id: 4, name: "Specifications", icon: FiSettings, component: SpecificationsStep },
   { id: 5, name: "Maintenance", icon: FiTool, component: MaintenanceStepWithAlerts },
-  { id: 6, name: "Media", icon: FiImage, component: MediaStep },
-  { id: 7, name: "Review", icon: FiCheckCircle, component: ReviewStep }
+  { id: 6, name: "Damage Waiver", icon: FiShield, component: DamageWaiverStep },
+  { id: 7, name: "Media", icon: FiImage, component: MediaStep },
+  { id: 8, name: "Review", icon: FiCheckCircle, component: ReviewStep }
 ];
 
 export default function AddProductElite() {
@@ -63,18 +65,18 @@ export default function AddProductElite() {
     productDescription: "",
     status: "Rental",
     uniqueAssetNo: generateRandomAssetNo(),
-    
+
     // Categories
     category: "",
     subCategory: "",
     depots: "",
-    
+
     // Pricing
     rentPrice: "",
     salePrice: "",
     rateDefinition: "",
     taxClass: "",
-    
+
     // Specifications
     quantity: 1,
     lengthUnit: "cm",
@@ -83,16 +85,35 @@ export default function AddProductElite() {
     length: "",
     width: "",
     height: "",
-    
+
     // Additional fields
     rate: "daily",
     range: "",
     vat: "",
-    
+
     // Barcode fields
     barcode: "",
     barcodeType: "CODE128",
     barcodeEnabled: false,
+
+    // Damage Waiver Settings
+    damageWaiverSettings: {
+      isEligible: true,
+      isExcluded: false,
+      exclusionReason: "",
+      customCoverageAmount: null,
+      customPremiumAmount: null,
+      riskLevel: "medium",
+      replacementValue: null,
+      depreciationRate: 0,
+      insuranceInfo: {
+        policyNumber: "",
+        provider: "",
+        coverageAmount: 0,
+        deductible: 0,
+        expiryDate: null,
+      },
+    },
   });
   
   // Supporting data states
@@ -265,7 +286,10 @@ export default function AddProductElite() {
       
       // Add all form fields
       Object.entries(formData).forEach(([key, value]) => {
-        if (value !== "" && value !== null && value !== undefined) {
+        if (key === "damageWaiverSettings" && value) {
+          // Handle nested damage waiver settings
+          productData.append(key, JSON.stringify(value));
+        } else if (value !== "" && value !== null && value !== undefined) {
           productData.append(key, value);
         }
       });

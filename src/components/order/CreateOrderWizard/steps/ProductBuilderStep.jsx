@@ -22,6 +22,7 @@ import InlineMaintenanceConfig from "../components/InlineMaintenanceConfig";
 import { ContextualHelp } from "../components/ContextualHelp";
 import { ProductSkeleton, TableSkeleton } from "../components/LoadingSkeleton";
 import AssetSelector from "../components/AssetSelector";
+import DamageWaiverSelector from "../components/DamageWaiverSelector";
 
 export default function ProductBuilderStep() {
   const { state, updateFormData, completeStep, setValidation } = useWizard();
@@ -45,6 +46,14 @@ export default function ProductBuilderStep() {
   const [assetSelectorVisible, setAssetSelectorVisible] = useState(false);
   const [currentProductForAssets, setCurrentProductForAssets] = useState(null);
   const [productAssets, setProductAssets] = useState({}); // { productId: [assets] }
+
+  // Damage waiver states
+  const [selectedDamageWaiverLevel, setSelectedDamageWaiverLevel] = useState(formData.damageWaiverLevel || null);
+  const [damageWaiverCalculations, setDamageWaiverCalculations] = useState({
+    waiverAmount: 0,
+    taxAmount: 0,
+    totalAmount: 0
+  });
 
   // Calculate rental duration (calendar days, used for display only)
   const rentalDuration =
@@ -287,7 +296,9 @@ export default function ProductBuilderStep() {
   const calculateTotalWithDiscount = () => {
     const subtotal = calculateSubtotal();
     const discountAmount = (subtotal * orderDiscount) / 100;
-    return subtotal - discountAmount;
+    const baseTotal = subtotal - discountAmount;
+    const damageWaiverTotal = damageWaiverCalculations.totalAmount || 0;
+    return baseTotal + damageWaiverTotal;
   };
 
   const handleBundleSelect = async (bundle) => {
@@ -313,6 +324,44 @@ export default function ProductBuilderStep() {
 
     setSelectedProducts(updatedProducts);
     updateFormData({ products: updatedProducts });
+  };
+
+  // Damage waiver handlers
+  const handleDamageWaiverLevelChange = (level) => {
+    setSelectedDamageWaiverLevel(level);
+    updateFormData({ damageWaiverLevel: level });
+  };
+
+  const handleDamageWaiverCalculationChange = (calculations) => {
+    setDamageWaiverCalculations(calculations);
+    updateFormData({
+      damageWaiverCalculations: calculations,
+      damageWaiverAmount: calculations.totalAmount
+    });
+  };
+
+  // Calculate eligible subtotal for damage waiver (products that support damage waiver)
+  const calculateEligibleSubtotal = () => {
+    return selectedProducts.reduce((total, product) => {
+      // Check if product has assets selected and supports damage waiver
+      const hasAssets = productAssets[product.productId]?.length > 0;
+      const supportsDamageWaiver = product.damageWaiverEligible !== false; // Default to true if not specified
+
+      if (hasAssets && supportsDamageWaiver) {
+        const salePriceNum = Number(product.salePrice);
+        const hasSalePrice = !isNaN(salePriceNum) && salePriceNum > 0;
+
+        if (hasSalePrice) {
+          return total + (product.quantity * salePriceNum);
+        } else {
+          const minDays = chargeableDaysForProduct(product);
+          const baseAmount = product.quantity * product.dailyRate * minDays;
+          return total + baseAmount;
+        }
+      }
+
+      return total;
+    }, 0);
   };
 
   const validateStep = () => {
@@ -624,6 +673,20 @@ export default function ProductBuilderStep() {
         </Card>
       )}
 
+      {/* Damage Waiver Selection */}
+      {selectedProducts.length > 0 && (
+        <div className="mt-6">
+          <DamageWaiverSelector
+            selectedLevel={selectedDamageWaiverLevel}
+            onLevelChange={handleDamageWaiverLevelChange}
+            eligibleSubtotal={calculateEligibleSubtotal()}
+            onCalculationChange={handleDamageWaiverCalculationChange}
+            token={token}
+            vendorId={user._id}
+          />
+        </div>
+      )}
+
       {/* Order Summary */}
       {selectedProducts.length > 0 && (
         <Card className="bg-blue-50">
@@ -654,20 +717,32 @@ export default function ProductBuilderStep() {
             </div>
 
             <div className="text-right">
-              <p className="text-sm text-gray-600">Subtotal</p>
-              <p className="text-lg font-semibold text-gray-800">{formatCurrency(calculateSubtotal())}</p>
+               <p className="text-sm text-gray-600">Subtotal</p>
+               <p className="text-lg font-semibold text-gray-800">{formatCurrency(calculateSubtotal())}</p>
 
-              {orderDiscount > 0 ? (
-                <>
-                  <p className="text-sm text-red-500">
-                    - {orderDiscount}% ({formatCurrency((calculateSubtotal() * orderDiscount) / 100)})
-                  </p>
-                  <p className="text-xl font-bold text-green-600">{formatCurrency(calculateTotalWithDiscount())}</p>
-                </>
-              ) : (
-                <p className="text-2xl font-bold text-blue-600">{formatCurrency(calculateSubtotal())}</p>
-              )}
-            </div>
+               {orderDiscount > 0 && (
+                 <p className="text-sm text-red-500">
+                   - {orderDiscount}% ({formatCurrency((calculateSubtotal() * orderDiscount) / 100)})
+                 </p>
+               )}
+
+               {damageWaiverCalculations.totalAmount > 0 && (
+                 <div className="mt-2 pt-2 border-t">
+                   <p className="text-sm text-blue-600">
+                     Damage Waiver: {formatCurrency(damageWaiverCalculations.totalAmount)}
+                   </p>
+                   {damageWaiverCalculations.taxAmount > 0 && (
+                     <p className="text-xs text-gray-500">
+                       (includes tax: {formatCurrency(damageWaiverCalculations.taxAmount)})
+                     </p>
+                   )}
+                 </div>
+               )}
+
+               <div className="mt-2 pt-2 border-t">
+                 <p className="text-xl font-bold text-blue-600">{formatCurrency(calculateTotalWithDiscount())}</p>
+               </div>
+             </div>
           </div>
         </Card>
       )}
