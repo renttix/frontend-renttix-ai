@@ -14,7 +14,6 @@ import CategoriesStep from "./steps/CategoriesStep";
 import PricingStep from "./steps/PricingStep";
 import SpecificationsStep from "./steps/SpecificationsStep";
 import MaintenanceStepWithAlerts from "./steps/MaintenanceStepWithAlerts";
-import DamageWaiverStep from "./steps/DamageWaiverStep";
 import MediaStep from "./steps/MediaStep";
 import ReviewStep from "./steps/ReviewStep";
 
@@ -39,7 +38,6 @@ const wizardSteps = [
   { id: 3, name: "Pricing", icon: FiDollarSign, component: PricingStep },
   { id: 4, name: "Specifications", icon: FiSettings, component: SpecificationsStep },
   { id: 5, name: "Maintenance", icon: FiTool, component: MaintenanceStepWithAlerts },
-  { id: 6, name: "Damage Waiver", icon: FiShield, component: DamageWaiverStep },
   { id: 7, name: "Media", icon: FiImage, component: MediaStep },
   { id: 8, name: "Review", icon: FiCheckCircle, component: ReviewStep }
 ];
@@ -76,6 +74,7 @@ export default function AddProductElite() {
     salePrice: "",
     rateDefinition: "",
     taxClass: "",
+    damageWaiverEnabled: false,
 
     // Specifications
     quantity: 1,
@@ -96,24 +95,8 @@ export default function AddProductElite() {
     barcodeType: "CODE128",
     barcodeEnabled: false,
 
-    // Damage Waiver Settings
-    damageWaiverSettings: {
-      isEligible: true,
-      isExcluded: false,
-      exclusionReason: "",
-      customCoverageAmount: null,
-      customPremiumAmount: null,
-      riskLevel: "medium",
-      replacementValue: null,
-      depreciationRate: 0,
-      insuranceInfo: {
-        policyNumber: "",
-        provider: "",
-        coverageAmount: 0,
-        deductible: 0,
-        expiryDate: null,
-      },
-    },
+    // Damage Waiver - Simple boolean flag
+    damageWaiverEnabled: false,
   });
   
   // Supporting data states
@@ -286,10 +269,7 @@ export default function AddProductElite() {
       
       // Add all form fields
       Object.entries(formData).forEach(([key, value]) => {
-        if (key === "damageWaiverSettings" && value) {
-          // Handle nested damage waiver settings
-          productData.append(key, JSON.stringify(value));
-        } else if (value !== "" && value !== null && value !== undefined) {
+        if (value !== "" && value !== null && value !== undefined) {
           productData.append(key, value);
         }
       });

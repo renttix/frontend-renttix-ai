@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
@@ -11,6 +11,9 @@ import { FiShield, FiInfo } from "react-icons/fi";
 import axios from "axios";
 import { BaseURL } from "../../../../../utils/baseUrl";
 
+// Cache for vendor settings to avoid repeated API calls
+const vendorSettingsCache = new Map();
+
 export default function DamageWaiverSelector({
   selectedLevel = null,
   onLevelChange,
@@ -20,17 +23,39 @@ export default function DamageWaiverSelector({
   categoryId = null,
   productId = null,
   token,
-  vendorId
+  vendorId,
+  selectedProducts = [], // Array of selected products to check damage waiver eligibility
+  rentalDuration = 1, // Rental duration in days
+  chargeableDaysForProduct = null, // Function to calculate chargeable days for a product
+  externalCalculations = null, // External calculations from parent to persist state
+  vendorSettings = null // Vendor settings passed from parent to avoid API calls
 }) {
   const [availableLevels, setAvailableLevels] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [calculations, setCalculations] = useState({});
+  const [calculations, setCalculations] = useState(externalCalculations || {});
   const [error, setError] = useState(null);
 
   // Fetch available damage waiver levels
   useEffect(() => {
     fetchAvailableLevels();
   }, [customerType, categoryId, productId, token, vendorId]);
+
+  // Sync with external calculations when they change
+  useEffect(() => {
+    if (externalCalculations) {
+      setCalculations(externalCalculations);
+    }
+  }, [externalCalculations]);
+
+  // Auto-recalculate when products change and a level is selected
+  useEffect(() => {
+    if (selectedLevel && selectedProducts.length > 0) {
+      const level = availableLevels.find(l => l._id === selectedLevel);
+      if (level) {
+        calculateWaiverCost(selectedLevel);
+      }
+    }
+  }, [selectedProducts, rentalDuration, chargeableDaysForProduct]);
 
   const fetchAvailableLevels = async () => {
     try {
@@ -63,7 +88,7 @@ export default function DamageWaiverSelector({
 
   // Calculate waiver cost for a specific level
   const calculateWaiverCost = async (levelId) => {
-    if (!levelId || !eligibleSubtotal) return;
+    if (!levelId) return;
 
     try {
       // First, get the damage waiver level details
@@ -73,12 +98,69 @@ export default function DamageWaiverSelector({
         return;
       }
 
-      // Calculate waiver amount based on eligible subtotal and rate
-      const waiverAmount = (eligibleSubtotal * level.rate) / 100;
+      // Filter products that have damage waiver enabled and assets selected
+      const eligibleProducts = selectedProducts.filter(product => {
+        const hasAssets = product.selectedAssets && product.selectedAssets.length > 0;
+        const hasDamageWaiver = product.damageWaiverEnabled === true;
+        return hasAssets && hasDamageWaiver;
+      });
+
+      if (eligibleProducts.length === 0) {
+        // Clear calculations when no eligible products
+        setCalculations({});
+        if (onCalculationChange) {
+          onCalculationChange({
+            waiverAmount: 0,
+            taxAmount: 0,
+            totalAmount: 0
+          });
+        }
+        return;
+      }
+
+      // Calculate waiver amount based on eligible products only
+      let eligibleSubtotalForWaiver = 0;
+
+      eligibleProducts.forEach(product => {
+        const salePriceNum = Number(product.salePrice);
+        const hasSalePrice = !isNaN(salePriceNum) && salePriceNum > 0;
+
+        if (hasSalePrice) {
+          // Sale item: just multiply by quantity
+          const saleAmount = product.quantity * salePriceNum;
+          eligibleSubtotalForWaiver += saleAmount;
+        } else {
+          // Rental item: use proper chargeable days calculation
+          let chargeableDays = rentalDuration; // Default to rentalDuration
+
+          if (chargeableDaysForProduct && typeof chargeableDaysForProduct === 'function') {
+            // Use the proper chargeable days calculation if available
+            chargeableDays = chargeableDaysForProduct(product);
+          }
+
+          const baseAmount = product.quantity * product.dailyRate * chargeableDays;
+          eligibleSubtotalForWaiver += baseAmount;
+        }
+      });
+
+      if (eligibleSubtotalForWaiver === 0) {
+        setCalculations({});
+        if (onCalculationChange) {
+          onCalculationChange({
+            waiverAmount: 0,
+            taxAmount: 0,
+            totalAmount: 0
+          });
+        }
+        return;
+      }
+
+      // Calculate waiver amount based on filtered eligible subtotal and rate
+      const waiverAmount = (eligibleSubtotalForWaiver * level.rate) / 100;
 
       // Get vendor settings for tax calculation
-      const vendorSettings = await getVendorWaiverSettings();
-      const taxRate = vendorSettings?.damageWaiverTaxable ? (vendorSettings.damageWaiverTaxRate || 0) : 0;
+      const currentVendorSettings = vendorSettings || await getVendorWaiverSettings();
+      const taxRate = currentVendorSettings?.damageWaiverTaxable ? (currentVendorSettings.damageWaiverTaxRate || 0) : 0;
       const taxAmount = (waiverAmount * taxRate) / 100;
       const totalAmount = waiverAmount + taxAmount;
 
@@ -88,10 +170,9 @@ export default function DamageWaiverSelector({
         totalAmount: Math.round(totalAmount * 100) / 100,
         rate: level.rate,
         taxRate: taxRate,
-        taxable: vendorSettings?.damageWaiverTaxable || false
+        taxable: currentVendorSettings?.damageWaiverTaxable || false,
+        eligibleSubtotal: eligibleSubtotalForWaiver
       };
-
-      console.log('Waiver calculation result:', calc);
 
       // Notify parent component of calculation change
       if (onCalculationChange) {
@@ -106,15 +187,16 @@ export default function DamageWaiverSelector({
     } catch (err) {
       console.error('Error calculating waiver:', err);
 
-      // Set fallback calculation
+      // Set fallback calculation using eligible subtotal
       const fallbackCalc = {
-        waiverAmount: Math.round((eligibleSubtotal * 0.05) * 100) / 100, // 5% fallback
+        waiverAmount: Math.round((eligibleSubtotalForWaiver * 0.05) * 100) / 100, // 5% fallback
         taxAmount: 0,
-        totalAmount: Math.round((eligibleSubtotal * 0.05) * 100) / 100,
+        totalAmount: Math.round((eligibleSubtotalForWaiver * 0.05) * 100) / 100,
         rate: 5,
         taxRate: 0,
         taxable: false,
-        fallback: true
+        fallback: true,
+        eligibleSubtotal: eligibleSubtotalForWaiver
       };
 
       if (onCalculationChange) {
@@ -129,8 +211,22 @@ export default function DamageWaiverSelector({
   };
 
 
-  // Get vendor damage waiver settings
-  const getVendorWaiverSettings = async () => {
+  // Get vendor damage waiver settings (use passed settings or cached)
+  const getVendorWaiverSettings = useCallback(async () => {
+    if (!vendorId || !token) return null;
+
+    // If vendorSettings are passed from parent, use them
+    if (vendorSettings) {
+      return vendorSettings;
+    }
+
+    const cacheKey = `${vendorId}`;
+
+    // Check cache first
+    if (vendorSettingsCache.has(cacheKey)) {
+      return vendorSettingsCache.get(cacheKey);
+    }
+
     try {
       const response = await axios.get(
         `${BaseURL}/damage-waiver/settings`,
@@ -141,13 +237,16 @@ export default function DamageWaiverSelector({
       );
 
       if (response.data.success) {
-        return response.data.data;
+        const settings = response.data.data;
+        // Cache the settings
+        vendorSettingsCache.set(cacheKey, settings);
+        return settings;
       }
     } catch (err) {
       console.error('Error fetching vendor settings:', err);
     }
     return null;
-  };
+  }, [vendorId, token, vendorSettings]);
 
   // Handle waiver level selection
   const handleLevelChange = async (levelId) => {
@@ -185,20 +284,16 @@ export default function DamageWaiverSelector({
       const vendorId = decodedPayload.vendorId || decodedPayload.vendor_id || decodedPayload.sub;
 
       if (vendorId) {
-        console.log('Extracted vendor ID from token:', vendorId);
         return vendorId;
       }
 
       // Fallback: try to extract from user object if present
       if (decodedPayload.user && decodedPayload.user.vendorId) {
-        console.log('Extracted vendor ID from user object:', decodedPayload.user.vendorId);
         return decodedPayload.user.vendorId;
       }
 
-      console.warn('Could not extract vendor ID from token');
       return null;
     } catch (err) {
-      console.error('Error decoding token for vendor ID:', err);
       return null;
     }
   };
@@ -303,7 +398,7 @@ export default function DamageWaiverSelector({
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span>Eligible Equipment Value:</span>
-                  <span>£{eligibleSubtotal.toFixed(2)}</span>
+                  <span>£{(currentCalculation.eligibleSubtotal || eligibleSubtotal).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Waiver Amount ({currentCalculation.rate}%):</span>

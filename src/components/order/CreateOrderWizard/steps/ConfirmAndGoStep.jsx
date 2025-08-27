@@ -288,6 +288,12 @@ export default function ConfirmAndGoStep() {
             <span className="text-gray-600">VAT:</span>
             <span>{formatCurrency(calculatedPricing.tax)}</span>
           </div>
+          {calculatedPricing.damageWaiverAmount > 0 && (
+            <div className="flex justify-between text-sm text-blue-600">
+              <span>Damage Waiver:</span>
+              <span>+{formatCurrency(calculatedPricing.damageWaiverAmount)}</span>
+            </div>
+          )}
           {orderDiscount > 0 && (
             <div className="flex justify-between text-sm text-red-600">
               <span>Discount ({orderDiscount}%)</span>

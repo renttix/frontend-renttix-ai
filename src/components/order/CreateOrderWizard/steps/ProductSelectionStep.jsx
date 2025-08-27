@@ -25,29 +25,41 @@ export default function ProductSelectionStep() {
   const { token } = useSelector((state) => state?.authReducer);
   
   const [products, setProducts] = useState([]);
-  const [selectedProducts, setSelectedProducts] = useState(formData.products || []);
+  const [selectedProducts, setSelectedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState(null);
+  const [damageWaiverFilter, setDamageWaiverFilter] = useState(false);
   const [categories, setCategories] = useState([]);
   const [errors, setErrors] = useState({});
   const [maintenanceConfigs, setMaintenanceConfigs] = useState({});
   const [maintenanceErrors, setMaintenanceErrors] = useState({});
+
+  // Initialize selectedProducts from formData, ensuring proper structure
+  useEffect(() => {
+    if (formData.products && Array.isArray(formData.products)) {
+      const normalizedProducts = formData.products.map(product => ({
+        ...product,
+        damageWaiverEnabled: Boolean(product.damageWaiverEnabled)
+      }));
+      setSelectedProducts(normalizedProducts);
+    }
+  }, [formData.products]);
   
   // Calculate rental duration for pricing
   const rentalDuration = formData.chargingStartDate && formData.expectedReturnDate && formData.useExpectedReturnDate
     ? calculateDaysBetween(new Date(formData.chargingStartDate), new Date(formData.expectedReturnDate))
     : 1;
   
-  // Fetch products
+  // Fetch products - only once when component mounts
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
         const vendorId = formData.vendorId || 'demo-vendor-456';
-        
+
         const response = await axios.post(
-          `${BaseURL}/product/product-lists?search=${searchQuery}&page=1&limit=100`,
+          `${BaseURL}/product/product-lists?page=1&limit=500`, // Fetch more products, no search filter
           { vendorId },
           {
             headers: {
@@ -56,12 +68,18 @@ export default function ProductSelectionStep() {
             }
           }
         );
-        
+
         if (response.data) {
-          setProducts(response.data.data || []);
-          
+          // Ensure all products have damageWaiverEnabled field, default to false if missing
+          const productsWithDamageWaiver = (response.data.data || []).map(product => ({
+            ...product,
+            damageWaiverEnabled: Boolean(product.damageWaiverEnabled)
+          }));
+
+          setProducts(productsWithDamageWaiver);
+
           // Extract unique categories
-          const uniqueCategories = [...new Set((response.data.data || [])
+          const uniqueCategories = [...new Set(productsWithDamageWaiver
             .map(p => p.category?.name)
             .filter(Boolean)
           )].map(name => ({ label: name, value: name }));
@@ -70,44 +88,57 @@ export default function ProductSelectionStep() {
       } catch (error) {
         console.error('Failed to fetch products:', error);
         // Set some demo products for demonstration
-        setProducts([
+        const demoProducts = [
           {
             _id: 'demo-1',
+            productName: 'Folding Chair',
             name: 'Folding Chair',
             sku: 'FC-001',
             price: 5,
+            rentPrice: 5,
             quantity: 100,
             category: { name: 'Furniture' },
-            images: ['/images/product/placeholder.webp']
+            images: ['/images/product/placeholder.webp'],
+            damageWaiverEnabled: true
           },
           {
             _id: 'demo-2',
+            productName: 'Round Table',
             name: 'Round Table',
             sku: 'RT-001',
             price: 15,
+            rentPrice: 15,
             quantity: 50,
             category: { name: 'Furniture' },
-            images: ['/images/product/placeholder.webp']
+            images: ['/images/product/placeholder.webp'],
+            damageWaiverEnabled: false
           },
           {
             _id: 'demo-3',
+            productName: 'PA System',
             name: 'PA System',
             sku: 'PA-001',
             price: 75,
+            rentPrice: 75,
             quantity: 10,
             category: { name: 'Audio' },
-            images: ['/images/product/placeholder.webp']
+            images: ['/images/product/placeholder.webp'],
+            damageWaiverEnabled: true
           },
           {
             _id: 'demo-4',
+            productName: 'LED Uplighter',
             name: 'LED Uplighter',
             sku: 'LED-001',
             price: 25,
+            rentPrice: 25,
             quantity: 30,
             category: { name: 'Lighting' },
-            images: ['/images/product/placeholder.webp']
+            images: ['/images/product/placeholder.webp'],
+            damageWaiverEnabled: false
           }
-        ]);
+        ];
+        setProducts(demoProducts);
         setCategories([
           { label: 'Furniture', value: 'Furniture' },
           { label: 'Audio', value: 'Audio' },
@@ -117,9 +148,9 @@ export default function ProductSelectionStep() {
         setLoading(false);
       }
     };
-    
+
     fetchProducts();
-  }, [token, formData.vendorId, searchQuery]);
+  }, [token, formData.vendorId]); // Removed searchQuery from dependencies
   
   // Handle maintenance config change
   const handleMaintenanceConfigChange = (productId, config) => {
@@ -181,20 +212,22 @@ export default function ProductSelectionStep() {
       updateFormData({ products: updated });
     } else {
       // Add product with default quantity
+      const productName = product.name || product.productName || 'Unknown Product';
       const newProduct = {
         productId: product._id,
-        name: product.name,
+        name: productName,
         sku: product.sku,
-        dailyRate: product.price || 0,
+        dailyRate: product.price || product.rentPrice || 0,
         quantity: 1,
         available: product.quantity || 0,
         category: product.category?.name || '',
         image: product.images?.[0] || null,
+        damageWaiverEnabled: Boolean(product.damageWaiverEnabled), // Explicit boolean conversion
         maintenanceConfig: product.maintenanceConfig || {}
       };
       const updated = [...selectedProducts, newProduct];
       setSelectedProducts(updated);
-      
+
       // Initialize maintenance config if product requires maintenance
       if (product.maintenanceConfig?.requiresMaintenance) {
         setMaintenanceConfigs(prev => ({
@@ -202,7 +235,7 @@ export default function ProductSelectionStep() {
           [product._id]: product.maintenanceConfig
         }));
       }
-      
+
       updateFormData({ products: updated });
     }
   };
@@ -218,10 +251,32 @@ export default function ProductSelectionStep() {
     updateFormData({ products: updated });
   };
   
-  // Calculate total price
+  // Calculate damage waiver cost for a product (example: 10% of rental cost)
+  // IMPORTANT: Only calculates for products where damageWaiverEnabled is explicitly TRUE
+  // Returns 0 for all other cases (false, undefined, null, etc.)
+  const calculateDamageWaiverCost = (product) => {
+    // Strict check: only calculate if damageWaiverEnabled is explicitly true
+    if (product.damageWaiverEnabled !== true) {
+      return 0;
+    }
+
+    // Additional safety checks
+    if (!product.quantity || !product.dailyRate || !rentalDuration) {
+      return 0;
+    }
+
+    const rentalCost = product.quantity * product.dailyRate * rentalDuration;
+    const waiverCost = rentalCost * 0.10; // 10% damage waiver premium
+    return waiverCost;
+  };
+
+  // Calculate total price including damage waiver
   const calculateTotal = () => {
     return selectedProducts.reduce((total, product) => {
-      return total + (product.quantity * product.dailyRate * rentalDuration);
+      const rentalCost = product.quantity * product.dailyRate * rentalDuration;
+      const damageWaiverCost = calculateDamageWaiverCost(product);
+      const productTotal = rentalCost + damageWaiverCost;
+      return total + productTotal;
     }, 0);
   };
   
@@ -229,16 +284,19 @@ export default function ProductSelectionStep() {
   const filteredProducts = products.filter(product => {
     // Ensure product has required properties
     if (!product) return false;
-    
+
     const matchesSearch = !searchQuery ||
       (product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
        product.productName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
        product.sku?.toLowerCase().includes(searchQuery.toLowerCase()));
-    
+
     const matchesCategory = !categoryFilter ||
       product.category?.name === categoryFilter;
-    
-    return matchesSearch && matchesCategory;
+
+    const matchesDamageWaiver = !damageWaiverFilter ||
+      (product.damageWaiverEnabled === true);
+
+    return matchesSearch && matchesCategory && matchesDamageWaiver;
   });
   
   // Column templates
@@ -253,9 +311,43 @@ export default function ProductSelectionStep() {
   };
   
   const nameBodyTemplate = (rowData) => {
+    const displayName = rowData.name || rowData.productName || 'Unknown Product';
+    const hasDamageWaiver = rowData.damageWaiverEnabled === true;
+
     return (
       <div>
-        <p className="font-medium">{rowData.name}</p>
+        <div className="flex items-center gap-2">
+          <p className="font-medium">{displayName}</p>
+          {hasDamageWaiver ? (
+            <Tag
+              value="DW"
+              severity="success"
+              icon="pi pi-shield"
+              className="text-xs"
+              style={{
+                fontSize: '10px',
+                padding: '2px 6px',
+                backgroundColor: '#10b981',
+                color: 'white',
+                borderRadius: '12px'
+              }}
+            />
+          ) : (
+            <Tag
+              value=""
+              severity="danger"
+              icon="pi pi-shield-alt"
+              className="text-xs opacity-50"
+              style={{
+                fontSize: '10px',
+                padding: '2px 6px',
+                backgroundColor: '#ef4444',
+                color: 'white',
+                borderRadius: '12px'
+              }}
+            />
+          )}
+        </div>
         <p className="text-sm text-gray-500">{rowData.sku}</p>
       </div>
     );
@@ -272,6 +364,17 @@ export default function ProductSelectionStep() {
       <span className="font-medium">
         £{(rowData.price || 0).toFixed(2)}/day
       </span>
+    );
+  };
+
+  const damageWaiverBodyTemplate = (rowData) => {
+    const isEnabled = rowData.damageWaiverEnabled || false;
+    return (
+      <Tag
+        value={isEnabled ? "Enabled" : "Disabled"}
+        severity={isEnabled ? "success" : "danger"}
+        icon={isEnabled ? "pi pi-shield" : "pi pi-shield-alt"}
+      />
     );
   };
   
@@ -360,26 +463,44 @@ export default function ProductSelectionStep() {
       )}
       
       {/* Filters */}
-      <div className="flex gap-4 mb-4">
-        <div className="flex-1">
-          <span className="p-input-icon-left w-full">
-            <i className="pi pi-search" />
-            <InputText
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search products..."
-              className="w-full"
-            />
-          </span>
+      <div className="flex flex-col gap-4 mb-4">
+        <div className="flex gap-4">
+          <div className="flex-1">
+            <span className="p-input-icon-left w-full">
+              <i className="pi pi-search" />
+              <InputText
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search products..."
+                className="w-full"
+              />
+            </span>
+          </div>
+          <Dropdown
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.value)}
+            options={categories}
+            placeholder="All Categories"
+            showClear
+            className="w-64"
+          />
         </div>
-        <Dropdown
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.value)}
-          options={categories}
-          placeholder="All Categories"
-          showClear
-          className="w-64"
-        />
+
+        {/* Damage Waiver Filter */}
+        <div className="flex items-center gap-3">
+          <Checkbox
+            inputId="damageWaiverFilter"
+            checked={damageWaiverFilter}
+            onChange={(e) => setDamageWaiverFilter(e.checked)}
+          />
+          <label htmlFor="damageWaiverFilter" className="text-sm font-medium cursor-pointer flex items-center gap-2">
+            <i className="pi pi-shield text-blue-600"></i>
+            Show only products with damage waiver enabled
+          </label>
+          <small className="text-gray-500">
+            {damageWaiverFilter ? 'Showing damage waiver eligible products only' : 'Showing all products'}
+          </small>
+        </div>
       </div>
       
       {/* Products Table */}
@@ -396,45 +517,65 @@ export default function ProductSelectionStep() {
           <Column body={nameBodyTemplate} header="Product" sortable />
           <Column body={categoryBodyTemplate} header="Category" sortable />
           <Column body={priceBodyTemplate} header="Daily Rate" sortable />
+          <Column body={damageWaiverBodyTemplate} header="Damage Waiver" sortable />
           <Column body={availabilityBodyTemplate} header="Availability" sortable />
           <Column body={selectionBodyTemplate} header="Select & Configure" style={{ width: '350px' }} />
         </DataTable>
       </Card>
       
+    
       {/* Selected Products Summary */}
       {selectedProducts.length > 0 && (
         <Card title="Selected Products">
           <div className="space-y-3">
-            {selectedProducts.map((product) => (
-              <div key={product.productId} className="flex items-center justify-between p-3 bg-gray-50 rounded">
-                <div className="flex items-center gap-3">
-                  {product.image && (
-                    <img 
-                      src={product.image} 
-                      alt={product.name}
-                      className="w-10 h-10 object-cover rounded"
-                    />
-                  )}
-                  <div>
-                    <p className="font-medium">{product.name}</p>
-                    <p className="text-sm text-gray-500">
-                      {product.quantity} × £{product.dailyRate.toFixed(2)}/day × {rentalDuration} days
-                    </p>
+            {selectedProducts.map((product) => {
+              const rentalCost = product.quantity * product.dailyRate * rentalDuration;
+              const damageWaiverCost = calculateDamageWaiverCost(product);
+              const totalCost = rentalCost + damageWaiverCost;
+
+              return (
+                <div key={product.productId} className="p-3 bg-gray-50 rounded">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      {product.image && (
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-10 h-10 object-cover rounded"
+                        />
+                      )}
+                      <div>
+                        <p className="font-medium">{product.name}</p>
+                        <p className="text-sm text-gray-500">
+                          {product.quantity} × £{product.dailyRate.toFixed(2)}/day × {rentalDuration} days
+                        </p>
+                        {product.damageWaiverEnabled && (
+                          <div className="flex items-center gap-1 mt-1">
+                            <i className="pi pi-shield text-green-600 text-xs"></i>
+                            <span className="text-xs text-green-600">Damage waiver included</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="space-y-1">
+                        <p className="font-medium">£{rentalCost.toFixed(2)}</p>
+                        {damageWaiverCost > 0 && (
+                          <p className="text-sm text-green-600">+£{damageWaiverCost.toFixed(2)} waiver</p>
+                        )}
+                        <p className="text-sm font-medium text-gray-700">Total: £{totalCost.toFixed(2)}</p>
+                      </div>
+                      <Button
+                        icon="pi pi-trash"
+                        className="p-button-text p-button-danger p-button-sm mt-2"
+                        onClick={() => handleProductToggle({ _id: product.productId })}
+                      />
+                    </div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-medium">
-                    £{(product.quantity * product.dailyRate * rentalDuration).toFixed(2)}
-                  </p>
-                  <Button
-                    icon="pi pi-trash"
-                    className="p-button-text p-button-danger p-button-sm"
-                    onClick={() => handleProductToggle({ _id: product.productId })}
-                  />
-                </div>
-              </div>
-            ))}
-            
+              );
+            })}
+
             <div className="border-t pt-3">
               <div className="flex justify-between items-center">
                 <span className="text-lg font-semibold">Total:</span>

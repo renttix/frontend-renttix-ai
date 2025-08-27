@@ -23,6 +23,7 @@ import { ContextualHelp } from "../components/ContextualHelp";
 import { ProductSkeleton, TableSkeleton } from "../components/LoadingSkeleton";
 import AssetSelector from "../components/AssetSelector";
 import DamageWaiverSelector from "../components/DamageWaiverSelector";
+import { FiShield } from "react-icons/fi";
 
 export default function ProductBuilderStep() {
   const { state, updateFormData, completeStep, setValidation } = useWizard();
@@ -49,11 +50,14 @@ export default function ProductBuilderStep() {
 
   // Damage waiver states
   const [selectedDamageWaiverLevel, setSelectedDamageWaiverLevel] = useState(formData.damageWaiverLevel || null);
-  const [damageWaiverCalculations, setDamageWaiverCalculations] = useState({
+  const [damageWaiverCalculations, setDamageWaiverCalculations] = useState(formData.damageWaiverCalculations || {
     waiverAmount: 0,
     taxAmount: 0,
     totalAmount: 0
   });
+  const [globalDamageWaiverEnabled, setGlobalDamageWaiverEnabled] = useState(false);
+  const [loadingDamageWaiverSettings, setLoadingDamageWaiverSettings] = useState(true);
+  const [vendorWaiverSettings, setVendorWaiverSettings] = useState(null);
 
   // Calculate rental duration (calendar days, used for display only)
   const rentalDuration =
@@ -116,7 +120,35 @@ export default function ProductBuilderStep() {
   // Fetch bundles
   useEffect(() => {
     fetchBundles();
+    fetchDamageWaiverSettings();
   }, [user]);
+
+  const fetchDamageWaiverSettings = async () => {
+    try {
+      setLoadingDamageWaiverSettings(true);
+      const vendorId = user?._id || user?.vendor;
+
+      const response = await axios.get(`${BaseURL}/damage-waiver/settings`, {
+        headers: { authorization: `Bearer ${token}` },
+        params: { vendorId: vendorId }
+      });
+
+      if (response.data.success) {
+        const settings = response.data.data;
+        setGlobalDamageWaiverEnabled(settings?.damageWaiverEnabled || false);
+        setVendorWaiverSettings(settings); // Store the full settings
+      } else {
+        setGlobalDamageWaiverEnabled(false);
+        setVendorWaiverSettings(null);
+      }
+    } catch (error) {
+      console.error('Failed to fetch damage waiver settings:', error);
+      setGlobalDamageWaiverEnabled(false);
+      setVendorWaiverSettings(null);
+    } finally {
+      setLoadingDamageWaiverSettings(false);
+    }
+  };
 
   useEffect(() => {
     updateFormData({ orderDiscount });
@@ -244,6 +276,7 @@ export default function ProductBuilderStep() {
             selectedAssets: assets,
             image: product.images?.[0] || "/images/product/placeholder.webp",
             maintenanceRequired: product.maintenanceRequired || false,
+            damageWaiverEnabled: Boolean(product.damageWaiverEnabled), // Ensure boolean value
             currency: currencyKey,
             product: product._id,
             price: product.rentPrice || product.salePrice || 0,
@@ -336,28 +369,32 @@ export default function ProductBuilderStep() {
     setDamageWaiverCalculations(calculations);
     updateFormData({
       damageWaiverCalculations: calculations,
-      damageWaiverAmount: calculations.totalAmount
+      damageWaiverAmount: calculations.totalAmount || 0
     });
   };
 
   // Calculate eligible subtotal for damage waiver (products that support damage waiver)
+  // NOTE: This is now mainly for display purposes - DamageWaiverSelector does its own filtering
   const calculateEligibleSubtotal = () => {
     return selectedProducts.reduce((total, product) => {
       // Check if product has assets selected and supports damage waiver
       const hasAssets = productAssets[product.productId]?.length > 0;
-      const supportsDamageWaiver = product.damageWaiverEligible !== false; // Default to true if not specified
+      const supportsDamageWaiver = product.damageWaiverEnabled === true; // Only true, not truthy
 
       if (hasAssets && supportsDamageWaiver) {
         const salePriceNum = Number(product.salePrice);
         const hasSalePrice = !isNaN(salePriceNum) && salePriceNum > 0;
 
+        let productTotal = 0;
         if (hasSalePrice) {
-          return total + (product.quantity * salePriceNum);
+          productTotal = product.quantity * salePriceNum;
         } else {
           const minDays = chargeableDaysForProduct(product);
           const baseAmount = product.quantity * product.dailyRate * minDays;
-          return total + baseAmount;
+          productTotal = baseAmount;
         }
+
+        return total + productTotal;
       }
 
       return total;
@@ -415,9 +452,43 @@ export default function ProductBuilderStep() {
   };
 
   const nameBodyTemplate = (product) => {
+    const displayName = product.productName || product.name || 'Unknown Product';
+    const hasDamageWaiver = product.damageWaiverEnabled === true;
+
     return (
       <div>
-        <div className="font-medium">{product.productName}</div>
+        <div className="flex items-center gap-2">
+          <div className="font-medium">{displayName}</div>
+          {hasDamageWaiver ? (
+            <Tag
+              value="DW"
+              severity="success"
+              icon="pi pi-shield"
+              className="text-xs"
+              style={{
+                fontSize: '10px',
+                padding: '2px 6px',
+                backgroundColor: '#10b981',
+                color: 'white',
+                borderRadius: '12px'
+              }}
+            />
+          ) : (
+            <Tag
+              value=""
+              severity="danger"
+              icon="pi pi-shield-alt"
+              className="text-xs opacity-50"
+              style={{
+                fontSize: '10px',
+                padding: '2px 6px',
+                backgroundColor: '#ef4444',
+                color: 'white',
+                borderRadius: '12px'
+              }}
+            />
+          )}
+        </div>
       </div>
     );
   };
@@ -673,17 +744,40 @@ export default function ProductBuilderStep() {
         </Card>
       )}
 
+     
+
       {/* Damage Waiver Selection */}
       {selectedProducts.length > 0 && (
         <div className="mt-6">
-          <DamageWaiverSelector
-            selectedLevel={selectedDamageWaiverLevel}
-            onLevelChange={handleDamageWaiverLevelChange}
-            eligibleSubtotal={calculateEligibleSubtotal()}
-            onCalculationChange={handleDamageWaiverCalculationChange}
-            token={token}
-            vendorId={user._id}
-          />
+          {!loadingDamageWaiverSettings && globalDamageWaiverEnabled ? (
+            <DamageWaiverSelector
+              selectedLevel={selectedDamageWaiverLevel}
+              onLevelChange={handleDamageWaiverLevelChange}
+              eligibleSubtotal={calculateEligibleSubtotal()}
+              onCalculationChange={handleDamageWaiverCalculationChange}
+              token={token}
+              vendorId={user._id}
+              selectedProducts={selectedProducts}
+              rentalDuration={rentalDuration}
+              chargeableDaysForProduct={chargeableDaysForProduct}
+              externalCalculations={damageWaiverCalculations}
+              vendorSettings={vendorWaiverSettings}
+            />
+          ) : (
+            !loadingDamageWaiverSettings && (
+              <Card className="border-red-200 bg-red-50">
+                <div className="flex items-center gap-3">
+                  <FiShield className="w-6 h-6 text-red-400" />
+                  <div>
+                    <h3 className="text-lg font-semibold text-red-900">Damage Waiver Not Available</h3>
+                    <p className="text-sm text-red-700">
+                      Damage waiver is not enabled for your account. Please contact your administrator or enable it in system settings.
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            )
+          )}
         </div>
       )}
 

@@ -257,8 +257,8 @@ export default function DamageWaiverSetup() {
             </label>
           </div>
 
-          {/* Settings Panel - Only show if enabled */}
-          {settings.damageWaiverEnabled && (
+          {/* Settings Panel - Show message if disabled or full settings if enabled */}
+          {settings.damageWaiverEnabled ? (
             <div className="space-y-6 pl-6 border-l-2 border-blue-200">
               {/* Tax and Accounting Settings */}
               <div>
@@ -353,6 +353,16 @@ export default function DamageWaiverSetup() {
                     <p className="text-sm">Add at least one level to enable damage waiver</p>
                   </div>
                 )}
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-6 pl-6 border-l-2 border-gray-200">
+              <div className="text-center py-12 text-gray-500">
+                <i className="pi pi-exclamation-triangle text-4xl mb-4 text-orange-400"></i>
+                <h3 className="text-lg font-medium mb-2">Damage Waiver is Not Enabled</h3>
+                <p className="text-sm max-w-md mx-auto">
+                  Damage waiver functionality is currently disabled. Enable it above to configure damage waiver settings, tax codes, and coverage levels.
+                </p>
               </div>
             </div>
           )}

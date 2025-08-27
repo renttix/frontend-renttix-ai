@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import { InputNumber } from "primereact/inputnumber";
 import { Dropdown } from "primereact/dropdown";
 import { Button } from "primereact/button";
+import { Checkbox } from "primereact/checkbox";
 import { TabView, TabPanel } from "primereact/tabview";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { BaseURL } from "../../../../../utils/baseUrl";
-import { 
+import {
   FiDollarSign, FiPercent, FiCalendar, FiTrendingUp,
-  FiClock, FiPlus, FiInfo, FiZap
+  FiClock, FiPlus, FiInfo, FiZap, FiShield
 } from "react-icons/fi";
 import AddTaxClassModal from "../../../system-setup/tax-classes/AddTaxClassModal";
 import RateDefinatonModal from "../../../system-setup/rate-defination/RateDefinatonModal";
@@ -390,6 +391,31 @@ export default function PricingStep({
               </div>
             </motion.div>
           )}
+        </div>
+
+        {/* Damage Waiver Configuration */}
+        <div className="border-t pt-6">
+          <div className="flex items-center mb-4">
+            <FiShield className="text-blue-600 mr-2" />
+            <h3 className="text-lg font-semibold text-gray-900">Damage Waiver</h3>
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <Checkbox
+                inputId="damageWaiverEnabled"
+                checked={formData.damageWaiverEnabled || false}
+                onChange={(e) => updateFormData({ damageWaiverEnabled: e.checked })}
+              />
+              <label htmlFor="damageWaiverEnabled" className="text-sm font-medium cursor-pointer">
+                Enable Damage Waiver for this product
+              </label>
+            </div>
+
+            <p className="text-xs text-gray-500 ml-6">
+              When enabled, this product will be eligible for damage waiver coverage during rental periods.
+            </p>
+          </div>
         </div>
       </div>
       
