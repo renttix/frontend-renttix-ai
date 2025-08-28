@@ -59,6 +59,11 @@ export default function ProductBuilderStep() {
   const [loadingDamageWaiverSettings, setLoadingDamageWaiverSettings] = useState(true);
   const [vendorWaiverSettings, setVendorWaiverSettings] = useState(null);
 
+  // Deposit states
+  const [depositType, setDepositType] = useState(formData.depositType || "noDeposit");
+  const [depositPercentage, setDepositPercentage] = useState(formData.depositPercentage || 0);
+  const [depositFixedAmount, setDepositFixedAmount] = useState(formData.depositFixedAmount || 0);
+
   // Calculate rental duration (calendar days, used for display only)
   const rentalDuration =
     formData.chargingStartDate && formData.expectedReturnDate
@@ -326,12 +331,32 @@ export default function ProductBuilderStep() {
     }, 0);
   };
 
+  // Calculate deposit amount based on type
+  const calculateDepositAmount = () => {
+    const subtotal = calculateSubtotal();
+    const discountAmount = (subtotal * orderDiscount) / 100;
+    const baseTotal = subtotal - discountAmount;
+    const damageWaiverTotal = damageWaiverCalculations.totalAmount || 0;
+    const orderTotal = baseTotal + damageWaiverTotal;
+
+    switch (depositType) {
+      case "percentage":
+        return (orderTotal * depositPercentage) / 100;
+      case "fixedAmount":
+        return depositFixedAmount;
+      case "noDeposit":
+      default:
+        return 0;
+    }
+  };
+
   const calculateTotalWithDiscount = () => {
     const subtotal = calculateSubtotal();
     const discountAmount = (subtotal * orderDiscount) / 100;
     const baseTotal = subtotal - discountAmount;
     const damageWaiverTotal = damageWaiverCalculations.totalAmount || 0;
-    return baseTotal + damageWaiverTotal;
+    const depositAmount = calculateDepositAmount();
+    return baseTotal + damageWaiverTotal + depositAmount;
   };
 
   const handleBundleSelect = async (bundle) => {
@@ -371,6 +396,35 @@ export default function ProductBuilderStep() {
       damageWaiverCalculations: calculations,
       damageWaiverAmount: calculations.totalAmount || 0
     });
+  };
+
+  // Deposit handlers
+  const handleDepositTypeChange = (type) => {
+    setDepositType(type);
+    updateFormData({
+      depositType: type,
+      depositAmount: calculateDepositAmount()
+    });
+  };
+
+  const handleDepositPercentageChange = (percentage) => {
+    setDepositPercentage(percentage);
+    if (depositType === "percentage") {
+      updateFormData({
+        depositPercentage: percentage,
+        depositAmount: calculateDepositAmount()
+      });
+    }
+  };
+
+  const handleDepositFixedAmountChange = (amount) => {
+    setDepositFixedAmount(amount);
+    if (depositType === "fixedAmount") {
+      updateFormData({
+        depositFixedAmount: amount,
+        depositAmount: calculateDepositAmount()
+      });
+    }
   };
 
   // Calculate eligible subtotal for damage waiver (products that support damage waiver)
@@ -781,6 +835,80 @@ export default function ProductBuilderStep() {
         </div>
       )}
 
+      {/* Deposit Selection */}
+      {selectedProducts.length > 0 && (
+        <Card className="mt-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Security Deposit</h3>
+            <Tag value="Optional" severity="info" />
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">Deposit Type</label>
+              <Dropdown
+                value={depositType}
+                options={[
+                  { label: "No Deposit", value: "noDeposit" },
+                  { label: "Percentage of Order Total", value: "percentage" },
+                  { label: "Fixed Amount", value: "fixedAmount" }
+                ]}
+                onChange={(e) => handleDepositTypeChange(e.value)}
+                placeholder="Select deposit type"
+                className="w-full"
+              />
+            </div>
+
+            {depositType === "percentage" && (
+              <div>
+                <label className="block text-sm font-medium mb-2">Deposit Percentage (%)</label>
+                <InputNumber
+                  value={depositPercentage}
+                  onValueChange={(e) => handleDepositPercentageChange(e.value || 0)}
+                  suffix="%"
+                  min={0}
+                  max={100}
+                  showButtons
+                  buttonLayout="horizontal"
+                  className="w-full"
+                />
+              </div>
+            )}
+
+            {depositType === "fixedAmount" && (
+              <div>
+                <label className="block text-sm font-medium mb-2">Fixed Deposit Amount</label>
+                <InputNumber
+                  value={depositFixedAmount}
+                  onValueChange={(e) => handleDepositFixedAmountChange(e.value || 0)}
+                  mode="currency"
+                  currency={user?.currencyKey || "GBP"}
+                  locale="en-GB"
+                  min={0}
+                  showButtons
+                  buttonLayout="horizontal"
+                  className="w-full"
+                />
+              </div>
+            )}
+
+            {depositType !== "noDeposit" && calculateDepositAmount() > 0 && (
+              <div className="bg-blue-50 p-3 rounded-lg">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-blue-800">Calculated Deposit:</span>
+                  <span className="text-lg font-bold text-blue-600">
+                    {formatCurrency(calculateDepositAmount())}
+                  </span>
+                </div>
+                <p className="text-xs text-blue-600 mt-1">
+                  Security deposit will be shown on a separate receipt
+                </p>
+              </div>
+            )}
+          </div>
+        </Card>
+      )}
+
       {/* Order Summary */}
       {selectedProducts.length > 0 && (
         <Card className="bg-blue-50">
@@ -830,6 +958,17 @@ export default function ProductBuilderStep() {
                        (includes tax: {formatCurrency(damageWaiverCalculations.taxAmount)})
                      </p>
                    )}
+                 </div>
+               )}
+
+               {calculateDepositAmount() > 0 && (
+                 <div className="mt-2 pt-2 border-t">
+                   <p className="text-sm text-green-600">
+                     Security Deposit: {formatCurrency(calculateDepositAmount())}
+                   </p>
+                   <p className="text-xs text-gray-500">
+                     (shown on separate receipt)
+                   </p>
                  </div>
                )}
 

@@ -101,7 +101,16 @@ export default function ConfirmAndGoStep() {
     const damageWaiverAmount = formData.damageWaiverCalculations?.totalAmount || 0;
     const damageWaiverTax = formData.damageWaiverCalculations?.taxAmount || 0;
 
-    const total = subtotalAfterDiscount + damageWaiverAmount;
+    // Calculate deposit amount
+    let depositAmount = 0;
+    if (formData.depositType === "percentage") {
+      const orderTotalForDeposit = subtotalAfterDiscount + damageWaiverAmount;
+      depositAmount = (orderTotalForDeposit * (formData.depositPercentage || 0)) / 100;
+    } else if (formData.depositType === "fixedAmount") {
+      depositAmount = formData.depositFixedAmount || 0;
+    }
+
+    const total = subtotalAfterDiscount + damageWaiverAmount + depositAmount;
 
     return {
       subtotal,
@@ -109,6 +118,7 @@ export default function ConfirmAndGoStep() {
       discountAmount,
       damageWaiverAmount,
       damageWaiverTax,
+      depositAmount,
       total,
     };
   };
@@ -292,6 +302,12 @@ export default function ConfirmAndGoStep() {
             <div className="flex justify-between text-sm text-blue-600">
               <span>Damage Waiver:</span>
               <span>+{formatCurrency(calculatedPricing.damageWaiverAmount)}</span>
+            </div>
+          )}
+          {calculatedPricing.depositAmount > 0 && (
+            <div className="flex justify-between text-sm text-green-600">
+              <span>Security Deposit:</span>
+              <span>+{formatCurrency(calculatedPricing.depositAmount)}</span>
             </div>
           )}
           {orderDiscount > 0 && (
