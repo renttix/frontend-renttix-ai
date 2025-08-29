@@ -15,7 +15,7 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter, useSearchParams } from "next/navigation";
 import Breadcrumb from "../Breadcrumbs/Breadcrumb";
-import { BaseURL } from "../../../utils/baseUrl";
+import { BaseURL, imageBaseURL } from "../../../utils/baseUrl";
 import CanceButton from "../Buttons/CanceButton";
 import Link from "next/link";
 import ImportDataModal from "../system-setup/import-data/ImportDataModal";
@@ -433,6 +433,8 @@ const ProductList = React.memo(() => {
   }, [router]);
 
   const renderColumnsBody = useCallback((field, item) => {
+  console.log(`${imageBaseURL}${item.images[0]}`)
+
     console.log({item})
     switch (field) {
       case "thumbnail":
@@ -440,8 +442,8 @@ const ProductList = React.memo(() => {
           <Link href={`/product/${item.id}`}>
           <img
             className="border-round h-[50px] w-[50px] rounded-lg shadow-2"
-            src={`${process.env.NEXT_PUBLIC_API_URL_IMAGE}${item.thumbnail}`}
-            alt={item.thumbnail}
+            src={`${imageBaseURL}${item.images[0]}`}
+            alt={item.images[0]}
             onError={(e) => (e.currentTarget.src = "/images/product/placeholder.webp")} // Provide a dummy image path
             style={{ width: "64px" }}
           />
@@ -451,7 +453,7 @@ const ProductList = React.memo(() => {
       case "productName":
         return (
           <>
-            <Link className="text-[#0068d6]" href={`/product/${item.id}`}>
+            <Link className="text-[#0068d6]" href={`/product/${item._id}`}>
               {item.productName}
             </Link>
           </>
