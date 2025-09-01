@@ -188,21 +188,21 @@ const AccountingData = {
     },
     {
       title: "Tax Rates",
-      link: "/",
+      link: "/system-setup/tax-classes",
       description:
         "Tax Rates are used by tax rules to calculate tax charges on an order and invoice",
       icon: FaPercent,
     },
     {
       title: "Tax Rules",
-      link: "/",
+      link: "/system-setup/tax-classes",
       description:
         "Tax Rules are defined as a combination of a customer tax class and a product tax class with an associated tax rate",
       icon: FaBalanceScale,
     },
     {
       title: "General Ledger Templates",
-      link: "/",
+      link: "/system-setup/document-number",
       description:
         "General Ledger Templates allow you to create a template for general ledger postings",
       icon: FaClipboard,
@@ -222,14 +222,14 @@ const AccountingData = {
     },
     {
       title: "Payment Methods",
-      link: "/",
+      link: "/system-setup/payment-terms",
       description:
         "Payment methods allow you to set up different ways to make payments within the system",
       icon: FaMoneyBill,
     },
     {
       title: "Rate definitions",
-      link: "/system-setup/rate-definition",
+      link: "/system-setup/rate-defination",
       description:
         "Rate definitions allow you to configure how to charge for your rental items",
       icon: FaCalculator,
@@ -240,6 +240,13 @@ const AccountingData = {
       description:
         "Invoice Run Codes can be used to group your orders in readiness for an invoice run.",
       icon: FaCube,
+    },
+    {
+      title: "E-Signature Settings",
+      link: "/system-setup/esign",
+      description:
+        "Configure e-signature settings and upload default documents for order signing.",
+      icon: LuFileText,
     },
     {
       title: "Damage Waiver",
