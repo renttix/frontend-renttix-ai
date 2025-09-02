@@ -91,8 +91,12 @@ const SignaturePad = ({
     // Cleanup function
     return () => {
       if (signaturePadRef.current) {
-        signaturePadRef.current.removeEventListener('beginStroke', handleBeginStroke);
-        signaturePadRef.current.removeEventListener('endStroke', handleEndStroke);
+        try {
+          signaturePadRef.current.off('beginStroke', handleBeginStroke);
+          signaturePadRef.current.off('endStroke', handleEndStroke);
+        } catch (error) {
+          console.warn('Error removing signature pad event listeners:', error);
+        }
         signaturePadRef.current = null;
       }
 

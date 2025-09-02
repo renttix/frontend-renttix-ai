@@ -6,15 +6,13 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import SignaturePad from "@/components/esign/SignaturePad";
 import axios from "axios";
-import { BaseURL } from "../../../../../utils/baseUrl";
+import {  imageBaseURL } from "../../../../../utils/baseUrl";
 import { useSelector } from "react-redux";
-import DebugSignatureState from "./debug-component";
 import { Toast } from "primereact/toast";
 
 const EsignPage = () => {
   const { orderId, tokens } = useParams();
   const router = useRouter();
-  const { token, user } = useSelector((state) => state?.authReducer);
   const toast = useRef(null);
   const [documentData, setDocumentData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -43,10 +41,9 @@ const EsignPage = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${BaseURL}/esign/${orderId}/${tokens}/document`,
+        `${imageBaseURL}/public/esign/${orderId}/${tokens}/document`,
         {
          
-          headers: { authorization: `Bearer ${token}` },
         
           responseType: 'blob'
         }
@@ -109,11 +106,17 @@ console.log({response:response.data})
         token: tokens,
       };
 
+      // Prepare URL parameters for dynamic success page
+      const successParams = new URLSearchParams({
+        orderId: orderId,
+        signerName: fullName.trim(),
+        signerEmail: email.trim(),
+        // Add other dynamic parameters here
+      });
+
       const response = await axios.post(
-        `${BaseURL}/esign/${orderId}/${tokens}/sign`,
-        signatureData,{
-          headers: { authorization: `Bearer ${token}` },
-        }
+        `${imageBaseURL}/public/esign/${orderId}/${tokens}/sign`,
+        signatureData
       );
 
       toast.current?.show({
@@ -123,9 +126,9 @@ console.log({response:response.data})
         life: 5000,
       });
 
-      // Redirect to success page or show success message
+      // Redirect to success page with dynamic parameters
       setTimeout(() => {
-        router.push('/esign/success');
+        router.push(`/esign/success?${successParams.toString()}`);
       }, 2000);
 
     } catch (error) {
