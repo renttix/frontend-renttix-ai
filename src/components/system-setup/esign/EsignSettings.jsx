@@ -28,30 +28,39 @@ const EsignSettings = () => {
 
   // Load settings on mount
   useEffect(() => {
-    const loadSettings = async () => {
-
-      try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/esign/settings/${user._id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-
-        if (response.data.success) {
-          setInitialValues({
-            esignEnabled: response.data.data.esignEnabled || false,
-            autoSendEnabled: response.data.data.autoSendEnabled || false,
-            defaultDocuments: response.data.data.defaultDocuments || [],
-            expirationDays: response.data.data.expirationDays || 30,
+    // Use esignSettings from user object if available, otherwise fetch from API
+    if (user?.esignSettings) {
+      setInitialValues({
+        esignEnabled: user.esignSettings.esignEnabled || false,
+        autoSendEnabled: user.esignSettings.autoSendEnabled || false,
+        defaultDocuments: user.esignSettings.defaultDocuments || [],
+        expirationDays: user.esignSettings.expirationDays || 30,
+      });
+    } else {
+      const loadSettings = async () => {
+        try {
+          const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/esign/settings/${user._id}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
           });
-        }
-      } catch (error) {
-        console.error("Error loading e-sign settings:", error);
-      }
-    };
 
-    loadSettings();
-  }, [token, user?._id]);
+          if (response.data.success) {
+            setInitialValues({
+              esignEnabled: response.data.data.esignEnabled || false,
+              autoSendEnabled: response.data.data.autoSendEnabled || false,
+              defaultDocuments: response.data.data.defaultDocuments || [],
+              expirationDays: response.data.data.expirationDays || 30,
+            });
+          }
+        } catch (error) {
+          console.error("Error loading e-sign settings:", error);
+        }
+      };
+
+      loadSettings();
+    }
+  }, [token, user?._id, user?.esignSettings]);
 
   const validationSchema = Yup.object().shape({
     esignEnabled: Yup.boolean(),
@@ -277,52 +286,182 @@ const EsignSettings = () => {
                           className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                         >
                           <div className="flex items-center gap-3">
-                            <svg className="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M8.5 2H15.5L17 3.5V8H23.5L22.5 9L20.5 22H3.5L1.5 9L0.5 8H7V3.5L8.5 2Z" />
-                            </svg>
+                            {/* Status indicator */}
+                            <div className={`w-4 h-4 rounded-full ${
+                              doc.status === 'checked' ? 'bg-green-500' :
+                              doc.status === 'uploaded' ? 'bg-blue-500' :
+                              'bg-red-500'
+                            }`}>
+                              {doc.status === 'checked' ? (
+                                <svg className="w-3 h-3 text-white mx-auto mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              ) : doc.status === 'uploaded' ? (
+                                <svg className="w-3 h-3 text-white mx-auto mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                  <path d="M8 9V3.5l6.5 6.5H13v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6h3z" />
+                                </svg>
+                              ) : (
+                                <svg className="w-3 h-3 text-white mx-auto mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                </svg>
+                              )}
+                            </div>
                             <div className="flex flex-col">
-                              <span className="text-sm font-medium">{doc.name}</span>
-                              <span className="text-xs text-gray-500">
-                                {(doc.size / 1024 / 1024).toFixed(2)} MB •
-                                Uploaded {new Date(doc.uploadedAt).toLocaleDateString()}
-                              </span>
+                              <span className="text-sm font-medium">{doc.name || doc.originalName}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-500">
+                                  {(doc.size / 1024 / 1024).toFixed(2)} MB •
+                                  Uploaded {new Date(doc.uploadedAt).toLocaleDateString()}
+                                </span>
+                                <span className={`text-xs px-2 py-0.5 rounded-full ${
+                                  doc.status === 'checked' ? 'bg-green-100 text-green-800' :
+                                  doc.status === 'uploaded' ? 'bg-blue-100 text-blue-800' :
+                                  'bg-red-100 text-red-800'
+                                }`}>
+                                  {doc.status}
+                                </span>
+                                {doc.fileExists === false && (
+                                  <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-800">
+                                    Missing
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
-                          <Button
-                            type="button"
-                            icon="pi pi-times"
-                            className="p-button-rounded p-button-danger p-button-text"
-                            onClick={async () => {
-                              try {
-                                const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/esign/settings/${user._id}/document/${doc.id}`, {
+                          <div className="flex items-center gap-2">
+                            {/* Preview Button */}
+                            <Button
+                              type="button"
+                              icon="pi pi-eye"
+                              className="p-button-text p-button-sm"
+                              tooltip="Preview Document"
+                              tooltipOptions={{ position: 'top' }}
+                              onClick={() => {
+                                const previewWindow = window.open('', '_blank', 'width=800,height=600');
+                                if (!previewWindow) {
+                                  toast.current.show({
+                                    severity: "error",
+                                    summary: "Preview Failed",
+                                    detail: "Pop-up blocker may be preventing preview. Please disable pop-up blocker.",
+                                    life: 4000,
+                                  });
+                                  return;
+                                }
+
+                                // Make request with auth headers
+                                axios.get(`${process.env.NEXT_PUBLIC_API_URL}/esign/settings/${user._id}/document/${doc.id}/preview`, {
                                   headers: {
                                     Authorization: `Bearer ${token}`
-                                  }
-                                });
-
-                                if (response.data.success) {
-                                  const updatedDocs = values.defaultDocuments.filter((_, i) => i !== index);
-                                  setFieldValue('defaultDocuments', updatedDocs);
+                                  },
+                                  responseType: 'blob'
+                                })
+                                .then(response => {
+                                  const blob = new Blob([response.data], { type: 'application/pdf' });
+                                  const url = URL.createObjectURL(blob);
+                                  previewWindow.location.href = url;
+                                })
+                                .catch(error => {
+                                  previewWindow.close();
+                                  console.error('Error previewing document:', error);
                                   toast.current.show({
-                                    severity: "success",
-                                    summary: "Document Deleted",
-                                    detail: `${doc.name} deleted successfully`,
+                                    severity: "error",
+                                    summary: "Preview Failed",
+                                    detail: "Could not load document preview",
                                     life: 3000,
                                   });
-                                } else {
-                                  throw new Error(response.data.message || 'Delete failed');
-                                }
-                              } catch (error) {
-                                console.error('Error deleting document:', error);
-                                toast.current.show({
-                                  severity: "error",
-                                  summary: "Delete Failed",
-                                  detail: error.response?.data?.message || error.message || 'Failed to delete document',
-                                  life: 3000,
                                 });
-                              }
-                            }}
-                          />
+                              }}
+                            />
+
+                            {doc.status !== 'checked' && (
+                              <Button
+                                type="button"
+                                label="Check"
+                                className="p-button-text p-button-sm"
+                                onClick={async () => {
+                                  try {
+                                    const response = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/esign/settings/${user._id}/document/${doc.id}/status`, {
+                                      status: 'checked',
+                                      isChecked: true
+                                    }, {
+                                      headers: {
+                                        Authorization: `Bearer ${token}`
+                                      }
+                                    });
+
+                                    if (response.data.success) {
+                                      // Update local state
+                                      const updatedValues = { ...values };
+                                      const docIndex = updatedValues.defaultDocuments.findIndex(d => d.id === doc.id);
+                                      if (docIndex !== -1) {
+                                        updatedValues.defaultDocuments[docIndex].status = 'checked';
+                                        updatedValues.defaultDocuments[docIndex].isChecked = true;
+                                        setInitialValues(updatedValues);
+                                      }
+
+                                      toast.current.show({
+                                        severity: "success",
+                                        summary: "Document Checked",
+                                        detail: `${doc.name || doc.originalName} marked as checked`,
+                                        life: 3000,
+                                      });
+                                    } else {
+                                      throw new Error(response.data.message || 'Mark as checked failed');
+                                    }
+                                  } catch (error) {
+                                    console.error('Error marking document as checked:', error);
+                                    toast.current.show({
+                                      severity: "error",
+                                      summary: "Check Failed",
+                                      detail: error.response?.data?.message || error.message || 'Failed to mark document as checked',
+                                      life: 3000,
+                                    });
+                                  }
+                                }}
+                              />
+                            )}
+
+                            <Button
+                              type="button"
+                              icon="pi pi-times"
+                              className="p-button-rounded p-button-danger p-button-text"
+                              onClick={async () => {
+                                try {
+                                  const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/esign/settings/${user._id}/document/${doc.id}`, {
+                                    headers: {
+                                      Authorization: `Bearer ${token}`
+                                    }
+                                  });
+
+                                  if (response.data.success) {
+                                    const updatedDocs = values.defaultDocuments.filter((_, i) => i !== index);
+                                    setFieldValue('defaultDocuments', updatedDocs);
+                                    // Also update initialValues to reflect changes
+                                    const updatedInitial = { ...initialValues };
+                                    updatedInitial.defaultDocuments = updatedDocs;
+                                    setInitialValues(updatedInitial);
+
+                                    toast.current.show({
+                                      severity: "success",
+                                      summary: "Document Deleted",
+                                      detail: `${doc.name || doc.originalName} deleted successfully`,
+                                      life: 3000,
+                                    });
+                                  } else {
+                                    throw new Error(response.data.message || 'Delete failed');
+                                  }
+                                } catch (error) {
+                                  console.error('Error deleting document:', error);
+                                  toast.current.show({
+                                    severity: "error",
+                                    summary: "Delete Failed",
+                                    detail: error.response?.data?.message || error.message || 'Failed to delete document',
+                                    life: 3000,
+                                  });
+                                }
+                              }}
+                            />
+                          </div>
                         </div>
                       ))}
                     </div>
