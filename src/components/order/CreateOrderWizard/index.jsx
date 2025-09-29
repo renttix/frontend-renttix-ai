@@ -351,9 +351,9 @@ function WizardContent() {
       
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 transition-all duration-300">
+        <div className="grid grid-cols-1 lg:grid-cols-3 transition-all duration-300">
           {/* Step Content */}
-          <div className={`${showOrderSummary ? 'lg:col-span-2' : 'lg:col-span-3'} transition-all duration-300`}>
+          <div className={`${showOrderSummary ? 'lg:col-span-5' : 'lg:col-span-12'} transition-all duration-300`}>
             <div className="bg-white rounded-lg shadow-sm p-6">
               <AnimatePresence mode="wait">
                 <motion.div
@@ -377,7 +377,7 @@ function WizardContent() {
           <AnimatePresence>
             {showOrderSummary && (
               <motion.div
-                className="lg:col-span-1"
+                className="lg:col-span-4"
                 initial={{ opacity: 0, x: 100 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 100 }}
