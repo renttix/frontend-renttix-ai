@@ -25,6 +25,9 @@ const IntegrationAccount = () => {
   const [taxOptions, setTaxOptions] = useState([]);
   const [selectedTax, setSelectedTax] = useState(null);
 
+  // ⬇️ NEW: sync customers from QB state
+  const [syncCustomersFromQBLoading, setSyncCustomersFromQBLoading] = useState(false);
+
   const [quickBookStatus, setQuickBookStatus] = useState(false);
 
   const { user, token } = useSelector((state) => state?.authReducer);
@@ -133,6 +136,35 @@ const IntegrationAccount = () => {
     }
   };
 
+  // ⬇️ NEW: sync customers from QuickBooks
+  const syncCustomersFromQB = async () => {
+    setSyncCustomersFromQBLoading(true);
+    try {
+      const { data } = await axios.post(
+        `${BaseURL}/integrations/qbo/customers/sync`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const stats = data?.stats || {};
+      toast.current?.show({
+        severity: data?.success ? "success" : "warn",
+        summary: "Customers Synced from QuickBooks",
+        detail: `Total: ${stats.total ?? 0}, Created: ${stats.created ?? 0}, Updated: ${stats.updated ?? 0}`,
+        life: 3500,
+      });
+    } catch (err) {
+      console.error("Customers sync from QB error:", err);
+      toast.current?.show({
+        severity: "error",
+        summary: "Sync Failed",
+        detail: err?.response?.data?.message || err.message || "Failed to sync customers from QuickBooks.",
+        life: 3500,
+      });
+    } finally {
+      setSyncCustomersFromQBLoading(false);
+    }
+  };
+
   // Load taxes on mount if connected
   useEffect(() => {
     if (!quickBookStatus && user?.isQuickBook) {
@@ -230,6 +262,14 @@ const IntegrationAccount = () => {
                           setSyncLoading(false);
                         }
                       }}
+                    />
+
+                    <Button
+                      label="Sync Customers from QuickBooks"
+                      icon="pi pi-download"
+                      className="p-button-warning"
+                      loading={syncCustomersFromQBLoading}
+                      onClick={syncCustomersFromQB}
                     />
 
                     {/* Existing: Sync Expense Accounts (Nominal Codes) */}
