@@ -382,7 +382,7 @@ export default function ConfirmAndGoStep() {
             <p className="text-sm text-gray-600">Payment Terms</p>
             <p className="font-medium">
               {formData.paymentTerm ? (
-                <Tag severity={"success"} value={formData.customerDetails.paymentTerm.name} />
+                <Tag severity={"success"} value={formData?.customerDetails?.paymentTerm?.name||''} />
               ) : (
                 <span className="text-red-500">Not Set</span>
               )}
@@ -392,7 +392,7 @@ export default function ConfirmAndGoStep() {
             <p className="text-sm text-gray-600">Invoice Run Code</p>
             <p className="font-medium">
               {formData.invoiceRunCode ? (
-                <Tag severity={"success"} value={formData.customerDetails.invoiceRunCode.name} />
+                <Tag severity={"success"} value={formData.customerDetails?.invoiceRunCode?.name ||''} />
               ) : (
                 <span className="text-red-500">Not Set</span>
               )}

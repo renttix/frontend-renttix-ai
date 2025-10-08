@@ -92,7 +92,7 @@ const Note = () => {
         <div className="p-6 flex flex-col space-y-4">
           {/* Header */}
           <div className="flex justify-between items-start">
-            <img src={`${imageBaseURL}${user?.brandLogo}`} alt="Logo" className="h-8 object-contain" />
+            <img src={`${imageBaseURL}/${user?.brandLogo}`} alt="Logo" className="h-8 object-contain" />
             <div className="text-right">
               <p className="text-sm text-gray-500 uppercase">{title}</p>
               <h2 className="text-2xl font-bold">{invoice?.invoiceNumber}</h2>

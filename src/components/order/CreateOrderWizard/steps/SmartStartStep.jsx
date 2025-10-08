@@ -218,27 +218,48 @@ export default function SmartStartStep() {
     } else {
       const deliveryDate = formData.deliveryDate || new Date();
       const returnDate = addDays(new Date(deliveryDate), value);
+      const year = returnDate.getFullYear();
+      const month = String(returnDate.getMonth() + 1).padStart(2, "0");
+      const day = String(returnDate.getDate()).padStart(2, "0");
       updateFormData({
         rentalDuration: value,
-        expectedReturnDate: returnDate.toISOString().split("T")[0],
+        expectedReturnDate: `${year}-${month}-${day}`,
         useExpectedReturnDate: true,
       });
     }
   };
 
   const handleDeliveryDateChange = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const dateStr = `${year}-${month}-${day}`;
+
     updateFormData({
-      deliveryDate: date.toISOString().split("T")[0],
-      chargingStartDate: date.toISOString().split("T")[0],
+      deliveryDate: dateStr,
     });
 
     // Update return date if duration is set
     if (formData.rentalDuration && formData.rentalDuration !== "custom") {
       const returnDate = addDays(date, formData.rentalDuration);
+      const returnYear = returnDate.getFullYear();
+      const returnMonth = String(returnDate.getMonth() + 1).padStart(2, "0");
+      const returnDay = String(returnDate.getDate()).padStart(2, "0");
       updateFormData({
-        expectedReturnDate: returnDate.toISOString().split("T")[0],
+        expectedReturnDate: `${returnYear}-${returnMonth}-${returnDay}`,
       });
     }
+  };
+
+  const handleChargingStartDateChange = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const dateStr = `${year}-${month}-${day}`;
+
+    updateFormData({
+      chargingStartDate: dateStr,
+    });
   };
 
   const validateStep = () => {
@@ -289,9 +310,12 @@ export default function SmartStartStep() {
     if (!customer) return null;
     return (
       <div className="flex items-center gap-2">
-        <div>
+        <div style={{width:"50%"}}>
+          <small>Id:{customer.customerID||''}</small>
           <div className="font-medium">{customer.name}</div>
           <div className="text-sm text-gray-500">{customer.email}</div>
+        
+     
         </div>
       </div>
     );
@@ -374,6 +398,9 @@ export default function SmartStartStep() {
                     <p className="text-sm text-gray-600">
                       {formData.customerDetails.email}
                     </p>
+                     <p className="text-sm text-gray-600">
+                      {`${formData.customerDetails.addressLine1||''} ${formData.customerDetails.city||''} ${formData.customerDetails.country||''}`}
+                    </p>
                     {formData.customerDetails.paymentTerm && (
                       <Tag
                         value={formData.customerDetails.paymentTerm.name}
@@ -450,34 +477,30 @@ export default function SmartStartStep() {
             </div>
           </div>
 
-          {/* Duration Selection */}
+          {/* Charging Start Date */}
           <div>
             <label className="mb-2 block text-sm font-medium">
-              Rental Duration
+              Charging Start Date
             </label>
-            <ContextualHelp fieldId="rentalDuration">
-              <div className="grid grid-cols-2 gap-2 md:grid-cols-6">
-                {durationPresets.map((preset) => (
-                  <Button
-                    key={preset.value}
-                    label={preset.label}
-                    className={`p-button-sm ${
-                      formData.rentalDuration === preset.value
-                        ? "p-button-primary"
-                        : "p-button-outlined"
-                    }`}
-                    onClick={() => handleDurationChange(preset.value)}
-                  />
-                ))}
-              </div>
+            <ContextualHelp fieldId="chargingStartDate">
+              <Calendar
+                value={
+                  formData.chargingStartDate
+                    ? new Date(formData.chargingStartDate)
+                    : null
+                }
+                onChange={(e) => handleChargingStartDateChange(e.value)}
+                minDate={new Date()}
+                dateFormat="dd/mm/yy"
+                showIcon
+                className="charging-start-date w-full"
+                placeholder="Select charging start date"
+              />
             </ContextualHelp>
-            {errors.duration && (
-              <small className="text-red-500">{errors.duration}</small>
-            )}
           </div>
 
           {/* Return Date */}
-          {formData.rentalDuration === "custom" && (
+          {/* {formData.rentalDuration === "custom" && ( */}
             <div>
               <label className="mb-2 block text-sm font-medium">
                 Return Date
@@ -515,7 +538,7 @@ export default function SmartStartStep() {
                 <small className="text-red-500">{errors.returnDate}</small>
               )}
             </div>
-          )}
+          {/* )} */}
 
           {/* Duration Summary */}
           {formData.deliveryDate && formData.expectedReturnDate && (

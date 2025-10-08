@@ -8,6 +8,7 @@ import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
+import { Dropdown } from "primereact/dropdown";
 import { Tag } from "primereact/tag";
 import moment from "moment";
 import Breadcrumb from "../Breadcrumbs/Breadcrumb";
@@ -24,9 +25,12 @@ import GoPrevious from "../common/GoPrevious/GoPrevious";
 import { Calendar } from "primereact/calendar";
 import { Tooltip } from "primereact/tooltip";
 import { setDefaultColumns } from "@/store/columnVisibilitySlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RiStickyNoteAddLine } from "react-icons/ri";
 import OderNotes from "./OderNotes";
+import axios from "axios";
+import { BaseURL } from "../../../utils/baseUrl";
+import Cookies from "js-cookie";
 
 export default function OrderList() {
   let emptyorder = {
@@ -62,10 +66,22 @@ export default function OrderList() {
   const [bookInProduct, setbookInProduct] = useState([]);
   const [generateRef, setgenerateRef] = useState("");
   const [refLoader, setrefLoader] = useState(false);
-  const router = useRouter();
+  const [importDialog, setImportDialog] = useState(false);
+   const [selectedFile, setSelectedFile] = useState(null);
+   const [importLoading, setImportLoading] = useState(false);
+   const [importResults, setImportResults] = useState(null);
 
-  const toast = useRef(null);
-const dispatch = useDispatch()
+   // Invoice settings state
+   const [paymentTerms, setPaymentTerms] = useState([]);
+   const [invoiceRunCodes, setInvoiceRunCodes] = useState([]);
+   const [selectedPaymentTerm, setSelectedPaymentTerm] = useState("");
+   const [selectedInvoiceRunCode, setSelectedInvoiceRunCode] = useState("");
+
+   const router = useRouter();
+
+   const toast = useRef(null);
+ const dispatch = useDispatch();
+ const { token, user } = useSelector((state) => state?.authReducer);
   const Columns = {
     orderId: "Order No",
     order: "Type",
@@ -82,6 +98,47 @@ const dispatch = useDispatch()
     dispatch(setDefaultColumns({ tableName: "Orders", columns: Object.keys(Columns) }));
   }, [dispatch]);
 
+  // Fetch invoice settings
+  const fetchInvoiceSettings = async () => {
+    if (!token) {
+      console.log("No token available for invoice settings");
+      return;
+    }
+    try {
+      console.log("Fetching invoice settings...");
+      // Fetch payment terms
+      const paymentTermsResponse = await axios.get(
+        `${BaseURL}/payment-terms`,
+        {
+          headers: { authorization: `Bearer ${token}` },
+        },
+      );
+      if (paymentTermsResponse.data.success) {
+        console.log("Payment terms loaded:", paymentTermsResponse.data.data);
+        setPaymentTerms(paymentTermsResponse.data.data || []);
+      }
+
+      // Fetch invoice run codes
+      const invoiceRunCodesResponse = await axios.get(
+        `${BaseURL}/invoice-run-code`,
+        {
+          headers: { authorization: `Bearer ${token}` },
+        },
+      );
+      if (invoiceRunCodesResponse.data.success) {
+        console.log("Invoice run codes loaded:", invoiceRunCodesResponse.data.data);
+        setInvoiceRunCodes(invoiceRunCodesResponse.data.data || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch invoice settings:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (token) {
+      fetchInvoiceSettings();
+    }
+  }, [token]);
 
   useEffect(() => {
     setloading(true);
@@ -142,12 +199,12 @@ const dispatch = useDispatch()
   const leftToolbarTemplate = () => {
     return (
       <div className="flex flex-wrap gap-2">
-        {/* <Button
-          label="Export"
+        <Button
+          label="Bulk Import"
           icon="pi pi-upload"
           className="p-button-help"
-          onClick={exportCSV}
-        /> */}
+          onClick={() => setImportDialog(true)}
+        />
 
         <ExportData route="/order/export" nameFile="order" />
       </div>
@@ -301,6 +358,85 @@ const dispatch = useDispatch()
   useEffect(() => {
     setReference(generateRef);
   }, [generateRef]);
+
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
+        toast.current.show({
+          severity: "error",
+          summary: "Invalid File",
+          detail: "Please select a valid Excel file (.xlsx or .xls)",
+          life: 3000,
+        });
+        return;
+      }
+      setSelectedFile(file);
+    }
+  };
+
+  const handleBulkImport = async () => {
+    if (!selectedFile) {
+      toast.current.show({
+        severity: "error",
+        summary: "No File Selected",
+        detail: "Please select a file to import",
+        life: 3000,
+      });
+      return;
+    }
+
+    setImportLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('xlsxFile', selectedFile);
+      formData.append('paymentTerm', selectedPaymentTerm);
+      formData.append('invoiceRunCode', selectedInvoiceRunCode);
+
+      // Use axios directly to avoid default content-type header
+      const token = Cookies.get("xpdx");
+      const response = await axios.post(`${BaseURL}/order/bulk-import`, formData, {
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : undefined,
+          // Let browser set content-type automatically for FormData
+        },
+        timeout: 30000, // Longer timeout for file upload
+      });
+
+      if (response.data.success) {
+        setImportResults(response.data.data);
+        toast.current.show({
+          severity: "success",
+          summary: "Import Completed",
+          detail: `Created ${response.data.data.created} orders, skipped ${response.data.data.skipped}`,
+          life: 5000,
+        });
+
+        // Refresh the orders list
+        setloading(true);
+        const ordersResponse = await apiServices.get("/order/get-all-orders", {
+          search: debouncedSearch,
+          page,
+          limit: rows,
+        });
+        setTotalRecords(ordersResponse.data.pagination.total);
+        setorders(ordersResponse.data.data);
+        setloading(false);
+      }
+    } catch (error) {
+      console.error("Bulk import error:", error);
+      toast.current.show({
+        severity: "error",
+        summary: "Import Failed",
+        detail: error.response?.data?.message || "An error occurred during import",
+        life: 5000,
+      });
+    } finally {
+      setImportLoading(false);
+    }
+  };
 
   const renderColumnsBody = (field, item) => {
     switch (field) {
@@ -592,6 +728,127 @@ const dispatch = useDispatch()
           {order && (
             <span>Are you sure you want to delete the selected Orders?</span>
           )}
+        </div>
+      </Dialog>
+
+      <Dialog
+        visible={importDialog}
+        style={{ width: "50rem" }}
+        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
+        header="Bulk Import Orders"
+        modal
+        onHide={() => {
+          setImportDialog(false);
+          setSelectedFile(null);
+          setImportResults(null);
+        }}
+      >
+        <div className="flex flex-col gap-4">
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Upload Excel File</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Select an Excel file (.xlsx or .xls) to import orders. The file should contain columns:
+              <strong> name ID, product, address, Date out, Date In, Ref Code, Quantity/Qty</strong>
+            </p>
+
+            <div className="flex items-center gap-4">
+              <input
+                type="file"
+                accept=".xlsx,.xls"
+                onChange={handleFileSelect}
+                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+            </div>
+
+            {selectedFile && (
+              <p className="mt-2 text-sm text-green-600">
+                Selected: {selectedFile.name}
+              </p>
+            )}
+          </div>
+
+          {importResults && (
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="font-semibold mb-2">Import Results</h4>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-green-600 font-medium">Created:</span> {importResults.created} orders
+                </div>
+                <div>
+                  <span className="text-orange-600 font-medium">Skipped:</span> {importResults.skipped} groups
+                </div>
+              </div>
+
+              {importResults.problems && importResults.problems.length > 0 && (
+                <div className="mt-4">
+                  <h5 className="font-medium text-red-600 mb-2">Problems:</h5>
+                  <div className="max-h-40 overflow-y-auto">
+                    {importResults.problems.map((problem, index) => (
+                      <div key={index} className="text-xs bg-red-50 p-2 rounded mb-1">
+                        {problem.groupKey ? `${problem.groupKey}: ` : ''}{problem.issue}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="mt-6 space-y-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Payment Terms <span className="text-red-500">*</span>
+                </label>
+                <Dropdown
+                  value={selectedPaymentTerm}
+                  onChange={(e) => setSelectedPaymentTerm(e.value)}
+                  options={paymentTerms}
+                  optionLabel="name"
+                  optionValue="_id"
+                  placeholder="Select payment terms"
+                  className="w-full"
+                  showClear
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Invoice Run Code <span className="text-red-500">*</span>
+                </label>
+                <Dropdown
+                  value={selectedInvoiceRunCode}
+                  onChange={(e) => setSelectedInvoiceRunCode(e.value)}
+                  options={invoiceRunCodes}
+                  optionLabel="name"
+                  optionValue="_id"
+                  placeholder="Select invoice run code"
+                  className="w-full"
+                  showClear
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 mt-6">
+             <CanceButton
+               onClick={() => {
+                 setImportDialog(false);
+                 setSelectedFile(null);
+                 setImportResults(null);
+                 setSelectedPaymentTerm("");
+                 setSelectedInvoiceRunCode("");
+               }}
+             />
+             <Button
+               label="Import Orders"
+               icon="pi pi-upload"
+               loading={importLoading}
+               onClick={handleBulkImport}
+               disabled={!selectedFile || !selectedPaymentTerm || !selectedInvoiceRunCode}
+               className="p-button-success"
+             />
+           </div>
         </div>
       </Dialog>
     </div>

@@ -442,6 +442,28 @@ const Customer360View = () => {
             </div>
           </div>
         </div>
+          <div className="glass-card stat-card">
+          <div className="stat-icon-wrapper green">
+            <FiDollarSign className="stat-icon" />
+          </div>
+          <div className="stat-content">
+            <h3 className="stat-value">{formatCurrency(customer.openBalance, user?.currencyKey)}</h3>
+            <p className="stat-label">Open Balance</p>
+           
+          </div>
+       
+        </div>
+           <div className="glass-card stat-card">
+          <div className="stat-icon-wrapper green">
+            <FiDollarSign className="stat-icon" />
+          </div>
+          <div className="stat-content">
+            <h3 className="stat-value">{formatCurrency(stats.overduePayment, user?.currencyKey)}</h3>
+            <p className="stat-label">OverDue Payment</p>
+         
+          </div>
+       
+        </div>
         <div className="glass-card stat-card">
           <div className="stat-icon-wrapper blue">
             <FiPackage className="stat-icon" />
@@ -467,7 +489,9 @@ const Customer360View = () => {
               <span className="trend-value positive">+12%</span>
             </div>
           </div>
+       
         </div>
+         
 
         <div className="glass-card stat-card">
           <div className="stat-icon-wrapper orange">
