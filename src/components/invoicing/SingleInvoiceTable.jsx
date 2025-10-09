@@ -62,7 +62,7 @@ export default function SingleInvoiceTable({ columnData }) {
         <Column
           field="price"
           header="Price"
-          body={(item) => <span>{formatCurrency(item.price, currency)}</span>}
+          body={(item) => <span>{formatCurrency(item.price, currency)}/{item.rate==="weekly"?'week':'day'}</span>}
         />
         <Column
           field="vat"

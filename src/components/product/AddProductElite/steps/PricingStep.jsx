@@ -200,30 +200,59 @@ export default function PricingStep({
             <TabView>
               <TabPanel header="Simple Pricing" leftIcon="pi pi-dollar">
                 <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Daily Rental Rate <span className="text-red-500">*</span>
-                    </label>
-                    <div className="p-inputgroup">
-                      <span className="p-inputgroup-addon bg-gray-100">
-                        {user?.currencyKey || '$'}
-                      </span>
-                      <InputNumber
-                        value={formData.rentPrice}
-                        onValueChange={(e) => updateFormData({ rentPrice: e.value })}
-                        mode="currency"
-                        currency={user?.currencyKey || 'USD'}
-                        locale="en-US"
-                        placeholder="0.00"
-                        className={`flex-1 ${errors.rentPrice ? 'p-invalid' : ''}`}
-                      />
-                      <span className="p-inputgroup-addon bg-gray-100">
-                        per day
-                      </span>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Rental Rate <span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex gap-3">
+                        <div className="flex-1">
+                          <div className="p-inputgroup">
+                            <span className="p-inputgroup-addon bg-gray-100">
+                              {user?.currencyKey || '$'}
+                            </span>
+                            <InputNumber
+                              value={formData.rentPrice}
+                              onValueChange={(e) => updateFormData({ rentPrice: e.value })}
+                              mode="currency"
+                              currency={user?.currencyKey || 'USD'}
+                              locale="en-US"
+                              placeholder="0.00"
+                              className={`flex-1 ${errors.rentPrice ? 'p-invalid' : ''}`}
+                            />
+                          </div>
+                        </div>
+                        <div className="w-32">
+                          <Dropdown
+                            value={formData.rate || 'daily'}
+                            onChange={(e) => updateFormData({ rate: e.value })}
+                            options={[
+                              { label: 'Daily', value: 'daily' },
+                              { label: 'Weekly', value: 'weekly' }
+                            ]}
+                            optionLabel="label"
+                            optionValue="value"
+                            placeholder="Select period"
+                            className={`w-full ${errors.rate ? 'p-invalid' : ''}`}
+                          />
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center mt-1">
+                        <small className="text-gray-500 text-xs">
+                          Enter the rate for the selected period
+                        </small>
+                        {formData.rate && (
+                          <small className="text-gray-500 text-xs">
+                            {formData.rate === 'weekly' && formData.rentPrice ?
+                              `Daily equivalent: ${user?.currencyKey || '$'}${(formData.rentPrice / 7).toFixed(2)}` : ''
+                            }
+                          </small>
+                        )}
+                      </div>
+                      {errors.rentPrice && (
+                        <small className="text-red-500 text-xs mt-1">{errors.rentPrice}</small>
+                      )}
                     </div>
-                    {errors.rentPrice && (
-                      <small className="text-red-500 text-xs mt-1">{errors.rentPrice}</small>
-                    )}
                   </div>
                   
                   <Button
@@ -440,7 +469,7 @@ export default function PricingStep({
             <div className="flex justify-between">
               <span className="text-gray-600">Tax ({selectedTaxClass?.taxRate}%):</span>
               <span className="font-medium text-gray-900">
-                {user?.currencyKey || '$'} {( selectedTaxClass?.taxRate / 100)*(formData.status === "Rental" ? formData.rentPrice : formData.salePrice).toFixed(2)}
+                {user?.currencyKey || '$'} {( selectedTaxClass?.taxRate / 100)*(formData.status === "Rental" ? formData.rentPrice : formData.salePrice)?.toFixed(2)}
               </span>
             </div>
             <div className="border-t pt-2 flex justify-between">

@@ -26,6 +26,7 @@ const RateDefinatonModal = ({refreshParent}) => {
     rateType: "Percentage",
     isActive: false,
     dayRates: Array(7).fill({ active: false, rate: "" }),
+    partialWeeksHandling: "chargePerDay", // "chargePerDay" or "roundUpToFullWeek"
   });
 
   const toast = React.useRef(null);
@@ -70,6 +71,7 @@ const RateDefinatonModal = ({refreshParent}) => {
         minimumRentalPeriod: 1,
         rateType: "Percentage",
         isActive: false,
+        partialWeeksHandling: "chargePerDay",
     })
     setVisible(false)
       setloading(false);
@@ -261,7 +263,40 @@ const RateDefinatonModal = ({refreshParent}) => {
                 placeholder="5"
               />
             </div>
-     </div>
+
+            {/* Partial Weeks (Remainder Days) */}
+            <div className="field">
+              <label className="text-[0.9em] font-bold text-black mb-3 block">
+                Partial Weeks (Remainder Days) <span className="text-gray-500 text-sm">(?)</span>
+              </label>
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-4">
+                  <RadioButton
+                    inputId="chargePerDay"
+                    name="partialWeeksHandling"
+                    value="chargePerDay"
+                    onChange={(e) => handleChange(e, "partialWeeksHandling")}
+                    checked={formData.partialWeeksHandling === "chargePerDay"}
+                  />
+                  <label htmlFor="chargePerDay" className="text-[0.9em] font-medium text-black cursor-pointer">
+                    Charge per day
+                  </label>
+                </div>
+                <div className="flex items-center gap-4">
+                  <RadioButton
+                    inputId="roundUpToFullWeek"
+                    name="partialWeeksHandling"
+                    value="roundUpToFullWeek"
+                    onChange={(e) => handleChange(e, "partialWeeksHandling")}
+                    checked={formData.partialWeeksHandling === "roundUpToFullWeek"}
+                  />
+                  <label htmlFor="roundUpToFullWeek" className="text-[0.9em] font-medium text-black cursor-pointer">
+                    Round up to full week
+                  </label>
+                </div>
+              </div>
+            </div>
+            </div>
 
             {/* Submit Button */}
             <div className="flex justify-end gap-5">

@@ -111,6 +111,39 @@ export default function ProductBuilderStep() {
     [formData.chargingStartDate, formData.expectedReturnDate]
   );
 
+  // Helper function to get product rate info (daily or weekly)
+  const getProductRateInfo = useCallback((product) => {
+    // Check if product has weekly rate (from product data or rate definition)
+    const isWeekly = product.rate === 'weekly';
+    console.log({isWeekly,product})
+    const rate = product.rentPrice || product.price || 0;
+    const period = isWeekly ? 'weekly' : 'daily';
+
+    return { rate, period, isWeekly };
+  }, []);
+
+  // Calculate chargeable units (days or weeks) for a product
+  const chargeableUnitsForProduct = useCallback(
+    (product) => {
+      const { isWeekly } = getProductRateInfo(product);
+      const chargeableDays = chargeableDaysForProduct(product);
+      const rentalDaysPerWeek = product.rentalDaysPerWeek || product?.rateDefinition?.rentalDaysPerWeek || 7;
+console.log()
+      if (isWeekly) {
+        // For weekly rates, minimum period is in weeks, not days
+        const minimumWeeks = 1;
+        // Convert days to weeks for weekly rate products using rate definition's days per week
+        const calculatedWeeks = Math.ceil(chargeableDays / rentalDaysPerWeek);
+        return Math.max(calculatedWeeks, minimumWeeks);
+      }
+
+      // For daily rates, minimum period is in days (existing behavior)
+      const minimumDays = product.minimumRentalPeriod || 1;
+      return Math.max(chargeableDays, minimumDays);
+    },
+    [chargeableDaysForProduct, getProductRateInfo]
+  );
+
   // Initialize product assets from selected products
   useEffect(() => {
     const assets = {};
@@ -286,6 +319,7 @@ export default function ProductBuilderStep() {
             product: product._id,
             price: product.rentPrice || product.salePrice || 0,
             salePrice: product.salePrice,
+            rate:product.rate,
             taxRate: product?.taxClass?.taxRate,
             xeroTaxTypeId: product?.taxClass?.xeroTaxTypeId,
             quickBooksTaxId: product?.taxClass?.quickBooksTaxId,
@@ -319,10 +353,11 @@ export default function ProductBuilderStep() {
         // If salePrice exists → just multiply by quantity
         return total + product.quantity * salePriceNum;
       } else {
-        // Otherwise → use rental calculation with tax and chargeable days
-        const minDays = chargeableDaysForProduct(product);
+        // Otherwise → use rental calculation with tax and chargeable units (days or weeks)
+        const { rate, isWeekly } = getProductRateInfo(product);
+        const chargeableUnits = chargeableUnitsForProduct(product);
 
-        const baseAmount = product.quantity * product.dailyRate * minDays;
+        const baseAmount = product.quantity * rate * chargeableUnits;
 
         const tax = baseAmount * (product.taxRate / 100);
 
@@ -443,8 +478,9 @@ export default function ProductBuilderStep() {
         if (hasSalePrice) {
           productTotal = product.quantity * salePriceNum;
         } else {
-          const minDays = chargeableDaysForProduct(product);
-          const baseAmount = product.quantity * product.dailyRate * minDays;
+          const { rate, isWeekly } = getProductRateInfo(product);
+          const chargeableUnits = chargeableUnitsForProduct(product);
+          const baseAmount = product.quantity * rate * chargeableUnits;
           productTotal = baseAmount;
         }
 
@@ -548,7 +584,12 @@ export default function ProductBuilderStep() {
   };
 
   const priceBodyTemplate = (product) => {
-    return <span>{formatCurrency(product.rentPrice || product.salePrice)} {product.rentPrice ? "/day" : ""}</span>;
+    if (product.salePrice) {
+      return <span>{formatCurrency(product.salePrice)}</span>;
+    }
+
+    const { rate, period } = getProductRateInfo(product);
+    return <span>{formatCurrency(rate)} /{period === 'weekly' ? 'week' : 'day'}</span>;
   };
 
   const stockBodyTemplate = (product) => {
@@ -593,7 +634,7 @@ export default function ProductBuilderStep() {
             {formatCurrency(
               selectedAssets.length *
                 productPrice *
-                (product.salePrice ? 1 : chargeableDaysForProduct(product))
+                (product.salePrice ? 1 : chargeableUnitsForProduct(product))
             )}
           </span>
         )}
@@ -725,9 +766,11 @@ export default function ProductBuilderStep() {
               const salePriceNum = Number(product.salePrice);
               const hasSalePrice = !isNaN(salePriceNum) && salePriceNum > 0;
 
-              const minRentalDays = chargeableDaysForProduct(product);
-
-              const rentalBase = product.quantity * product.dailyRate * minRentalDays;
+              // Use the new weekly rate calculation logic
+              const { rate, isWeekly } = getProductRateInfo(product);
+              const chargeableUnits = chargeableUnitsForProduct(product);
+console.log({chargeableUnits})
+              const rentalBase = product.quantity * rate * chargeableUnits;
               const rentalTax = rentalBase * (product.taxRate / 100);
               const rentalTotal = rentalBase + rentalTax;
 
@@ -757,11 +800,13 @@ export default function ProductBuilderStep() {
                             // RENTAL ITEM DISPLAY
                             <>
                               <p className="text-sm text-gray-500">
-                                {product.quantity} assets × {formatCurrency(product.dailyRate)}/day × {minRentalDays} days + {product.taxRate}% tax
+                                {product.quantity} assets × {formatCurrency(rate)}/{isWeekly ? 'week' : 'day'} × {chargeableUnits} {isWeekly ? 'weeks' : 'days'} + {product.taxRate}% tax
                               </p>
-                              <p className="text-sm text-red-500">
-                                Minimum rental period {product.minimumRentalPeriod} days
-                              </p>
+                              {!isWeekly && (
+                                <p className="text-sm text-red-500">
+                                  Minimum rental period {product.minimumRentalPeriod} days
+                                </p>
+                              )}
                             </>
                           )}
                         </div>

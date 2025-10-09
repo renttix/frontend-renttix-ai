@@ -384,7 +384,7 @@ const [assetDialogVisible, setAssetDialogVisible] = useState(false);
         <Column field="price" header="Price" body={(item=>(
           <>
           
-          <label htmlFor="">{formatCurrency(item?.price,user?.currencyKey)}</label></>
+          <label htmlFor="">{formatCurrency(item?.price,user?.currencyKey)}/{item.rate==="weekly"?'week':'day'}</label></>
         ))} />
         <Column
           field="taxRate"

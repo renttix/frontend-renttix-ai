@@ -71,6 +71,39 @@ export default function ConfirmAndGoStep() {
     [formData.chargingStartDate, formData.deliveryDate, formData.expectedReturnDate]
   );
 
+  // Helper function to get product rate info (daily or weekly)
+  const getProductRateInfo = useCallback((product) => {
+    // Check if product has weekly rate (from product data or rate definition)
+    const isWeekly = product.rate === 'weekly' ||
+                     (product.rateDefinition && product.rateDefinition.unit === 'week');
+    const rate = product.rentPrice || product.price || 0;
+    const period = isWeekly ? 'weekly' : 'daily';
+
+    return { rate, period, isWeekly };
+  }, []);
+
+  // Calculate chargeable units (days or weeks) for a product
+  const chargeableUnitsForProduct = useCallback(
+    (product) => {
+      const { isWeekly } = getProductRateInfo(product);
+      const chargeableDays = chargeableDaysForProduct(product);
+      const rentalDaysPerWeek = product.rentalDaysPerWeek || product?.rateDefinition?.rentalDaysPerWeek || 7;
+
+      if (isWeekly) {
+        // For weekly rates, minimum period is in weeks, not days
+        const minimumWeeks =  1;
+        // Convert days to weeks for weekly rate products using rate definition's days per week
+        const calculatedWeeks = Math.ceil(chargeableDays / rentalDaysPerWeek);
+        return Math.max(calculatedWeeks, minimumWeeks);
+      }
+
+      // For daily rates, minimum period is in days (existing behavior)
+      const minimumDays = product.minimumRentalPeriod || 1;
+      return Math.max(chargeableDays, minimumDays);
+    },
+    [chargeableDaysForProduct, getProductRateInfo]
+  );
+
   // ---- Pricing -------------------------------------------------------------
 
   const calculatePricing = () => {
@@ -84,8 +117,10 @@ export default function ConfirmAndGoStep() {
       if (hasSalePrice) {
         subtotal += product.quantity * salePriceNum;
       } else {
-        const billableDays = chargeableDaysForProduct(product);
-        const baseAmount = product.quantity * product.dailyRate * billableDays;
+        // Use the new weekly rate calculation logic
+        const { rate, isWeekly } = getProductRateInfo(product);
+        const chargeableUnits = chargeableUnitsForProduct(product);
+        const baseAmount = product.quantity * rate * chargeableUnits;
         const taxAmount = baseAmount * (Number(product.taxRate) / 100);
 
         subtotal += baseAmount;
@@ -220,8 +255,10 @@ export default function ConfirmAndGoStep() {
             const salePriceNum = Number(product.salePrice);
             const hasSalePrice = !isNaN(salePriceNum) && salePriceNum > 0;
 
-            const billableDays = hasSalePrice ? 0 : chargeableDaysForProduct(product);
-            const baseAmount = hasSalePrice ? 0 : product.quantity * product.dailyRate * billableDays;
+            // Use the new weekly rate calculation logic
+            const { rate, isWeekly } = getProductRateInfo(product);
+            const chargeableUnits = hasSalePrice ? 0 : chargeableUnitsForProduct(product);
+            const baseAmount = hasSalePrice ? 0 : product.quantity * rate * chargeableUnits;
             const taxAmount = hasSalePrice ? 0 : baseAmount * (Number(product.taxRate) / 100);
 
             return (
@@ -247,7 +284,7 @@ export default function ConfirmAndGoStep() {
                         </span>
                       ) : (
                         <span>
-                          {product.quantity} × {formatCurrency(product.dailyRate, user?.currencyKey)}/day +{" "}
+                          {product.quantity} × {formatCurrency(rate, user?.currencyKey)}/{isWeekly ? 'week' : 'day'} +{" "}
                           {product.taxRate}% tax
                         </span>
                       )}
@@ -265,8 +302,8 @@ export default function ConfirmAndGoStep() {
 
                     {!hasSalePrice && (
                       <div className="text-xs text-gray-500 mt-1">
-                        Billed days: {billableDays}
-                        {product?.minimumRentalPeriod
+                        Billed {isWeekly ? 'weeks' : 'days'}: {chargeableUnits}
+                        {!isWeekly && product?.minimumRentalPeriod
                           ? ` (min ${product.minimumRentalPeriod} days applied)`
                           : ""}
                       </div>

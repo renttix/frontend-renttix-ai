@@ -86,7 +86,7 @@ export default function AddProductElite() {
     height: "",
 
     // Additional fields
-    rate: "daily",
+    rate: "",
     range: "",
     vat: "",
 

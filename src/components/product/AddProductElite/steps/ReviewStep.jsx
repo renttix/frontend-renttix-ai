@@ -46,7 +46,7 @@ export default function ReviewStep({
 
       const selectedTaxClass = taxClasses?.find(tc => tc._id === formData.taxClass);
 
-  
+  console.log({formData})
   const getValidationStatus = () => {
     const issues = [];
     console.log({formData})
@@ -245,7 +245,7 @@ export default function ReviewStep({
               <p className="text-2xl font-bold text-green-700">
                 {formatPrice(formData.salePrice ||formData.rentPrice || 0)}
                 <span className="text-sm font-normal text-gray-600 ml-2">
-                  per {formData.priceUnit || 'day'}
+                  per {formData.rate || 'day'}
                 </span>
               </p>
             </div>
